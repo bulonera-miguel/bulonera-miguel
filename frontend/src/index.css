@@ -1,0 +1,9 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: "Barlow", sans-serif;
+  background: #07111F;
+  color: #C8E4F4;
+  overflow: hidden;
+}

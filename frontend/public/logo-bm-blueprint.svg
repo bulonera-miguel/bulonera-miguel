@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 70" fill="none">
+
+  <!-- ========== ÍCONO: estilo línea fina / blueprint cian ========== -->
+
+  <!-- Hexágono exterior -->
+  <polygon points="35,4 57,16 57,42 35,54 13,42 13,16"
+    fill="none"
+    stroke="#00C8F0"
+    stroke-width="1.4"
+    opacity="0.9"/>
+
+  <!-- Hexágono interior (relieve blueprint) -->
+  <polygon points="35,11 51,20 51,38 35,47 19,38 19,20"
+    fill="none"
+    stroke="#00C8F0"
+    stroke-width="0.6"
+    opacity="0.35"/>
+
+  <!-- Punto central de mira -->
+  <circle cx="35" cy="29" r="2.2"
+    fill="none"
+    stroke="#00C8F0"
+    stroke-width="1"
+    opacity="0.8"/>
+  <circle cx="35" cy="29" r="0.7"
+    fill="#00C8F0"
+    opacity="0.9"/>
+
+  <!-- Cruz de mira -->
+  <line x1="35" y1="25" x2="35" y2="27"   stroke="#00C8F0" stroke-width="0.7" opacity="0.6"/>
+  <line x1="35" y1="31" x2="35" y2="33"   stroke="#00C8F0" stroke-width="0.7" opacity="0.6"/>
+  <line x1="31" y1="29" x2="33" y2="29"   stroke="#00C8F0" stroke-width="0.7" opacity="0.6"/>
+  <line x1="37" y1="29" x2="39" y2="29"   stroke="#00C8F0" stroke-width="0.7" opacity="0.6"/>
+
+  <!-- Vástago superior -->
+  <line x1="35" y1="4"  x2="35" y2="11"
+    stroke="#00C8F0" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Cabeza del tornillo (líneas de rosca) -->
+  <line x1="29" y1="14" x2="41" y2="14"   stroke="#00C8F0" stroke-width="0.7" opacity="0.5"/>
+  <line x1="29" y1="16" x2="41" y2="16"   stroke="#00C8F0" stroke-width="0.7" opacity="0.5"/>
+  <line x1="29" y1="18" x2="41" y2="18"   stroke="#00C8F0" stroke-width="0.7" opacity="0.5"/>
+
+  <!-- Vástago inferior -->
+  <line x1="35" y1="47" x2="35" y2="54"
+    stroke="#00C8F0" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Tuerca inferior (hexágono pequeño) -->
+  <polygon points="35,56 40,59 40,64 35,67 30,64 30,59"
+    fill="none"
+    stroke="#00C8F0"
+    stroke-width="1"
+    opacity="0.7"/>
+
+  <!-- ========== TEXTOS ========== -->
+
+  <!-- Texto "Bulonera Miguel" -->
+  <text x="70" y="32"
+    font-family="'Arial Narrow', 'Barlow Condensed', 'Liberation Sans Narrow', Arial, sans-serif"
+    font-size="22" font-weight="700"
+    fill="#E8F4FF"
+    letter-spacing="0.5">Bulonera Miguel</text>
+
+  <!-- Subtítulo "Sistema de Gestión" -->
+  <text x="71" y="48"
+    font-family="'Arial Narrow', 'Barlow Condensed', 'Liberation Sans Narrow', Arial, sans-serif"
+    font-size="11" font-weight="400"
+    fill="#00C8F0"
+    letter-spacing="2.5"
+    opacity="0.85">SISTEMA DE GESTIÓN</text>
+
+</svg>

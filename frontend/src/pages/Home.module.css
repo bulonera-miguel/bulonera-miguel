@@ -1,0 +1,311 @@
+/* ============================================================
+   BULONERA MIGUEL — Sistema de Gestión
+   Home.module.css — Estilos de la página Home (ex portada.css)
+   ============================================================ */
+
+/* ── FONDO GRILLA ── */
+.gridBg {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,180,220,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,180,220,0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── RESPLANDOR CENTRAL ── */
+.centerGlow {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,180,220,0.06) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── LÍNEA DE ESCANEO ── */
+.scan {
+  position: fixed; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,200,240,0.06) 15%,
+    rgba(0,200,240,0.22) 50%,
+    rgba(0,200,240,0.06) 85%,
+    transparent 100%);
+  box-shadow: 0 0 6px rgba(0,200,240,0.10);
+  animation: scan 10s linear infinite;
+  pointer-events: none; z-index: 200;
+}
+@keyframes scan { 0%{top:-1px} 100%{top:100vh} }
+
+/* ── ESQUINAS HUD ── */
+.hud { position: fixed; pointer-events: none; z-index: 60; width: 44px; height: 44px; }
+.tl { top:28px; left:28px;   border-top:1.5px solid #00C8F0; border-left:1.5px solid #00C8F0; }
+.tr { top:28px; right:28px;  border-top:1.5px solid #00C8F0; border-right:1.5px solid #00C8F0; }
+.bl { bottom:28px; left:28px;  border-bottom:1.5px solid #00C8F0; border-left:1.5px solid #00C8F0; }
+.br { bottom:28px; right:28px; border-bottom:1.5px solid #00C8F0; border-right:1.5px solid #00C8F0; }
+
+/* ── CONTENEDOR PRINCIPAL ── */
+.page {
+  position: relative; z-index: 10;
+  margin: 28px;
+  height: calc(100vh - 56px);
+  display: grid;
+  grid-template-rows: 68px 1fr;
+  /*grid-template-rows: 76px 1fr;*/
+}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  /*padding: 0 24px;*/
+  padding: 6px 24px;
+  border-bottom: 1px solid rgba(0,200,240,0.18);
+}
+
+.logo { display: flex; align-items: center; gap: 12px; }
+/*.logoImg { height: 54px; width: auto; object-fit: contain; }*/
+.logoImg { height: 68px; width: auto; object-fit: contain; }
+
+.navLinks { display: flex; gap: 32px; list-style: none; }
+.navLinks a {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.80); text-decoration: none; transition: color 0.2s;
+}
+.navLinks a:hover { color: #00C8F0; }
+.navLinks .active { color: #00C8F0; border-bottom: 1px solid #00C8F0; padding-bottom: 2px; }
+
+.navRight { display: flex; align-items: center; gap: 18px; }
+.statusPill {
+  display: flex; align-items: center; gap: 7px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1.5px; color: rgba(200,228,244,0.80);
+}
+.dotLive {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00E87A;
+  box-shadow: 0 0 8px rgba(0,232,122,0.6);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.btnNav {
+  padding: 9px 22px;
+  border: 1.5px solid #00C8F0; background: transparent; color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
+  transition: all 0.25s; position: relative; overflow: hidden;
+}
+.btnNav::before { content:""; position:absolute; inset:0; background:#00C8F0; opacity:0; transition:opacity 0.25s; }
+.btnNav:hover { color: #07111F; }
+.btnNav:hover::before { opacity: 1; }
+.btnNav span { position: relative; z-index: 1; }
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero {
+  display: grid;
+  grid-template-columns: 290px 1fr 350px;
+  align-items: center;
+  padding: 16px 24px 18px;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── COLUMNA IZQUIERDA ── */
+.heroLeft { display: flex; flex-direction: column; gap: 13px; }
+
+.statCard {
+  padding: 15px 18px;
+  background: rgba(0,200,240,0.06); border: 1px solid rgba(0,200,240,0.18);
+  position: relative; overflow: hidden;
+}
+.statCard::before {
+  content:""; position:absolute; top:0; left:0;
+  width:3px; height:100%; background:#00C8F0; opacity:0.6;
+}
+.statCardLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.70); margin-bottom: 4px;
+}
+.statCardNum {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 44px; letter-spacing: 2px; color: #EAF4FF; line-height: 1;
+}
+.statCardSub { font-size: 13px; font-weight: 300; color: rgba(200,228,244,0.80); margin-top: 3px; }
+
+.sysGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: rgba(0,200,240,0.18); border: 1px solid rgba(0,200,240,0.18);
+}
+.sysCell { background: #07111F; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.sysCellLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(200,228,244,0.70);
+}
+.sysCellVal { font-family: "Barlow Condensed", sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+.green { color: #00E87A; }
+.amber { color: #FFB830; }
+.cyan  { color: #00C8F0; }
+.red   { color: #FF4444; }
+
+/* ── COLUMNA CENTRAL ── */
+.heroCenter {
+  display: flex; align-items: center; justify-content: center;
+  position: relative; height: 100%;
+  padding-left: 36px;
+}
+.boltWrap {
+  position: relative; width: 240px;
+  animation: levitate 5s ease-in-out infinite;
+}
+@keyframes levitate { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+
+.ring1, .ring2 {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); border-radius: 50%; pointer-events: none;
+}
+.ring1 { width: 258px; height: 258px; border: 1px solid rgba(0,200,240,0.07); animation: spin 28s linear infinite; }
+.ring2 { width: 210px; height: 210px; border: 1px dashed rgba(0,200,240,0.05); animation: spin 18s linear infinite reverse; }
+@keyframes spin { to{transform:translate(-50%,-50%) rotate(360deg)} }
+
+/* Anotaciones del bulón */
+.co {
+  position: absolute;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #7FDFFF;
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.coVal { font-family: "Bebas Neue", sans-serif; font-size: 14px; color: #EAF4FF; letter-spacing: 1px; }
+.coLine { height: 1px; background: #7FDFFF; opacity: 0.55; }
+
+.L1 { top: 10%; left: -132px; flex-direction: column; align-items: flex-end; gap: 2px; }
+.L1 .coInner { display: flex; align-items: center; gap: 5px; }
+.L1 .coLine { width: 48px; }
+.L2 { top: 41%; left: -128px; flex-direction: column; align-items: flex-end; gap: 2px; }
+.L2 .coInner { display: flex; align-items: center; gap: 5px; }
+.L2 .coLine { width: 44px; }
+.L3 { bottom: 20%; left: -120px; flex-direction: column; align-items: flex-end; gap: 2px; }
+.L3 .coInner { display: flex; align-items: center; gap: 5px; }
+.L3 .coLine { width: 40px; }
+
+.R1 { top: 10%; right: -128px; flex-direction: column; align-items: flex-start; gap: 2px; }
+.R1 .coInner { display: flex; align-items: center; gap: 5px; flex-direction: row-reverse; }
+.R1 .coLine { width: 48px; }
+.R2 { top: 41%; right: -124px; flex-direction: column; align-items: flex-start; gap: 2px; }
+.R2 .coInner { display: flex; align-items: center; gap: 5px; flex-direction: row-reverse; }
+.R2 .coLine { width: 44px; }
+.R3 { bottom: 20%; right: -120px; flex-direction: column; align-items: flex-start; gap: 2px; }
+.R3 .coInner { display: flex; align-items: center; gap: 5px; flex-direction: row-reverse; }
+.R3 .coLine { width: 40px; }
+
+.coVal.critico { color: #FF4444; animation: blinkRed 1.5s ease-in-out infinite; }
+.coVal.alerta  { color: #FFB830; }
+@keyframes blinkRed { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* Panel producto crítico */
+.productoPanel {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,200,240,0.05); border: 1px solid rgba(0,200,240,0.20);
+  padding: 8px 16px; text-align: center; min-width: 220px;
+}
+.productoPanelTag {
+  font-family: "Barlow Condensed", sans-serif; font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; color: #FF4444; margin-bottom: 3px;
+  animation: blinkRed 1.5s ease-in-out infinite;
+}
+.productoPanelNombre {
+  font-family: "Barlow Condensed", sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 1px; color: #EAF4FF;
+}
+
+/* ── COLUMNA DERECHA ── */
+.heroRight {
+  display: flex; flex-direction: column; gap: 14px;
+  align-items: flex-start; padding-left: 26px;
+}
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+  color: #00C8F0; opacity: 0.75;
+}
+.eyebrow::before { content:""; width:20px; height:1px; background:#00C8F0; opacity:0.7; }
+
+.heroTitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(48px, 4.6vw, 64px); letter-spacing: 3px; line-height: 0.93;
+  color: #EAF4FF;
+}
+.tCyan { display: block; color: #00C8F0; text-shadow: 0 0 36px rgba(0,200,240,0.35); }
+.tDim  { display: block; font-size: 55%; color: rgba(200,228,244,0.80); letter-spacing: 6px; }
+
+.heroDesc {
+  font-size: 14px; font-weight: 300; line-height: 1.8;
+  color: rgba(200,228,244,0.80); max-width: 295px;
+  padding-left: 13px; border-left: 2px solid rgba(0,200,240,0.22);
+}
+
+.ctaRow { display: flex; gap: 11px; align-items: center; }
+
+.btnCta {
+  padding: 13px 26px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 20px rgba(0,200,240,0.25);
+}
+.btnCta::after {
+  content:""; position:absolute; top:0; left:-80px; width:50px; height:100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+  animation: sheen 3s 1s infinite;
+}
+@keyframes sheen { 0%{left:-80px} 40%,100%{left:130%} }
+.btnCta:hover { transform: translateY(-2px); box-shadow: 0 4px 24px rgba(0,200,240,0.4); }
+
+.btnDemo {
+  padding: 13px 22px; background: transparent;
+  border: 1.5px solid rgba(0,200,240,0.28); color: rgba(200,228,244,0.80);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.22s;
+}
+.btnDemo:hover { border-color: rgba(0,200,240,0.65); color: #00C8F0; }
+
+.chips { display: flex; gap: 9px; max-width: 295px; }
+.chip {
+  flex: 1; padding: 8px 12px;
+  background: rgba(0,200,240,0.06); border: 1px solid rgba(0,200,240,0.16);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1.5px; color: rgba(200,228,244,0.80);
+  display: flex; align-items: center; gap: 5px;
+  justify-content: center; white-space: nowrap;
+}
+.chip strong { font-size: 17px; font-weight: 700; color: #00C8F0; font-family: "Bebas Neue", sans-serif; letter-spacing: 0; }
+
+/* ══════════════════════════════════════
+   ANIMACIONES DE ENTRADA
+══════════════════════════════════════ */
+.fi { animation: fi 0.65s ease-out both; }
+.d1{animation-delay:.05s} .d2{animation-delay:.15s}
+.d3{animation-delay:.28s} .d4{animation-delay:.42s}
+.d5{animation-delay:.55s} .d6{animation-delay:.68s}
+@keyframes fi { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+/* Animación dibujo SVG */
+.draw  { stroke-dasharray:800; stroke-dashoffset:800; animation:draw 2.2s .3s ease forwards; }
+.draw2 { stroke-dasharray:500; stroke-dashoffset:500; animation:draw 1.8s .6s ease forwards; }
+.draw3 { stroke-dasharray:300; stroke-dashoffset:300; animation:draw 1.5s .9s ease forwards; }
+.draw4 { stroke-dasharray:200; stroke-dashoffset:200; animation:draw 1.2s 1.1s ease forwards; }
+@keyframes draw { to{stroke-dashoffset:0} }

@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+frontend/node_modules/
+backend/__pycache__/
+backend/*.pyc
+backend/.venv/
+
+# Variables de entorno — NUNCA subir al repo
+.env
+.env.local
+.env.production
+
+# Vite / React build
+frontend/dist/
+frontend/.vite/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
