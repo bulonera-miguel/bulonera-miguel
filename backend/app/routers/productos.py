@@ -95,7 +95,44 @@ async def listar_productos(
         # devolvemos un error 500 (Internal Server Error) con el mensaje del error.
 
 
-# ─── ENDPOINT 2: OBTENER UN PRODUCTO POR ID ───────────────────────────────────
+# ─── ENDPOINT 2: BUSCAR PRODUCTOS ───────────────────────────────────────────────
+
+@router.get("/buscar", response_model=list[ProductoResponse])
+# GET /api/productos/buscar?q=bulon
+# Este endpoint va ANTES de /{producto_id} porque si va después,
+# FastAPI interpreta "buscar" como un producto_id y falla.
+
+async def buscar_productos(
+    q: str = Query(min_length=1),
+    # q: el texto que escribe el usuario en el buscador.
+    # min_length=1: debe tener al menos 1 carácter — no permitimos búsquedas vacías.
+    # Ejemplo de URL: GET /api/productos/buscar?q=bulon
+):
+    try:
+        response = (
+            supabase.table("productos")
+            .select("*")
+            .eq("activo", True)
+            # Solo buscamos productos activos
+            .ilike("nombre", f"%{q}%")
+            # .ilike(): búsqueda case-insensitive (no distingue mayúsculas/minúsculas).
+            # El % antes y después significa "cualquier texto antes y después".
+            # Ejemplo: q="bulon" encuentra "Bulón M10", "BULON zinc", "bulón hexagonal".
+            # Es equivalente a SQL: WHERE nombre ILIKE '%bulon%'
+            .order("nombre")
+            # Ordena los resultados alfabéticamente
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al buscar productos: {str(e)}"
+        )
+
+# ─── ENDPOINT 3: OBTENER UN PRODUCTO POR ID ───────────────────────────────────
 
 @router.get("/{producto_id}", response_model=ProductoResponse)
 # {producto_id}: parámetro de ruta dinámica.
@@ -133,7 +170,7 @@ async def obtener_producto(producto_id: UUID):
         raise HTTPException(status_code=500, detail=f"Error al obtener producto: {str(e)}")
 
 
-# ─── ENDPOINT 3: CREAR UN PRODUCTO ────────────────────────────────────────────
+# ─── ENDPOINT 4: CREAR UN PRODUCTO ────────────────────────────────────────────
 
 @router.post("/", response_model=ProductoResponse, status_code=201)
 # @router.post("/"): escucha peticiones POST en /api/productos/
@@ -186,7 +223,7 @@ async def crear_producto(producto: ProductoCreate):
         raise HTTPException(status_code=500, detail=f"Error al crear producto: {str(e)}")
 
 
-# ─── ENDPOINT 4: ACTUALIZAR UN PRODUCTO ───────────────────────────────────────
+# ─── ENDPOINT 5: ACTUALIZAR UN PRODUCTO ───────────────────────────────────────
 
 @router.patch("/{producto_id}", response_model=ProductoResponse)
 # PATCH en lugar de PUT: usamos PATCH porque actualizamos PARCIALMENTE.
@@ -236,7 +273,7 @@ async def actualizar_producto(producto_id: UUID, datos: ProductoUpdate):
         raise HTTPException(status_code=500, detail=f"Error al actualizar producto: {str(e)}")
 
 
-# ─── ENDPOINT 5: ELIMINAR UN PRODUCTO (SOFT DELETE) ───────────────────────────
+# ─── ENDPOINT 6: ELIMINAR UN PRODUCTO (SOFT DELETE) ───────────────────────────
 
 @router.delete("/{producto_id}", status_code=204)
 # status_code=204: No Content. El estándar HTTP para eliminaciones exitosas.
