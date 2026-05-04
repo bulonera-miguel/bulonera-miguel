@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import supabase
 from app.routers import productos  # ← AGREGAR
+from app.routers import categorias  # ← agregar con los otros imports
+from app.routers import stock    # ← agregar con los otros imports
 
 app = FastAPI(title="Bulonera Miguel API", version="1.0.0")
 
@@ -15,6 +17,8 @@ app.add_middleware(
 )
 
 app.include_router(productos.router)  # ← AGREGAR
+app.include_router(categorias.router)  # ← agregar después de productos
+app.include_router(stock.router) # ← agregar después de categorias
 
 @app.get("/")
 def root():
