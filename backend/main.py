@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import supabase
+from app.routers import productos  # ← AGREGAR
 
 app = FastAPI(title="Bulonera Miguel API", version="1.0.0")
 
@@ -12,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(productos.router)  # ← AGREGAR
 
 @app.get("/")
 def root():
