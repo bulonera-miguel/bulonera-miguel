@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './Home.module.css'
-//import logoSvg from '../../public/logo-bm-blueprint.svg'
+
 const logoSvg = '/logo-bm-blueprint.svg'
 
-// ── Datos provisorios ──────────────────────────────────────────
-// Cuando el backend esté listo, reemplazar con:
-// useEffect(() => { fetch("/api/portada/stock-critico").then(r=>r.json()).then(setProducto) }, [])
 const PRODUCTO_CRITICO = {
   nombre:         'Bulón hex. M10',
   nombreCompleto: 'Bulón hexagonal M10 × 50mm zinc',
@@ -21,11 +19,14 @@ const KPIS = {
   movimientosHoy:  142,
   alertasCriticas: 3,
 }
-// ──────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [producto] = useState(PRODUCTO_CRITICO)
   const [kpis]     = useState(KPIS)
+  const [menuAbierto, setMenuAbierto] = useState(false)
+  // menuAbierto: controla si el menú hamburger está abierto o cerrado.
+  // false = cerrado (estado inicial), true = abierto.
+  // Se usa solo en mobile — en desktop este estado no tiene efecto visual.
 
   return (
     <>
@@ -47,12 +48,32 @@ export default function Home() {
           <div className={styles.logo}>
             <img className={styles.logoImg} src={logoSvg} alt="Bulonera Miguel" />
           </div>
-         <ul className={styles.navLinks}>
-          <li><Link to="/" className={styles.active}>Inicio</Link></li>
-          <li><Link to="/inventario">Inventario</Link></li>
-          <li><Link to="/stock">Stock</Link></li>
-          <li><Link to="/reportes">Reportes</Link></li>
-        </ul>
+
+          {/* Nav links — solo visible en desktop */}
+          <ul className={styles.navLinksDesktop}>
+            <li><Link to="/" className={styles.active}>Inicio</Link></li>
+            <li><Link to="/inventario">Inventario</Link></li>
+            <li><Link to="/stock">Stock</Link></li>
+            <li><Link to="/reportes">Reportes</Link></li>
+          </ul>
+
+          {/* Menú y overlay via Portal — se renderizan en el body,
+            fuera del árbol de React, sin problemas de z-index */}
+          {createPortal(
+            <>
+              <ul className={`${styles.navLinks} ${menuAbierto ? styles.navLinksOpen : ''}`}>
+                <li><Link to="/" className={styles.active} onClick={() => setMenuAbierto(false)}>Inicio</Link></li>
+                <li><Link to="/inventario" onClick={() => setMenuAbierto(false)}>Inventario</Link></li>
+                <li><Link to="/stock" onClick={() => setMenuAbierto(false)}>Stock</Link></li>
+                <li><Link to="/reportes" onClick={() => setMenuAbierto(false)}>Reportes</Link></li>
+              </ul>
+              {menuAbierto && (
+                <div className={styles.menuOverlay} onClick={() => setMenuAbierto(false)} />
+              )}
+            </>,
+            document.body
+          )}
+
           <div className={styles.navRight}>
             <div className={styles.statusPill}>
               <div className={styles.dotLive}></div>
@@ -61,8 +82,36 @@ export default function Home() {
             <Link to="/login">
               <button className={styles.btnNav}><span>Iniciar sesión</span></button>
             </Link>
+
+            {/* Botón hamburger — solo visible en mobile */}
+            <button
+              className={styles.hamburger}
+              onClick={() => setMenuAbierto(!menuAbierto)}
+              // !menuAbierto: invierte el estado actual.
+              // Si estaba cerrado (false) → lo abre (true).
+              // Si estaba abierto (true) → lo cierra (false).
+              aria-label="Menú de navegación"
+              // aria-label: accesibilidad — describe el botón para lectores de pantalla.
+            >
+              {/* Las 3 líneas del hamburger — se animan cuando el menú está abierto */}
+              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineTop : ''}`}></span>
+              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineMid : ''}`}></span>
+              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineBot : ''}`}></span>
+              {/* Cuando menuAbierto es true, las 3 líneas se transforman en una X
+                  usando rotaciones CSS — línea top rota +45°, mid desaparece,
+                  bot rota -45°. */}
+            </button>
           </div>
         </nav>
+
+        {/* Overlay oscuro detrás del menú mobile — cierra el menú al hacer clic */}
+        {menuAbierto && (
+          <div
+            className={styles.menuOverlay}
+            onClick={() => setMenuAbierto(false)}
+            // Si el usuario hace clic fuera del menú, lo cierra.
+          />
+        )}
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
@@ -99,13 +148,11 @@ export default function Home() {
             </div>
           </div>
 
-          {/* COLUMNA CENTRAL — Bulón blueprint */}
+          {/* COLUMNA CENTRAL — Bulón blueprint — se oculta en tablet y mobile */}
           <div className={`${styles.heroCenter} ${styles.fi} ${styles.d3}`}>
             <div className={styles.ring1}></div>
             <div className={styles.ring2}></div>
             <div className={styles.boltWrap}>
-
-              {/* Anotaciones izquierda */}
               <div className={`${styles.co} ${styles.L1}`}>
                 <span className={styles.coVal}>{producto.nombre}</span>
                 <div className={styles.coInner}><div className={styles.coLine}></div><span>Producto</span></div>
@@ -118,8 +165,6 @@ export default function Home() {
                 <span className={styles.coVal}>{producto.categoria}</span>
                 <div className={styles.coInner}><div className={styles.coLine}></div><span>Categoría</span></div>
               </div>
-
-              {/* Anotaciones derecha */}
               <div className={`${styles.co} ${styles.R1}`}>
                 <div className={styles.coInner}><span>Stock actual</span><div className={styles.coLine}></div></div>
                 <span className={`${styles.coVal} ${styles.critico}`}>{producto.stock} uds.</span>
@@ -132,8 +177,6 @@ export default function Home() {
                 <div className={styles.coInner}><span>Estado</span><div className={styles.coLine}></div></div>
                 <span className={`${styles.coVal} ${styles.critico}`}>{producto.estado}</span>
               </div>
-
-              {/* SVG Blueprint del bulón */}
               <svg viewBox="0 0 240 395" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="120" y1="14" x2="120" y2="340" stroke="rgba(0,200,240,0.08)" strokeWidth="0.8" strokeDasharray="10,5"/>
                 <polygon className={styles.draw} points="120,50 163,75 163,125 120,150 77,125 77,75" stroke="#00C8F0" strokeWidth="1.6" fill="rgba(0,200,240,0.04)"/>
@@ -161,8 +204,6 @@ export default function Home() {
                 <circle cx="140" cy="266" r="2.6" fill="#FF4444" opacity="0.9"/>
                 <circle cx="98"  cy="297" r="2.6" fill="#FF4444" opacity="0.9"/>
               </svg>
-
-              {/* Panel nombre producto crítico */}
               <div className={styles.productoPanel}>
                 <div className={styles.productoPanelTag}>⚠ Producto con stock crítico</div>
                 <div className={styles.productoPanelNombre}>{producto.nombreCompleto}</div>
