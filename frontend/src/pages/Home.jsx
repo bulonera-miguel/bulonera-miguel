@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
+import Navbar from '../components/Navbar'
 import styles from './Home.module.css'
 
 const logoSvg = '/logo-bm-blueprint.svg'
@@ -22,8 +22,7 @@ const KPIS = {
 
 export default function Home() {
   const [producto] = useState(PRODUCTO_CRITICO)
-  const [kpis]     = useState(KPIS)
-  const [menuAbierto, setMenuAbierto] = useState(false)
+  const [kpis]     = useState(KPIS)  
   // menuAbierto: controla si el menú hamburger está abierto o cerrado.
   // false = cerrado (estado inicial), true = abierto.
   // Se usa solo en mobile — en desktop este estado no tiene efecto visual.
@@ -44,74 +43,7 @@ export default function Home() {
       <div className={styles.page}>
 
         {/* ── NAV ── */}
-        <nav className={`${styles.fi} ${styles.d1}`}>
-          <div className={styles.logo}>
-            <img className={styles.logoImg} src={logoSvg} alt="Bulonera Miguel" />
-          </div>
-
-          {/* Nav links — solo visible en desktop */}
-          <ul className={styles.navLinksDesktop}>
-            <li><Link to="/" className={styles.active}>Inicio</Link></li>
-            <li><Link to="/inventario">Inventario</Link></li>
-            <li><Link to="/stock">Stock</Link></li>
-            <li><Link to="/reportes">Reportes</Link></li>
-          </ul>
-
-          {/* Menú y overlay via Portal — se renderizan en el body,
-            fuera del árbol de React, sin problemas de z-index */}
-          {createPortal(
-            <>
-              <ul className={`${styles.navLinks} ${menuAbierto ? styles.navLinksOpen : ''}`}>
-                <li><Link to="/" className={styles.active} onClick={() => setMenuAbierto(false)}>Inicio</Link></li>
-                <li><Link to="/inventario" onClick={() => setMenuAbierto(false)}>Inventario</Link></li>
-                <li><Link to="/stock" onClick={() => setMenuAbierto(false)}>Stock</Link></li>
-                <li><Link to="/reportes" onClick={() => setMenuAbierto(false)}>Reportes</Link></li>
-              </ul>
-              {menuAbierto && (
-                <div className={styles.menuOverlay} onClick={() => setMenuAbierto(false)} />
-              )}
-            </>,
-            document.body
-          )}
-
-          <div className={styles.navRight}>
-            <div className={styles.statusPill}>
-              <div className={styles.dotLive}></div>
-              Sistema activo
-            </div>
-            <Link to="/login">
-              <button className={styles.btnNav}><span>Iniciar sesión</span></button>
-            </Link>
-
-            {/* Botón hamburger — solo visible en mobile */}
-            <button
-              className={styles.hamburger}
-              onClick={() => setMenuAbierto(!menuAbierto)}
-              // !menuAbierto: invierte el estado actual.
-              // Si estaba cerrado (false) → lo abre (true).
-              // Si estaba abierto (true) → lo cierra (false).
-              aria-label="Menú de navegación"
-              // aria-label: accesibilidad — describe el botón para lectores de pantalla.
-            >
-              {/* Las 3 líneas del hamburger — se animan cuando el menú está abierto */}
-              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineTop : ''}`}></span>
-              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineMid : ''}`}></span>
-              <span className={`${styles.hamburgerLine} ${menuAbierto ? styles.hamburgerLineBot : ''}`}></span>
-              {/* Cuando menuAbierto es true, las 3 líneas se transforman en una X
-                  usando rotaciones CSS — línea top rota +45°, mid desaparece,
-                  bot rota -45°. */}
-            </button>
-          </div>
-        </nav>
-
-        {/* Overlay oscuro detrás del menú mobile — cierra el menú al hacer clic */}
-        {menuAbierto && (
-          <div
-            className={styles.menuOverlay}
-            onClick={() => setMenuAbierto(false)}
-            // Si el usuario hace clic fuera del menú, lo cierra.
-          />
-        )}
+        <Navbar />        
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
