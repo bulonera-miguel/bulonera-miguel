@@ -1,31 +1,59 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { portadaApi } from '../services/api'
 import Navbar from '../components/Navbar'
 import styles from './Home.module.css'
 
-const logoSvg = '/logo-bm-blueprint.svg'
-
-const PRODUCTO_CRITICO = {
-  nombre:         'Bulón hex. M10',
-  nombreCompleto: 'Bulón hexagonal M10 × 50mm zinc',
-  codigo:         'BM-1050-ZN',
-  categoria:      'Bulones zinc',
-  stock:          18,
-  minimo:         50,
-  estado:         'CRÍTICO',
-}
-const KPIS = {
-  totalProductos:  '2.847',
-  movimientosHoy:  142,
-  alertasCriticas: 3,
-}
+// ── Opciones del selector de vista ────────────────────────────
+const OPCIONES_VISTA = [
+  { value: 'stock_critico',  label: '⚠ Stock crítico',  },
+  { value: 'mas_vendido',    label: '📈 Más vendido',    },
+  { value: 'menos_vendido',  label: '📉 Menos vendido',  },
+  { value: 'mas_reciente',   label: '🆕 Más reciente',   },
+  { value: 'mayor_precio',   label: '💰 Mayor precio',   },
+  { value: 'mayor_stock',    label: '📦 Mayor stock',    },
+]
 
 export default function Home() {
-  const [producto] = useState(PRODUCTO_CRITICO)
-  const [kpis]     = useState(KPIS)  
-  // menuAbierto: controla si el menú hamburger está abierto o cerrado.
-  // false = cerrado (estado inicial), true = abierto.
-  // Se usa solo en mobile — en desktop este estado no tiene efecto visual.
+  // ── ESTADOS ──────────────────────────────────────────────
+  const [kpis, setKpis]               = useState({ total_productos: '—', alertas_criticas: '—' })
+  const [vistas, setVistas]           = useState({})
+  const [vistaActual, setVistaActual] = useState('stock_critico')
+  const [cargando, setCargando]       = useState(true)
+  const [error, setError]             = useState(null)
+
+  // ── CARGAR DATOS AL MONTAR ────────────────────────────────
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        setCargando(true)
+        const data = await portadaApi.resumen()
+        setKpis(data.kpis)
+        setVistas(data.vistas)
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setCargando(false)
+      }
+    }
+    cargar()
+  }, [])
+
+  // ── PRODUCTO ACTUALMENTE SELECCIONADO ─────────────────────
+  const producto = vistas[vistaActual] || null
+  // Si la vista seleccionada no tiene datos, producto es null
+
+  // ── DATOS DEL PRODUCTO PARA EL SVG ───────────────────────
+  const nombreProducto    = producto?.nombre?.split(' ').slice(0,3).join(' ') || '—'
+  const codigoProducto    = producto?.codigo || '—'
+  const categoriaProducto = '—'
+  const stockProducto     = producto?.stock_actual ?? '—'
+  const minimoProducto    = producto?.stock_minimo ?? '—'
+  const estadoProducto    = producto
+    ? (producto.stock_actual <= producto.stock_minimo ? 'CRÍTICO' : 'NORMAL')
+    : '—'
+  const esCritico = producto
+    ? producto.stock_actual <= producto.stock_minimo
+    : false
 
   return (
     <>
@@ -43,7 +71,7 @@ export default function Home() {
       <div className={styles.page}>
 
         {/* ── NAV ── */}
-        <Navbar />        
+        <Navbar />
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
@@ -52,18 +80,24 @@ export default function Home() {
           <div className={`${styles.heroLeft} ${styles.fi} ${styles.d2}`}>
             <div className={styles.statCard}>
               <div className={styles.statCardLabel}>Productos registrados</div>
-              <div className={styles.statCardNum}>{kpis.totalProductos}</div>
+              <div className={styles.statCardNum}>
+                {cargando ? '...' : kpis.total_productos}
+              </div>
               <div className={styles.statCardSub}>unidades en catálogo activo</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statCardLabel}>Movimientos hoy</div>
-              <div className={styles.statCardNum}>{kpis.movimientosHoy}</div>
-              <div className={styles.statCardSub}>entradas + salidas de stock</div>
+              <div className={styles.statCardLabel}>Alertas críticas</div>
+              <div className={styles.statCardNum}>
+                {cargando ? '...' : kpis.alertas_criticas}
+              </div>
+              <div className={styles.statCardSub}>productos bajo stock mínimo</div>
             </div>
             <div className={styles.sysGrid}>
               <div className={styles.sysCell}>
                 <span className={styles.sysCellLabel}>Conexión</span>
-                <span className={`${styles.sysCellVal} ${styles.green}`}>Activa</span>
+                <span className={`${styles.sysCellVal} ${styles.green}`}>
+                  {error ? 'Error' : cargando ? '...' : 'Activa'}
+                </span>
               </div>
               <div className={styles.sysCell}>
                 <span className={styles.sysCellLabel}>Servidor</span>
@@ -71,7 +105,9 @@ export default function Home() {
               </div>
               <div className={styles.sysCell}>
                 <span className={styles.sysCellLabel}>Alertas críticas</span>
-                <span className={`${styles.sysCellVal} ${styles.red}`}>{kpis.alertasCriticas} ítems</span>
+                <span className={`${styles.sysCellVal} ${styles.red}`}>
+                  {cargando ? '...' : `${kpis.alertas_criticas} ítems`}
+                </span>
               </div>
               <div className={styles.sysCell}>
                 <span className={styles.sysCellLabel}>Disponibilidad</span>
@@ -80,35 +116,47 @@ export default function Home() {
             </div>
           </div>
 
-          {/* COLUMNA CENTRAL — Bulón blueprint — se oculta en tablet y mobile */}
+          {/* COLUMNA CENTRAL — Bulón blueprint */}
           <div className={`${styles.heroCenter} ${styles.fi} ${styles.d3}`}>
             <div className={styles.ring1}></div>
             <div className={styles.ring2}></div>
             <div className={styles.boltWrap}>
+
+              {/* Anotaciones izquierda */}
               <div className={`${styles.co} ${styles.L1}`}>
-                <span className={styles.coVal}>{producto.nombre}</span>
+                <span className={styles.coVal}>{nombreProducto}</span>
                 <div className={styles.coInner}><div className={styles.coLine}></div><span>Producto</span></div>
               </div>
               <div className={`${styles.co} ${styles.L2}`}>
-                <span className={styles.coVal}>{producto.codigo}</span>
+                <span className={styles.coVal}>{codigoProducto}</span>
                 <div className={styles.coInner}><div className={styles.coLine}></div><span>Código</span></div>
               </div>
               <div className={`${styles.co} ${styles.L3}`}>
-                <span className={styles.coVal}>{producto.categoria}</span>
+                <span className={styles.coVal}>{categoriaProducto}</span>
                 <div className={styles.coInner}><div className={styles.coLine}></div><span>Categoría</span></div>
               </div>
+
+              {/* Anotaciones derecha */}
               <div className={`${styles.co} ${styles.R1}`}>
                 <div className={styles.coInner}><span>Stock actual</span><div className={styles.coLine}></div></div>
-                <span className={`${styles.coVal} ${styles.critico}`}>{producto.stock} uds.</span>
+                <span className={`${styles.coVal} ${esCritico ? styles.critico : ''}`}>
+                  {stockProducto} {producto ? 'uds.' : ''}
+                </span>
               </div>
               <div className={`${styles.co} ${styles.R2}`}>
                 <div className={styles.coInner}><span>Mínimo</span><div className={styles.coLine}></div></div>
-                <span className={`${styles.coVal} ${styles.alerta}`}>{producto.minimo} uds.</span>
+                <span className={`${styles.coVal} ${styles.alerta}`}>
+                  {minimoProducto} {producto ? 'uds.' : ''}
+                </span>
               </div>
               <div className={`${styles.co} ${styles.R3}`}>
                 <div className={styles.coInner}><span>Estado</span><div className={styles.coLine}></div></div>
-                <span className={`${styles.coVal} ${styles.critico}`}>{producto.estado}</span>
+                <span className={`${styles.coVal} ${esCritico ? styles.critico : ''}`}>
+                  {estadoProducto}
+                </span>
               </div>
+
+              {/* SVG Blueprint del bulón */}
               <svg viewBox="0 0 240 395" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="120" y1="14" x2="120" y2="340" stroke="rgba(0,200,240,0.08)" strokeWidth="0.8" strokeDasharray="10,5"/>
                 <polygon className={styles.draw} points="120,50 163,75 163,125 120,150 77,125 77,75" stroke="#00C8F0" strokeWidth="1.6" fill="rgba(0,200,240,0.04)"/>
@@ -136,12 +184,44 @@ export default function Home() {
                 <circle cx="140" cy="266" r="2.6" fill="#FF4444" opacity="0.9"/>
                 <circle cx="98"  cy="297" r="2.6" fill="#FF4444" opacity="0.9"/>
               </svg>
+
+              {/* Panel inferior — selector de vista */}
               <div className={styles.productoPanel}>
-                <div className={styles.productoPanelTag}>⚠ Producto con stock crítico</div>
-                <div className={styles.productoPanelNombre}>{producto.nombreCompleto}</div>
+                {/* Selector de vista */}
+                <select
+                  className={styles.vistaSelect}
+                  value={vistaActual}
+                  onChange={e => setVistaActual(e.target.value)}
+                >
+                  {OPCIONES_VISTA.map(op => (
+                    <option key={op.value} value={op.value}>{op.label}</option>
+                  ))}
+                </select>
+
+                {/* Nombre del producto seleccionado */}
+                <div className={styles.productoPanelNombre}>
+                  {cargando ? 'Cargando...' : producto ? producto.nombre : 'Sin datos'}
+                </div>
               </div>
+
             </div>
           </div>
+
+          {/* SELECTOR MOBILE/TABLET — visible solo en tablet y mobile */}
+          <div className={styles.selectorMobile}>
+            <select
+              className={styles.vistaSelect}
+              value={vistaActual}
+              onChange={e => setVistaActual(e.target.value)}
+            >
+              {OPCIONES_VISTA.map(op => (
+                <option key={op.value} value={op.value}>{op.label}</option>
+              ))}
+            </select>
+            <div className={styles.productoPanelNombre}>
+              {cargando ? 'Cargando...' : producto ? producto.nombre : 'Sin datos'}
+            </div>
+          </div> 
 
           {/* COLUMNA DERECHA — Título + CTA */}
           <div className={`${styles.heroRight} ${styles.fi} ${styles.d4}`}>
@@ -160,9 +240,13 @@ export default function Home() {
               <button className={styles.btnDemo}>Ver demo</button>
             </div>
             <div className={`${styles.chips} ${styles.fi} ${styles.d6}`}>
-              <div className={styles.chip}><strong>+200</strong> Categorías</div>
+              <div className={styles.chip}>
+                <strong>{cargando ? '...' : kpis.total_productos}</strong> Productos
+              </div>
               <div className={styles.chip}><strong>24/7</strong> Online</div>
-              <div className={styles.chip}><strong>100%</strong> Trazable</div>
+              <div className={styles.chip}>
+                <strong>{cargando ? '...' : kpis.alertas_criticas}</strong> Alertas
+              </div>
             </div>
           </div>
 

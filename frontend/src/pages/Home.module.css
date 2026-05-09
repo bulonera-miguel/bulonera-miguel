@@ -368,6 +368,28 @@ nav {
 .navLinksDesktop a:hover { color: #00C8F0; }
 .navLinksDesktop .active { color: #00C8F0; border-bottom: 1px solid #00C8F0; padding-bottom: 2px; }
 
+/* ── SELECTOR DE VISTA ── */
+.selectorMobile {
+  display: none;
+  /* Oculto por defecto en desktop */
+}
+
+.vistaSelect {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(0,200,240,0.08);
+  border: 1px solid rgba(0,200,240,0.30);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; outline: none;
+  margin-bottom: 6px;
+}
+.vistaSelect option {
+  background: #07111F;
+  color: #EAF4FF;
+}
+
 
 /* ══════════════════════════════════════
    RESPONSIVE — TABLET (hasta 1023px)
@@ -383,19 +405,35 @@ nav {
     height: auto;
     min-height: calc(100vh - 56px);
     overflow: visible;
+    display: flex;
+    flex-direction: column;
   }
-
+  
   .hero {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
+    grid-template-areas:
+      "left right"
+      "selector selector";
     padding: 20px 16px;
     gap: 20px;
     align-items: start;
+    align-content: start;
   }
 
+  .heroLeft   { grid-area: left; }
+  .heroRight  { grid-area: right; padding-left: 16px; }
   .heroCenter { display: none; }
-  .heroRight { padding-left: 16px; }
-  .heroTitle { font-size: clamp(36px, 5vw, 52px); }
+  .heroTitle  { font-size: clamp(36px, 5vw, 52px); }
+
+  /* Selector visible en tablet y mobile */
+  .selectorMobile {
+    grid-area: selector;
+    display: block;
+    background: rgba(0,200,240,0.05);
+    border: 1px solid rgba(0,200,240,0.20);
+    padding: 12px 16px;
+    margin-top: 0;
+  }
 
   .navLinks {
     display: none;
@@ -450,6 +488,7 @@ nav {
   }
 
   .hamburger { display: flex; }
+  
 }
 
 /* ══════════════════════════════════════
@@ -496,7 +535,9 @@ nav {
   }
 
   .heroCenter { display: none; }
-  .heroRight { padding-left: 0; align-items: flex-start; }
+  .heroRight { padding-left: 0; align-items: flex-start; grid-column: 1; grid-row: 1; }
+  .heroLeft  { grid-column: 1; grid-row: 2; }
+  .selectorMobile { grid-row: 3; }
   .heroTitle { font-size: clamp(40px, 12vw, 56px); letter-spacing: 2px; }
   .heroDesc { max-width: 100%; padding-left: 10px; font-size: 13px; }
 

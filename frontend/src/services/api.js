@@ -73,3 +73,14 @@ export const categoriasApi = {
     return res.json()
   },
 }
+
+// ── PORTADA ────────────────────────────────────────────────
+
+export const portadaApi = {
+
+  resumen: async () => {
+    const res = await fetch(`${BASE_URL}/api/portada/resumen`)
+    if (!res.ok) throw new Error('Error al obtener resumen de portada')
+    return res.json()
+  },
+}
