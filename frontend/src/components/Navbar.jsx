@@ -1,20 +1,23 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useAuth } from '../context/AuthContext'
 import styles from './Navbar.module.css'
 
 const logoSvg = '/logo-bm-blueprint.svg'
 
 export default function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
-  const location = useLocation()
-  // useLocation: nos dice en qué ruta estamos actualmente.
-  // Lo usamos para marcar el link activo dinámicamente.
-  // Así cuando estemos en /inventario, ese link se resalta automáticamente.
+  const location  = useLocation()
+  const navigate  = useNavigate()
+  const { usuario, perfil, esAdmin, logout } = useAuth()
 
   const esActivo = (ruta) => location.pathname === ruta ? styles.active : ''
-  // esActivo: función que compara la ruta actual con la del link.
-  // Si coinciden devuelve la clase 'active', si no devuelve string vacío.
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   return (
     <nav className={styles.nav}>
@@ -31,6 +34,10 @@ export default function Navbar() {
         <li><Link to="/inventario" className={esActivo('/inventario')}>Inventario</Link></li>
         <li><Link to="/stock"      className={esActivo('/stock')}>Stock</Link></li>
         <li><Link to="/reportes"   className={esActivo('/reportes')}>Reportes</Link></li>
+        {/* Usuarios solo visible para admin */}
+        {esAdmin && (
+          <li><Link to="/usuarios" className={esActivo('/usuarios')}>Usuarios</Link></li>
+        )}
       </ul>
 
       {/* Portal — menú mobile + overlay */}
@@ -41,6 +48,17 @@ export default function Navbar() {
             <li><Link to="/inventario" className={esActivo('/inventario')} onClick={() => setMenuAbierto(false)}>Inventario</Link></li>
             <li><Link to="/stock"      className={esActivo('/stock')}      onClick={() => setMenuAbierto(false)}>Stock</Link></li>
             <li><Link to="/reportes"   className={esActivo('/reportes')}   onClick={() => setMenuAbierto(false)}>Reportes</Link></li>
+            {esAdmin && (
+              <li><Link to="/usuarios" className={esActivo('/usuarios')}   onClick={() => setMenuAbierto(false)}>Usuarios</Link></li>
+            )}
+            {/* Cerrar sesión en mobile */}
+            {usuario && (
+              <li>
+                <button className={styles.btnLogoutMobile} onClick={() => { handleLogout(); setMenuAbierto(false) }}>
+                  Cerrar sesión
+                </button>
+              </li>
+            )}
           </ul>
           {menuAbierto && (
             <div className={styles.menuOverlay} onClick={() => setMenuAbierto(false)} />
@@ -55,9 +73,28 @@ export default function Navbar() {
           <div className={styles.dotLive}></div>
           Sistema activo
         </div>
-        <Link to="/login">
-          <button className={styles.btnNav}><span>Iniciar sesión</span></button>
-        </Link>
+
+        {usuario ? (
+          /* Usuario logueado — muestra nombre + botón cerrar sesión */
+          <div className={styles.usuarioWrap}>
+            <div className={styles.usuarioInfo}>
+              <span className={styles.usuarioNombre}>
+                {perfil?.nombre || usuario.email}
+              </span>
+              <span className={styles.usuarioRol}>
+                {perfil?.rol || ''}
+              </span>
+            </div>
+            <button className={styles.btnLogout} onClick={handleLogout}>
+              Salir
+            </button>
+          </div>
+        ) : (
+          /* No logueado — muestra botón iniciar sesión */
+          <Link to="/login">
+            <button className={styles.btnNav}><span>Iniciar sesión</span></button>
+          </Link>
+        )}
 
         {/* Botón hamburger */}
         <button

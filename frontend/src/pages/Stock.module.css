@@ -1,0 +1,351 @@
+/* ============================================================
+   BULONERA MIGUEL — Sistema de Gestión
+   Stock.module.css — Estilos de la página Stock
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #07111F;
+  color: #C8E4F4;
+  font-family: "Barlow", sans-serif;
+}
+
+.contenido {
+  padding: 24px 28px;
+}
+
+/* ── HEADER DE PÁGINA ── */
+.pageHeader {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+  padding-bottom: 16px;
+}
+.pageTitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 32px; letter-spacing: 3px;
+  color: #EAF4FF; margin: 0;
+}
+.pageSubtitle {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; opacity: 0.75;
+}
+
+/* ── ALERTAS CRÍTICAS ── */
+.alertasWrap {
+  margin-bottom: 24px;
+  background: rgba(255,68,68,0.04);
+  border: 1px solid rgba(255,68,68,0.25);
+  padding: 16px;
+}
+.alertasTitle {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #FF4444; margin-bottom: 12px;
+}
+.alertasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.alertaCard {
+  background: rgba(255,68,68,0.06);
+  border: 1px solid rgba(255,68,68,0.20);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.alertaCard:hover {
+  background: rgba(255,68,68,0.12);
+}
+.alertaCardNombre {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px;
+  color: #EAF4FF; margin-bottom: 4px;
+}
+.alertaCardStock {
+  display: flex; align-items: center; gap: 6px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 18px;
+}
+.alertaCardSep { color: rgba(200,228,244,0.30); }
+.stockCritico  { color: #FF4444; }
+.stockMinimo   { color: rgba(200,228,244,0.50); font-size: 14px; }
+.stockOk       { color: #00E87A; }
+
+/* ── LAYOUT PRINCIPAL ── */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── PANEL FORMULARIO ── */
+.formPanel {
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.15);
+  padding: 20px;
+}
+.panelTitle {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; margin: 0 0 18px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+}
+
+/* ── FORMULARIO ── */
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.formGroup {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.formGroup label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.60);
+}
+
+/* ── BUSCADOR CON SUGERENCIAS ── */
+.buscadorWrap { position: relative; }
+.buscador {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.20);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif;
+  font-size: 14px; outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.buscador:focus { border-color: #00C8F0; }
+.buscador::placeholder { color: rgba(200,228,244,0.35); }
+
+.sugerencias {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: #0D1F2D;
+  border: 1px solid rgba(0,200,240,0.25);
+  border-top: none;
+  list-style: none;
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.sugerenciaItem {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(0,200,240,0.08);
+}
+.sugerenciaItem:hover { background: rgba(0,200,240,0.08); }
+.sugerNombre {
+  font-family: "Barlow", sans-serif;
+  font-size: 13px; color: #EAF4FF;
+}
+.sugerStock {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.50);
+}
+
+/* ── INFO DEL PRODUCTO SELECCIONADO ── */
+.productoInfo {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.15);
+  padding: 12px;
+}
+.productoInfoItem {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.productoInfoItem span {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+}
+.productoInfoItem strong {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 16px; font-weight: 600;
+  color: #EAF4FF;
+}
+
+/* ── TIPO DE MOVIMIENTO ── */
+.tipoWrap {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.tipoBtn {
+  padding: 11px;
+  background: transparent;
+  border: 1.5px solid rgba(0,232,122,0.30);
+  color: rgba(0,232,122,0.60);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.tipoBtn:hover { border-color: #00E87A; color: #00E87A; }
+.tipoBtnActivo {
+  background: rgba(0,232,122,0.12);
+  border-color: #00E87A;
+  color: #00E87A;
+}
+.tipoBtnSalida {
+  padding: 11px;
+  background: transparent;
+  border: 1.5px solid rgba(255,68,68,0.30);
+  color: rgba(255,68,68,0.60);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.tipoBtnSalida:hover { border-color: #FF4444; color: #FF4444; }
+.tipoBtnSalidaActivo {
+  background: rgba(255,68,68,0.12);
+  border-color: #FF4444;
+  color: #FF4444;
+}
+
+/* ── INPUT GENÉRICO ── */
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  /* resto igual... */
+  padding: 10px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.20);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif;
+  font-size: 14px; outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: #00C8F0; }
+.input::placeholder { color: rgba(200,228,244,0.35); }
+
+/* ── MENSAJES FEEDBACK ── */
+.mensajeOk {
+  padding: 10px 14px;
+  background: rgba(0,232,122,0.10);
+  border: 1px solid rgba(0,232,122,0.30);
+  color: #00E87A;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px;
+}
+.mensajeError {
+  padding: 10px 14px;
+  background: rgba(255,68,68,0.10);
+  border: 1px solid rgba(255,68,68,0.30);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px;
+}
+
+/* ── BOTÓN CONFIRMAR ── */
+.btnConfirmar {
+  width: 100%;
+  /* resto igual... */
+  padding: 13px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 16px rgba(0,200,240,0.25);
+}
+.btnConfirmar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,200,240,0.4);
+}
+
+/* ── PANEL HISTORIAL ── */
+.historialPanel {
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.15);
+  padding: 20px;
+  min-height: 300px;
+}
+.historialVacio {
+  text-align: center;
+  padding: 40px 20px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px;
+  color: rgba(200,228,244,0.35);
+}
+.historialList {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.historialItem {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px;
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.10);
+  transition: background 0.15s;
+}
+.historialItem:hover { background: rgba(0,200,240,0.06); }
+
+.historialItemLeft {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.historialItemRight {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+
+.tipoEntrada {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00E87A;
+}
+.tipoSalida {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #FF4444;
+}
+.historialMotivo {
+  font-size: 13px;
+  color: rgba(200,228,244,0.70);
+}
+.historialCantidad {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 20px; letter-spacing: 1px;
+  color: #EAF4FF;
+}
+.historialFecha {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.40);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1023px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+  .contenido { padding: 16px; }
+}
+
+@media (max-width: 600px) {
+  .alertasGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .productoInfo {
+    grid-template-columns: 1fr 1fr;
+  }
+  .historialItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .historialItemRight {
+    align-items: flex-start;
+  }
+  /* ← agregás esto acá adentro */
+  .historialList {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+}

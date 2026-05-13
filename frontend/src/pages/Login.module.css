@@ -1,0 +1,178 @@
+/* ============================================================
+   Login.module.css — Estilos de la página de Login
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #07111F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: "Barlow", sans-serif;
+}
+
+/* ── FONDOS DECORATIVOS ── */
+.gridBg {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,200,240,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,240,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.glow {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,200,240,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── ESQUINAS HUD ── */
+.hud {
+  position: fixed; width: 20px; height: 20px;
+  z-index: 1; pointer-events: none;
+}
+.tl { top: 16px; left: 16px; border-top: 1.5px solid rgba(0,200,240,0.40); border-left: 1.5px solid rgba(0,200,240,0.40); }
+.tr { top: 16px; right: 16px; border-top: 1.5px solid rgba(0,200,240,0.40); border-right: 1.5px solid rgba(0,200,240,0.40); }
+.bl { bottom: 16px; left: 16px; border-bottom: 1.5px solid rgba(0,200,240,0.40); border-left: 1.5px solid rgba(0,200,240,0.40); }
+.br { bottom: 16px; right: 16px; border-bottom: 1.5px solid rgba(0,200,240,0.40); border-right: 1.5px solid rgba(0,200,240,0.40); }
+
+/* ── CONTENEDOR PRINCIPAL ── */
+.loginWrap {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 24px;
+  width: 100%; max-width: 420px;
+  padding: 20px;
+}
+
+/* ── LOGO ── */
+.logoWrap {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo {
+  width: 48px; height: 48px;
+}
+.logoTexto {
+  display: flex; flex-direction: column;
+}
+.logoNombre {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 22px; letter-spacing: 3px;
+  color: #EAF4FF;
+}
+.logoSub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: #00C8F0; opacity: 0.75;
+}
+
+/* ── PANEL ── */
+.panel {
+  width: 100%;
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.18);
+  padding: 32px;
+  /* Efecto clip-path en las esquinas — toque tech */
+  clip-path: polygon(
+    16px 0%, 100% 0%,
+    100% calc(100% - 16px),
+    calc(100% - 16px) 100%,
+    0% 100%, 0% 16px
+  );
+}
+
+.panelHeader {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.12);
+}
+.panelTitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 26px; letter-spacing: 3px;
+  color: #EAF4FF; margin: 0 0 4px 0;
+}
+.panelSub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45);
+}
+
+/* ── FORMULARIO ── */
+.form {
+  display: flex; flex-direction: column; gap: 18px;
+}
+.formGroup {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.formGroup label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.55);
+}
+.input {
+  width: 100%; padding: 12px 14px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.20);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif;
+  font-size: 14px; outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.input:focus {
+  border-color: #00C8F0;
+  background: rgba(0,200,240,0.08);
+}
+.input::placeholder { color: rgba(200,228,244,0.25); }
+
+/* ── ERROR ── */
+.errorMsg {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.30);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px;
+}
+
+/* ── BOTÓN ── */
+.btnLogin {
+  width: 100%; padding: 14px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  border: none; cursor: pointer;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 0 20px rgba(0,200,240,0.25);
+  margin-top: 6px;
+}
+.btnLogin:hover:not(:disabled) {
+  opacity: 0.90;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 24px rgba(0,200,240,0.40);
+}
+.btnLogin:disabled {
+  opacity: 0.50; cursor: not-allowed;
+}
+
+/* ── FOOTER ── */
+.footer {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.25);
+  text-align: center;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .panel { padding: 24px 20px; }
+  .loginWrap { padding: 16px; }
+}

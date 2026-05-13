@@ -1,0 +1,515 @@
+/* ============================================================
+   BULONERA MIGUEL — Sistema de Gestión
+   Reportes.module.css — Estilos de la página Reportes
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #07111F;
+  color: #C8E4F4;
+  font-family: "Barlow", sans-serif;
+}
+
+.contenido {
+  padding: 24px 28px;
+}
+
+/* ── HEADER ── */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+  padding-bottom: 16px;
+}
+.pageTitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 32px; letter-spacing: 3px;
+  color: #EAF4FF; margin: 0;
+}
+.pageSubtitle {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; opacity: 0.75;
+}
+.contadorResultados {
+  display: flex; flex-direction: column; align-items: flex-end;
+}
+.contadorNum {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 28px; color: #00C8F0; line-height: 1;
+}
+.contadorLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+}
+
+/* ── SELECTOR DE REPORTES ── */
+.selectorReportes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.selectorBtn {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 12px 14px;
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.12);
+  cursor: pointer; text-align: left;
+  transition: all 0.2s;
+}
+.selectorBtn:hover {
+  background: rgba(0,200,240,0.07);
+  border-color: rgba(0,200,240,0.30);
+}
+.selectorBtnActivo {
+  background: rgba(0,200,240,0.10);
+  border-color: #00C8F0;
+  border-left: 3px solid #00C8F0;
+}
+.selectorIcono {
+  font-size: 18px; line-height: 1;
+  color: #00C8F0;
+}
+.selectorLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+  color: #EAF4FF; font-weight: 600;
+}
+.selectorDesc {
+  font-family: "Barlow", sans-serif;
+  font-size: 11px; color: rgba(200,228,244,0.50);
+}
+
+/* ── FILTROS ── */
+.filtrosPanel {
+  background: rgba(0,200,240,0.03);
+  border: 1px solid rgba(0,200,240,0.12);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.filtrosTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; margin-bottom: 12px;
+}
+.filtrosGrid {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+}
+.filtroGrupo {
+  display: flex; flex-direction: column; gap: 5px;
+  min-width: 150px;
+}
+.filtroGrupo label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.55);
+}
+.filtroInput {
+  padding: 8px 11px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif;
+  font-size: 13px; outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.filtroInput:focus { border-color: #00C8F0; }
+.filtroInput::placeholder { color: rgba(200,228,244,0.30); }
+.filtroInput option { background: #0D1F2D; }
+
+/* Inputs de fecha — forzar color de texto en el ícono del calendario */
+.filtroInput[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6) sepia(1) saturate(3) hue-rotate(170deg);
+  cursor: pointer;
+}
+
+.filtroAcciones {
+  display: flex; gap: 8px; align-items: flex-end;
+}
+.btnAplicar {
+  padding: 9px 18px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer;
+  clip-path: polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.btnAplicar:hover { opacity: 0.85; }
+.btnLimpiar {
+  padding: 9px 14px;
+  background: transparent;
+  border: 1px solid rgba(200,228,244,0.20);
+  color: rgba(200,228,244,0.55);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px;
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.btnLimpiar:hover {
+  border-color: rgba(200,228,244,0.40);
+  color: #EAF4FF;
+}
+
+/* ── ERROR ── */
+.errorMsg {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px; margin-bottom: 16px;
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.30);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px;
+  line-height: 1.5;
+}
+.errorIcono { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── TOGGLE DE VISTA ── */
+.vistaToggle {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.vistaLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+  margin-right: 4px;
+}
+.vistaBtn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.18);
+  color: rgba(200,228,244,0.55);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px;
+  cursor: pointer; transition: all 0.2s;
+}
+.vistaBtn:hover {
+  border-color: rgba(0,200,240,0.40);
+  color: #EAF4FF;
+}
+.vistaBtnActivo {
+  background: rgba(0,200,240,0.12);
+  border-color: #00C8F0;
+  color: #00C8F0;
+}
+.vistaHint {
+  font-family: "Barlow", sans-serif;
+  font-size: 11px;
+  color: rgba(200,228,244,0.30);
+  margin-left: 8px;
+  font-style: italic;
+}
+
+/* ── CARGANDO ── */
+.cargando {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px;
+  padding: 60px 20px;
+  color: rgba(200,228,244,0.50);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+}
+.cargandoSpinner {
+  width: 32px; height: 32px;
+  border: 2px solid rgba(0,200,240,0.15);
+  border-top-color: #00C8F0;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LAYOUT PRINCIPAL ── */
+.mainGrid {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+/* Vista ambos: tabla izquierda, gráficos derecha */
+.mainGrid_ambos {
+  grid-template-columns: 1fr 1fr;
+}
+/* Solo tabla: ocupa todo el ancho */
+.mainGrid_tabla {
+  grid-template-columns: 1fr;
+}
+/* Solo gráfico: ocupa todo el ancho */
+.mainGrid_grafico {
+  grid-template-columns: 1fr;
+}
+
+/* ── PANEL TABLA ── */
+.tablaPanel {
+  background: rgba(0,200,240,0.02);
+  border: 1px solid rgba(0,200,240,0.12);
+  overflow: hidden;
+}
+.tablaPanelHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.12);
+}
+.panelTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0;
+}
+.panelContador {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.40);
+}
+
+/* ── TABLA ── */
+.tablaWrap {
+  overflow-x: auto;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.tablaWrap::-webkit-scrollbar { width: 4px; height: 4px; }
+.tablaWrap::-webkit-scrollbar-track { background: rgba(0,200,240,0.04); }
+.tablaWrap::-webkit-scrollbar-thumb { background: rgba(0,200,240,0.25); }
+
+.tabla {
+  width: 100%; border-collapse: collapse;
+  font-family: "Barlow", sans-serif;
+  font-size: 13px;
+}
+.tabla thead tr {
+  background: rgba(0,200,240,0.06);
+  position: sticky; top: 0; z-index: 1;
+}
+.tabla th {
+  padding: 10px 14px; text-align: left;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.55);
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+  white-space: nowrap;
+}
+.tabla td {
+  padding: 10px 14px;
+  color: rgba(200,228,244,0.85);
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+  white-space: nowrap;
+}
+.tabla tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tabla tbody tr:hover {
+  background: rgba(0,200,240,0.05);
+}
+.filaResaltada {
+  background: rgba(0,200,240,0.10) !important;
+  border-left: 3px solid #00C8F0;
+}
+.tablaVacia {
+  padding: 40px 20px; text-align: center;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.30);
+}
+
+/* ── VALORES COLOREADOS ── */
+.valorRojo    { color: #FF4444; font-weight: 600; }
+.valorVerde   { color: #00E87A; font-weight: 600; }
+.valorCyan    { color: #00C8F0; font-weight: 600; }
+.valorAmarillo{ color: #FFB800; font-weight: 600; }
+
+/* ── BADGES ── */
+.badgeCritico {
+  display: inline-block; padding: 2px 8px;
+  background: rgba(255,68,68,0.12);
+  border: 1px solid rgba(255,68,68,0.30);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+}
+.badgeNormal {
+  display: inline-block; padding: 2px 8px;
+  background: rgba(0,232,122,0.08);
+  border: 1px solid rgba(0,232,122,0.25);
+  color: #00E87A;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+}
+
+/* ── PANEL GRÁFICOS ── */
+.graficosPanel {
+  background: rgba(0,200,240,0.02);
+  border: 1px solid rgba(0,200,240,0.12);
+  overflow: hidden;
+}
+.graficosHeader {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.12);
+}
+.graficosWrap {
+  display: flex; flex-direction: column; gap: 0;
+}
+.graficoBloque {
+  padding: 16px 16px 8px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.08);
+}
+.graficoBloque:last-child { border-bottom: none; }
+.graficoTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+  margin-bottom: 12px;
+}
+.graficoSubtitulo {
+  font-family: "Barlow", sans-serif;
+  font-size: 11px; font-style: italic;
+  color: rgba(200,228,244,0.30);
+  margin-top: -8px; margin-bottom: 8px;
+}
+
+/* ── TOOLTIP ── */
+.tooltip {
+  background: #0D1F2D;
+  border: 1px solid rgba(0,200,240,0.30);
+  padding: 10px 14px;
+  font-family: "Barlow", sans-serif;
+  font-size: 12px;
+  max-width: 220px;
+}
+.tooltipLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.60);
+  margin-bottom: 6px;
+  white-space: normal; word-break: break-word;
+}
+.tooltipRow {
+  display: flex; justify-content: space-between; gap: 12px;
+  color: #EAF4FF; font-size: 12px;
+  margin-top: 3px;
+}
+
+/* ── KPI CARDS (productos baja) ── */
+.kpiGrid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 8px 0 16px 0;
+}
+.kpiCard {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 16px;
+  background: rgba(0,200,240,0.04);
+  border: 1px solid rgba(0,200,240,0.12);
+}
+.kpiCardLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+}
+.kpiCardValor {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 32px; letter-spacing: 2px; line-height: 1;
+}
+
+/* ── KPI VALOR TOTAL (inventario) ── */
+.kpiValorTotal {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 12px 0 4px 0;
+}
+.kpiLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+}
+.kpiValor {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 26px; letter-spacing: 2px;
+  color: #00C8F0;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — TABLET 768px
+   ══════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .contenido { padding: 16px; }
+
+  /* Selector de reportes: 2 columnas + 1 centrada abajo si son 5 */
+  .selectorReportes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* El quinto botón ocupa las 2 columnas */
+  .selectorBtn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* Layout principal: siempre una columna en tablet */
+  .mainGrid_ambos {
+    grid-template-columns: 1fr;
+  }
+
+  /* En tablet con vista "ambos", primero gráficos, luego tabla */
+  .graficosPanel { order: -1; }
+
+  .filtrosGrid { gap: 10px; }
+  .filtroGrupo { min-width: 140px; }
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — MOBILE 390px
+   ══════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .contenido { padding: 12px; }
+
+  .pageHeader { flex-direction: column; gap: 8px; }
+
+  /* Selector: una columna en mobile */
+  .selectorReportes {
+    grid-template-columns: 1fr 1fr;
+  }
+  .selectorBtn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .selectorDesc { display: none; } /* Ocultamos descripción en mobile */
+
+  /* Filtros en columna */
+  .filtrosGrid { flex-direction: column; }
+  .filtroGrupo { min-width: unset; width: 100%; }
+  .filtroAcciones { width: 100%; }
+  .btnAplicar { flex: 1; }
+  .btnLimpiar { flex-shrink: 0; }
+
+  /* Toggle de vista */
+  .vistaToggle { gap: 6px; }
+  .vistaHint { display: none; }
+  .vistaBtn { padding: 5px 10px; font-size: 11px; }
+
+  /* Tabla responsive: data-label */
+  .tabla thead { display: none; }
+  .tabla tbody tr {
+    display: flex; flex-direction: column;
+    padding: 10px 14px; gap: 4px;
+    border-bottom: 1px solid rgba(0,200,240,0.12);
+  }
+  .tabla td {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 0; border: none;
+    white-space: normal;
+  }
+  .tabla td::before {
+    content: attr(data-label);
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(200,228,244,0.40);
+    flex-shrink: 0; margin-right: 8px;
+  }
+
+  /* Gráficos: altura reducida en mobile */
+  .graficoBloque { padding: 12px 8px 8px 8px; }
+
+  /* KPI grid en mobile: columna */
+  .kpiGrid { grid-template-columns: 1fr; }
+}

@@ -84,3 +84,36 @@ export const portadaApi = {
     return res.json()
   },
 }
+
+// ── STOCK ──────────────────────────────────────────────────
+
+export const stockApi = {
+
+  // Obtener productos con stock crítico
+  criticos: async () => {
+    const res = await fetch(`${BASE_URL}/api/stock/criticos`)
+    if (!res.ok) throw new Error('Error al obtener stock crítico')
+    return res.json()
+  },
+
+  // Registrar un movimiento de stock (entrada o salida)
+  registrarMovimiento: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/stock/movimiento`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al registrar movimiento')
+    }
+    return res.json()
+  },
+
+  // Obtener historial de movimientos de un producto
+  historial: async (productoId) => {
+    const res = await fetch(`${BASE_URL}/api/stock/${productoId}/movimientos`)
+    if (!res.ok) throw new Error('Error al obtener historial')
+    return res.json()
+  },
+}
