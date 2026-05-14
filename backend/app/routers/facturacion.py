@@ -117,8 +117,9 @@ async def emitir_factura(datos: FacturaCreate):
             iva_21 = round(neto * 0.21, 2)
             total  = subtotal
         else:
-            neto   = subtotal
-            iva_21 = 0
+            # Factura B: IVA incluido en el precio, se desglosa igual
+            neto   = round(subtotal / 1.21, 2)
+            iva_21 = round(neto * 0.21, 2)
             total  = subtotal
 
         # PASO 2: Obtener último comprobante
@@ -143,9 +144,8 @@ async def emitir_factura(datos: FacturaCreate):
             doc_tipo      = 99
 
         # PASO 4: Armar comprobante
-        detalle_iva = []
-        if datos.tipo == "A":
-            detalle_iva = [{"Id": 5, "BaseImp": neto, "Importe": iva_21}]
+        # Tanto A como B requieren desglose de IVA según RG 5616
+        detalle_iva = [{"Id": 5, "BaseImp": neto, "Importe": iva_21}]
 
         comprobante = {
             "FeCabReq": {
