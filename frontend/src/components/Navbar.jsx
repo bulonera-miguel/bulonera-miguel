@@ -34,6 +34,7 @@ export default function Navbar() {
         <li><Link to="/inventario" className={esActivo('/inventario')}>Inventario</Link></li>
         <li><Link to="/stock"      className={esActivo('/stock')}>Stock</Link></li>
         <li><Link to="/reportes"   className={esActivo('/reportes')}>Reportes</Link></li>
+        <li><Link to="/facturacion" className={esActivo('/facturacion')}>Facturación</Link></li>
         {/* Usuarios solo visible para admin */}
         {esAdmin && (
           <li><Link to="/usuarios" className={esActivo('/usuarios')}>Usuarios</Link></li>
@@ -48,6 +49,7 @@ export default function Navbar() {
             <li><Link to="/inventario" className={esActivo('/inventario')} onClick={() => setMenuAbierto(false)}>Inventario</Link></li>
             <li><Link to="/stock"      className={esActivo('/stock')}      onClick={() => setMenuAbierto(false)}>Stock</Link></li>
             <li><Link to="/reportes"   className={esActivo('/reportes')}   onClick={() => setMenuAbierto(false)}>Reportes</Link></li>
+            <li><Link to="/facturacion" className={esActivo('/facturacion')}>Facturación</Link></li>
             {esAdmin && (
               <li><Link to="/usuarios" className={esActivo('/usuarios')}   onClick={() => setMenuAbierto(false)}>Usuarios</Link></li>
             )}

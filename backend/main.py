@@ -7,6 +7,7 @@ from app.routers import stock    # ← agregar con los otros imports
 from app.routers import portada    # ← agregar
 from app.routers import reportes
 from app.routers import usuarios
+from app.routers import facturacion
 
 app = FastAPI(title="Bulonera Miguel API", version="1.0.0")
 
@@ -25,6 +26,7 @@ app.include_router(stock.router) # ← agregar después de categorias
 app.include_router(portada.router) # ← agregar
 app.include_router(reportes.router)
 app.include_router(usuarios.router)
+app.include_router(facturacion.router)
 
 @app.get("/")
 def root():

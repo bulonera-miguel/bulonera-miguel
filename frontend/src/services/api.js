@@ -117,3 +117,64 @@ export const stockApi = {
     return res.json()
   },
 }
+
+// ── FACTURACIÓN ────────────────────────────────────────────
+
+export const facturacionApi = {
+
+  // Buscar clientes por nombre
+  buscarClientes: async (texto) => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/clientes/buscar?q=${encodeURIComponent(texto)}`)
+    if (!res.ok) throw new Error('Error al buscar clientes')
+    return res.json()
+  },
+
+  // Listar todos los clientes
+  listarClientes: async () => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/clientes`)
+    if (!res.ok) throw new Error('Error al listar clientes')
+    return res.json()
+  },
+
+  // Crear un cliente nuevo
+  crearCliente: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/clientes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al crear cliente')
+    }
+    return res.json()
+  },
+
+  // Emitir una factura electrónica
+  emitir: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/emitir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al emitir factura')
+    }
+    return res.json()
+  },
+
+  // Listar facturas emitidas
+  listarFacturas: async () => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/facturas`)
+    if (!res.ok) throw new Error('Error al listar facturas')
+    return res.json()
+  },
+
+  // Detalle de una factura
+  detalle: async (facturaId) => {
+    const res = await fetch(`${BASE_URL}/api/facturacion/facturas/${facturaId}`)
+    if (!res.ok) throw new Error('Error al obtener detalle de factura')
+    return res.json()
+  },
+}
