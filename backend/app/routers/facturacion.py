@@ -158,6 +158,7 @@ async def emitir_factura(datos: FacturaCreate):
                     "Concepto":   1,
                     "DocTipo":    doc_tipo,
                     "DocNro":     cuit_receptor,
+                    "CondicionIVAReceptorId": 5,
                     "CbteDesde":  numero_cbte,
                     "CbteHasta":  numero_cbte,
                     "CbteFch":    fecha_hoy,
