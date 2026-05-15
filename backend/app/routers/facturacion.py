@@ -156,9 +156,9 @@ async def emitir_factura(datos: FacturaCreate):
             "FeDetReq": {
                 "FECAEDetRequest": [{
                     "Concepto":   1,
-                    "DocTipo":    doc_tipo,
-                    "DocNro":     cuit_receptor,
-                    "CondicionIVAReceptorId": 5,
+                    "DocTipo":    80 if datos.tipo == "A" else 99,
+                    "DocNro":     cuit_receptor if datos.tipo == "A" else 0,
+                    "CondicionIVAReceptorId": 1 if datos.tipo == "A" else 5,
                     "CbteDesde":  numero_cbte,
                     "CbteHasta":  numero_cbte,
                     "CbteFch":    fecha_hoy,
@@ -188,7 +188,7 @@ async def emitir_factura(datos: FacturaCreate):
 
         cae        = detalle.CAE
         cae_vto    = detalle.CAEFchVto
-        numero_str = f"{AFIP_PV:05d}-{numero_cbte:08d}"
+        numero_str = f"{datos.tipo}-{AFIP_PV:05d}-{numero_cbte:08d}"
 
         # PASO 6: Guardar factura
         factura_db = supabase.table("facturas").insert({
