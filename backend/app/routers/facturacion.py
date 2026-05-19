@@ -8,6 +8,7 @@ from app.afip_client import get_wsfe_client, get_auth, AFIP_PV, AFIP_MODO
 import io
 from fastapi.responses import StreamingResponse
 from app.pdf_factura import generar_pdf_factura
+from app.email_service import enviar_factura_por_email
 
 
 router = APIRouter(
@@ -36,6 +37,9 @@ class ClienteCreate(BaseModel):
     direccion:    Optional[str] = None
     telefono:     Optional[str] = None
     email:        Optional[str] = None
+
+class EmailRequest(BaseModel):
+    email_destino: str    # el email del cliente al que se enviará la factura    
 
 # ─── CLIENTES ─────────────────────────────────────────────────────────────────
 
@@ -375,3 +379,121 @@ async def descargar_pdf_factura(factura_id: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+    
+
+@router.post("/facturas/{factura_id}/enviar-email")
+async def enviar_email_factura(factura_id: str, datos: EmailRequest):
+    """
+    Genera el PDF de la factura y lo envía por email al destinatario indicado.
+    Reutiliza exactamente el mismo generador de PDF del endpoint /pdf.
+    """
+    try:
+        # ── PASO 1: Obtener datos de la factura ────────────────────────────
+        fac_res = (
+            supabase.table("facturas")
+            .select("*, clientes(nombre, cuit, direccion, email)")
+            .eq("id", factura_id)
+            .single()
+            .execute()
+        )
+        if not fac_res.data:
+            raise HTTPException(status_code=404, detail="Factura no encontrada")
+        fac = fac_res.data
+
+        if not fac.get("cae"):
+            raise HTTPException(
+                status_code=400,
+                detail="Esta factura no tiene CAE. No se puede enviar por email.",
+            )
+
+        # ── PASO 2: Obtener items ──────────────────────────────────────────
+        items_res = (
+            supabase.table("factura_items")
+            .select("*, productos(codigo, nombre)")
+            .eq("factura_id", factura_id)
+            .execute()
+        )
+        items   = items_res.data or []
+        cliente = fac.get("clientes") or {}
+
+        # ── PASO 3: Fecha en zona Argentina ───────────────────────────────
+        _created = fac.get("created_at", "")
+        if _created:
+            from datetime import timezone, timedelta
+            dt_utc = datetime.fromisoformat(str(_created).replace("Z", "+00:00"))
+            dt_arg = dt_utc.astimezone(timezone(timedelta(hours=-3)))
+            _fecha_emision = dt_arg.strftime("%Y-%m-%d")
+        else:
+            _fecha_emision = ""
+
+        # ── PASO 4: Armar dict para el generador de PDF ───────────────────
+        factura_data = {
+            "numero_comprobante": fac.get("numero", ""),
+            "tipo_comprobante":   fac.get("tipo", "B").strip(),
+            "fecha_emision":      _fecha_emision,
+            "cae":                fac.get("cae", ""),
+            "cae_vencimiento":    fac.get("cae_vto", ""),
+            "cliente": {
+                "nombre":        cliente.get("nombre", "Consumidor Final"),
+                "cuit_dni":      cliente.get("cuit", ""),
+                "domicilio":     cliente.get("direccion", ""),
+                "condicion_iva": "Responsable Inscripto"
+                                 if fac.get("tipo", "B").strip() == "A"
+                                 else "Consumidor Final",
+            },
+            "items": [
+                {
+                    "descripcion":     (it.get("productos") or {}).get("nombre", "Producto"),
+                    "cantidad":        float(it.get("cantidad", 1)),
+                    "precio_unitario": float(it.get("precio_unitario", 0)),
+                    "subtotal":        float(it.get("subtotal", 0)),
+                }
+                for it in items
+            ],
+            "subtotal":       float(fac.get("subtotal", 0)),
+            "iva_porcentaje": 21.0,
+            "iva_monto":      float(fac.get("iva", 0)),
+            "total":          float(fac.get("total", 0)),
+            "observaciones":  fac.get("observaciones", "") or "",
+        }
+
+        # ── PASO 5: Generar PDF ────────────────────────────────────────────
+        pdf_bytes = generar_pdf_factura(factura_data)
+
+        # ── PASO 6: Enviar email ───────────────────────────────────────────
+        from app.email_service import enviar_factura_por_email
+
+        enviar_factura_por_email(
+            email_destino  = datos.email_destino,
+            numero_factura = fac.get("numero", ""),
+            tipo_factura   = fac.get("tipo", "B").strip(),
+            nombre_cliente = cliente.get("nombre", "Cliente"),
+            total          = float(fac.get("total", 0)),
+            cae            = fac.get("cae", ""),
+            pdf_bytes      = pdf_bytes,
+        )
+
+        # ── PASO 7: Registrar en BD que se envió (opcional pero útil) ─────
+        supabase.table("facturas").update({
+            "email_enviado_a": datos.email_destino,
+        }).eq("id", factura_id).execute()
+        # NOTA: si la columna email_enviado_a no existe en tu tabla facturas,
+        # comentá las 3 líneas de arriba o ejecutá en Supabase:
+        # ALTER TABLE facturas ADD COLUMN email_enviado_a TEXT;
+
+        return {
+            "ok":      True,
+            "mensaje": f"Factura enviada correctamente a {datos.email_destino}",
+            "numero":  fac.get("numero", ""),
+        }
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        # Error de configuración SMTP (credenciales faltantes)
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al enviar email: {str(e)}",
+        )
