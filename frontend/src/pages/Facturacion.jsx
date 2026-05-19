@@ -1,47 +1,55 @@
 // ============================================================
-// Facturacion.jsx — Página de facturación electrónica
-// Emisión de facturas A y B con integración AFIP
+// Facturacion.jsx — con envío de factura por email
+// Cambios respecto a la versión anterior:
+//   • Estado: emailModal, emailDest, enviandoEmail, emailFeedback
+//   • Función: enviarEmail(facturaId, emailSugerido)
+//   • En historial: botón ✉ Email junto a ↓ PDF
+//   • En resultado (después de emitir): botón "Enviar por email"
+//   • Modal de confirmación/edición de email
 // ============================================================
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import { facturacionApi, productosApi } from '../services/api'
 import styles from './Facturacion.module.css'
 
-// ── TABS ──────────────────────────────────────────────────────────────────────
 const TABS = [
-  { id: 'nueva',    label: '+ Nueva factura'    },
-  { id: 'historial',label: '≡ Historial'        },
+  { id: 'nueva',     label: '+ Nueva factura' },
+  { id: 'historial', label: '≡ Historial'     },
 ]
 
 export default function Facturacion() {
 
-  const [tab, setTab]                   = useState('nueva')
+  const [tab, setTab] = useState('nueva')
 
-  // ── ESTADOS FORMULARIO ────────────────────────────────────
-  const [tipoFactura, setTipoFactura]   = useState('B')
-  const [cliente, setCliente]           = useState(null)
-  const [busqCliente, setBusqCliente]   = useState('')
+  // ── FORMULARIO ────────────────────────────────────────────
+  const [tipoFactura, setTipoFactura]     = useState('B')
+  const [cliente, setCliente]             = useState(null)
+  const [busqCliente, setBusqCliente]     = useState('')
   const [sugerClientes, setSugerClientes] = useState([])
   const [mostrarSugerC, setMostrarSugerC] = useState(false)
-  const [modalCliente, setModalCliente] = useState(false)
-  const [formCliente, setFormCliente]   = useState({ nombre: '', cuit: '', direccion: '', telefono: '', email: '' })
-
-  const [busqProducto, setBusqProducto] = useState('')
+  const [modalCliente, setModalCliente]   = useState(false)
+  const [formCliente, setFormCliente]     = useState({ nombre: '', cuit: '', direccion: '', telefono: '', email: '' })
+  const [busqProducto, setBusqProducto]   = useState('')
   const [sugerProductos, setSugerProductos] = useState([])
   const [mostrarSugerP, setMostrarSugerP] = useState(false)
-  const [items, setItems]               = useState([])
-  // items: lista de productos agregados a la factura
+  const [items, setItems]                 = useState([])
+  const [emitiendo, setEmitiendo]         = useState(false)
+  const [resultado, setResultado]         = useState(null)
+  const [error, setError]                 = useState(null)
 
-  const [emitiendo, setEmitiendo]       = useState(false)
-  const [resultado, setResultado]       = useState(null)
-  // resultado: respuesta de AFIP con CAE, número, etc.
-  const [error, setError]               = useState(null)
-
-  // ── ESTADOS HISTORIAL ─────────────────────────────────────
-  const [facturas, setFacturas]         = useState([])
-  const [cargandoHist, setCargandoHist] = useState(false)
+  // ── HISTORIAL ─────────────────────────────────────────────
+  const [facturas, setFacturas]           = useState([])
+  const [cargandoHist, setCargandoHist]   = useState(false)
   const [facturaDetalle, setFacturaDetalle] = useState(null)
+
+  // ── EMAIL — estados nuevos ────────────────────────────────
+  const [emailModal, setEmailModal]       = useState(false)
+  const [emailFacturaId, setEmailFacturaId] = useState(null)
+  const [emailDest, setEmailDest]         = useState('')
+  const [enviandoEmail, setEnviandoEmail] = useState(false)
+  const [emailFeedback, setEmailFeedback] = useState(null)
+  // emailFeedback: { ok: bool, mensaje: string } | null
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function Facturacion() {
     }
   }
 
-  // ── BUSCADOR DE CLIENTES ──────────────────────────────────
+  // ── BUSCADOR CLIENTES ─────────────────────────────────────
   useEffect(() => {
     if (busqCliente.trim().length < 2) { setMostrarSugerC(false); return }
     const t = setTimeout(async () => {
@@ -73,7 +81,7 @@ export default function Facturacion() {
     return () => clearTimeout(t)
   }, [busqCliente])
 
-  // ── BUSCADOR DE PRODUCTOS ─────────────────────────────────
+  // ── BUSCADOR PRODUCTOS ────────────────────────────────────
   useEffect(() => {
     if (busqProducto.trim().length < 2) { setMostrarSugerP(false); return }
     const t = setTimeout(async () => {
@@ -86,21 +94,16 @@ export default function Facturacion() {
     return () => clearTimeout(t)
   }, [busqProducto])
 
-  // ── SELECCIONAR CLIENTE ───────────────────────────────────
   const seleccionarCliente = (c) => {
     setCliente(c)
     setBusqCliente(c.nombre)
     setMostrarSugerC(false)
   }
 
-  // ── CREAR CLIENTE ─────────────────────────────────────────
   const crearCliente = async (e) => {
     e.preventDefault()
     try {
-      const nuevo = await facturacionApi.crearCliente({
-        ...formCliente,
-        tipo_factura: tipoFactura,
-      })
+      const nuevo = await facturacionApi.crearCliente({ ...formCliente, tipo_factura: tipoFactura })
       setCliente(nuevo)
       setBusqCliente(nuevo.nombre)
       setModalCliente(false)
@@ -110,11 +113,9 @@ export default function Facturacion() {
     }
   }
 
-  // ── AGREGAR PRODUCTO ──────────────────────────────────────
   const agregarProducto = (p) => {
     setBusqProducto('')
     setMostrarSugerP(false)
-    // Si ya está en la lista, incrementar cantidad
     const existe = items.find(i => i.producto_id === p.id)
     if (existe) {
       setItems(items.map(i =>
@@ -135,7 +136,6 @@ export default function Facturacion() {
     }
   }
 
-  // ── CAMBIAR CANTIDAD ──────────────────────────────────────
   const cambiarCantidad = (productoId, cantidad) => {
     if (cantidad < 1) return
     setItems(items.map(i =>
@@ -145,7 +145,6 @@ export default function Facturacion() {
     ))
   }
 
-  // ── CAMBIAR PRECIO ────────────────────────────────────────
   const cambiarPrecio = (productoId, precio) => {
     setItems(items.map(i =>
       i.producto_id === productoId
@@ -154,21 +153,15 @@ export default function Facturacion() {
     ))
   }
 
-  // ── ELIMINAR ITEM ─────────────────────────────────────────
-  const eliminarItem = (productoId) => {
-    setItems(items.filter(i => i.producto_id !== productoId))
-  }
+  const eliminarItem = (productoId) => setItems(items.filter(i => i.producto_id !== productoId))
 
-  // ── CALCULAR TOTALES ──────────────────────────────────────
   const subtotal = items.reduce((s, i) => s + i.subtotal, 0)
   const iva21    = tipoFactura === 'A' ? Math.round((subtotal / 1.21) * 0.21 * 100) / 100 : 0
   const total    = subtotal
 
-  // ── EMITIR FACTURA ────────────────────────────────────────
   const emitirFactura = async () => {
     if (!items.length) { setError('Agregá al menos un producto'); return }
     if (tipoFactura === 'A' && !cliente) { setError('Factura A requiere cliente con CUIT'); return }
-
     setError(null)
     setEmitiendo(true)
     try {
@@ -181,8 +174,8 @@ export default function Facturacion() {
           precio_unitario: i.precio_unitario,
         })),
       })
-      setResultado(res)
-      // Resetear formulario
+      // Guardamos también el email del cliente para pre-completar el modal
+      setResultado({ ...res, clienteEmail: cliente?.email || '' })
       setItems([])
       setCliente(null)
       setBusqCliente('')
@@ -193,27 +186,67 @@ export default function Facturacion() {
     }
   }
 
-  // ── NUEVA FACTURA ─────────────────────────────────────────
   const nuevaFactura = () => {
     setResultado(null)
     setError(null)
     setItems([])
     setCliente(null)
     setBusqCliente('')
+    setEmailFeedback(null)
   }
 
-  // ── FORMATEAR ─────────────────────────────────────────────
-  const fmt     = (n) => Number(n).toLocaleString('es-AR')
-  const fmtP    = (n) => `$${Number(n).toLocaleString('es-AR')}`
-  // DESPUÉS — fuerza interpretación como UTC y convierte a zona local Argentina:
+  // ── ABRIR MODAL EMAIL ─────────────────────────────────────
+  // emailSugerido: email del cliente si lo tiene, para pre-completar
+  const abrirModalEmail = (facturaId, emailSugerido = '') => {
+    setEmailFacturaId(facturaId)
+    setEmailDest(emailSugerido)
+    setEmailFeedback(null)
+    setEmailModal(true)
+  }
+
+  // ── ENVIAR EMAIL ──────────────────────────────────────────
+  const enviarEmail = async (e) => {
+    e.preventDefault()
+    if (!emailDest.trim()) return
+    setEnviandoEmail(true)
+    setEmailFeedback(null)
+    try {
+      // Llamada al endpoint POST /api/facturacion/facturas/{id}/enviar-email
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${emailFacturaId}/enviar-email`,
+        {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email_destino: emailDest.trim() }),
+        }
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Error al enviar')
+      setEmailFeedback({ ok: true, mensaje: `✓ Enviado correctamente a ${emailDest}` })
+    } catch (e) {
+      setEmailFeedback({ ok: false, mensaje: `✗ ${e.message}` })
+    } finally {
+      setEnviandoEmail(false)
+    }
+  }
+
+  const cerrarModalEmail = () => {
+    setEmailModal(false)
+    setEmailFeedback(null)
+    setEmailDest('')
+    setEmailFacturaId(null)
+  }
+
+  // ── FORMATEO ──────────────────────────────────────────────
+  const fmt  = (n) => Number(n).toLocaleString('es-AR')
+  const fmtP = (n) => `$${Number(n).toLocaleString('es-AR')}`
   const fmtF = (f) => {
     if (!f) return '—'
-    // Si el string no tiene Z ni offset, Supabase lo guarda en UTC → agregamos Z
     const fecha = f.includes('Z') || f.includes('+') ? f : f + 'Z'
     return new Date(fecha).toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })
   }
 
-  // ── RENDER ────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <Navbar />
@@ -249,8 +282,8 @@ export default function Facturacion() {
             TAB: NUEVA FACTURA
         ══════════════════════════════════════════════ */}
         {tab === 'nueva' && (
-
           <div>
+
             {/* RESULTADO — después de emitir */}
             {resultado && (
               <div className={styles.resultadoWrap}>
@@ -280,9 +313,39 @@ export default function Facturacion() {
                     </div>
                   </div>
                 </div>
-                <button className={styles.btnNuevaFactura} onClick={nuevaFactura}>
-                  + Nueva factura
-                </button>
+
+                {/* ── ACCIONES POST-EMISIÓN ── */}
+                <div className={styles.resultadoAcciones}>
+                  {/* Descargar PDF */}
+                  <a
+                    href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${resultado.factura_id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.btnPdfResultado}
+                  >
+                    ↓ Descargar PDF
+                  </a>
+
+                  {/* Enviar por email */}
+                  <button
+                    className={styles.btnEmailResultado}
+                    onClick={() => abrirModalEmail(resultado.factura_id, resultado.clienteEmail)}
+                  >
+                    ✉ Enviar por email
+                  </button>
+
+                  {/* Nueva factura */}
+                  <button className={styles.btnNuevaFactura} onClick={nuevaFactura}>
+                    + Nueva factura
+                  </button>
+                </div>
+
+                {/* Feedback de email en el panel resultado */}
+                {emailFeedback && (
+                  <div className={emailFeedback.ok ? styles.emailOk : styles.emailError}>
+                    {emailFeedback.mensaje}
+                  </div>
+                )}
               </div>
             )}
 
@@ -319,10 +382,7 @@ export default function Facturacion() {
                       <span className={styles.seccionTitulo}>
                         Cliente {tipoFactura === 'A' ? '*' : '(opcional)'}
                       </span>
-                      <button
-                        className={styles.btnClienteNuevo}
-                        onClick={() => setModalCliente(true)}
-                      >
+                      <button className={styles.btnClienteNuevo} onClick={() => setModalCliente(true)}>
                         + Nuevo
                       </button>
                     </div>
@@ -332,10 +392,7 @@ export default function Facturacion() {
                         className={styles.input}
                         placeholder="Buscar cliente por nombre..."
                         value={busqCliente}
-                        onChange={e => {
-                          setBusqCliente(e.target.value)
-                          if (!e.target.value) setCliente(null)
-                        }}
+                        onChange={e => { setBusqCliente(e.target.value); if (!e.target.value) setCliente(null) }}
                       />
                       {mostrarSugerC && sugerClientes.length > 0 && (
                         <ul className={styles.sugerencias}>
@@ -354,8 +411,12 @@ export default function Facturacion() {
                         <div className={styles.clienteDatos}>
                           <span className={styles.clienteNombre}>{cliente.nombre}</span>
                           {cliente.cuit && <span className={styles.clienteCuit}>CUIT: {cliente.cuit}</span>}
+                          {cliente.email && <span className={styles.clienteCuit}>✉ {cliente.email}</span>}
                         </div>
-                        <button className={styles.btnQuitarCliente} onClick={() => { setCliente(null); setBusqCliente('') }}>✕</button>
+                        <button
+                          className={styles.btnQuitarCliente}
+                          onClick={() => { setCliente(null); setBusqCliente('') }}
+                        >✕</button>
                       </div>
                     )}
                     {!cliente && tipoFactura === 'B' && (
@@ -395,28 +456,22 @@ export default function Facturacion() {
                     </div>
                   </div>
 
-                  {/* ERROR */}
-                  {error && (
-                    <div className={styles.errorMsg}>⚠ {error}</div>
-                  )}
-
+                  {error && <div className={styles.errorMsg}>⚠ {error}</div>}
                 </div>
 
                 {/* PANEL DERECHO — DETALLE Y TOTALES */}
                 <div className={styles.detallePanel}>
-
                   <div className={styles.detallePanelHeader}>
                     <span className={styles.panelTitulo}>Detalle de la factura</span>
                     {items.length > 0 && (
-                      <span className={styles.itemsCount}>{items.length} ítem{items.length !== 1 ? 's' : ''}</span>
+                      <span className={styles.itemsCount}>
+                        {items.length} ítem{items.length !== 1 ? 's' : ''}
+                      </span>
                     )}
                   </div>
 
-                  {/* ITEMS */}
                   {items.length === 0 ? (
-                    <div className={styles.itemsVacio}>
-                      Buscá y agregá productos para comenzar
-                    </div>
+                    <div className={styles.itemsVacio}>Buscá y agregá productos para comenzar</div>
                   ) : (
                     <div className={styles.itemsList}>
                       {items.map(item => (
@@ -427,10 +482,7 @@ export default function Facturacion() {
                           </div>
                           <div className={styles.itemControles}>
                             <div className={styles.itemCantidad}>
-                              <button
-                                className={styles.btnCantidad}
-                                onClick={() => cambiarCantidad(item.producto_id, item.cantidad - 1)}
-                              >−</button>
+                              <button className={styles.btnCantidad} onClick={() => cambiarCantidad(item.producto_id, item.cantidad - 1)}>−</button>
                               <input
                                 type="number"
                                 className={styles.inputCantidad}
@@ -438,10 +490,7 @@ export default function Facturacion() {
                                 onChange={e => cambiarCantidad(item.producto_id, parseInt(e.target.value) || 1)}
                                 min="1"
                               />
-                              <button
-                                className={styles.btnCantidad}
-                                onClick={() => cambiarCantidad(item.producto_id, item.cantidad + 1)}
-                              >+</button>
+                              <button className={styles.btnCantidad} onClick={() => cambiarCantidad(item.producto_id, item.cantidad + 1)}>+</button>
                             </div>
                             <div className={styles.itemPrecioWrap}>
                               <span className={styles.itemPrecioLabel}>$</span>
@@ -455,22 +504,17 @@ export default function Facturacion() {
                               />
                             </div>
                             <span className={styles.itemSubtotal}>{fmtP(item.subtotal)}</span>
-                            <button
-                              className={styles.btnEliminarItem}
-                              onClick={() => eliminarItem(item.producto_id)}
-                            >✕</button>
+                            <button className={styles.btnEliminarItem} onClick={() => eliminarItem(item.producto_id)}>✕</button>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* TOTALES */}
                   {items.length > 0 && (
                     <div className={styles.totalesWrap}>
                       <div className={styles.totalRow}>
-                        <span>Subtotal</span>
-                        <span>{fmtP(subtotal)}</span>
+                        <span>Subtotal</span><span>{fmtP(subtotal)}</span>
                       </div>
                       {tipoFactura === 'A' && (
                         <>
@@ -479,8 +523,7 @@ export default function Facturacion() {
                             <span>{fmtP(Math.round(subtotal / 1.21 * 100) / 100)}</span>
                           </div>
                           <div className={styles.totalRow}>
-                            <span>IVA 21%</span>
-                            <span>{fmtP(iva21)}</span>
+                            <span>IVA 21%</span><span>{fmtP(iva21)}</span>
                           </div>
                         </>
                       )}
@@ -499,9 +542,7 @@ export default function Facturacion() {
                             <span className={styles.spinner}></span>
                             Conectando con AFIP...
                           </span>
-                        ) : (
-                          `▶ Emitir Factura ${tipoFactura}`
-                        )}
+                        ) : `▶ Emitir Factura ${tipoFactura}`}
                       </button>
 
                       <div className={styles.afipNota}>
@@ -509,7 +550,6 @@ export default function Facturacion() {
                       </div>
                     </div>
                   )}
-
                 </div>
               </div>
             )}
@@ -535,25 +575,36 @@ export default function Facturacion() {
                     <th>Total</th>
                     <th>Estado</th>
                     <th>Fecha</th>
-                    <th>PDF</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {facturas.map(f => (
                     <tr key={f.id} className={styles.tablaFila}>
-                      <td data-label="Número" className={styles.tdNumero} onClick={() => setFacturaDetalle(f)}>{f.numero}</td>
-                      <td data-label="Tipo" onClick={() => setFacturaDetalle(f)}>
-                        <span className={f.tipo === 'A' ? styles.badgeA : styles.badgeB}>Factura {f.tipo}</span>
+                      <td data-label="Número" className={styles.tdNumero} onClick={() => setFacturaDetalle(f)}>
+                        {f.numero}
                       </td>
-                      <td data-label="Cliente" onClick={() => setFacturaDetalle(f)}>{f.clientes?.nombre || 'Consumidor Final'}</td>
-                      <td data-label="Total" className={styles.tdTotal} onClick={() => setFacturaDetalle(f)}>{fmtP(f.total)}</td>
+                      <td data-label="Tipo" onClick={() => setFacturaDetalle(f)}>
+                        <span className={f.tipo === 'A' ? styles.badgeA : styles.badgeB}>
+                          Factura {f.tipo}
+                        </span>
+                      </td>
+                      <td data-label="Cliente" onClick={() => setFacturaDetalle(f)}>
+                        {f.clientes?.nombre || 'Consumidor Final'}
+                      </td>
+                      <td data-label="Total" className={styles.tdTotal} onClick={() => setFacturaDetalle(f)}>
+                        {fmtP(f.total)}
+                      </td>
                       <td data-label="Estado" onClick={() => setFacturaDetalle(f)}>
                         <span className={styles.badgeEmitida}>{f.estado}</span>
                       </td>
-                      <td data-label="Fecha" onClick={() => setFacturaDetalle(f)}>{fmtF(f.created_at)}</td>
-                      <td data-label="PDF">
-                        <a                        
-                          href={`http://localhost:8000/api/facturacion/facturas/${f.id}/pdf`}
+                      <td data-label="Fecha" onClick={() => setFacturaDetalle(f)}>
+                        {fmtF(f.created_at)}
+                      </td>
+                      {/* ── ACCIONES — PDF + EMAIL ── */}
+                      <td data-label="Acciones" className={styles.tdAcciones}>
+                        <a
+                          href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${f.id}/pdf`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={styles.btnPdf}
@@ -561,6 +612,20 @@ export default function Facturacion() {
                         >
                           ↓ PDF
                         </a>
+                        <button
+                          className={styles.btnEmail}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            abrirModalEmail(f.id, f.clientes?.email || f.email_enviado_a || '')
+                          }}
+                          title="Enviar factura por email"
+                        >
+                          ✉ Email
+                          {/* Indicador verde si ya fue enviada antes */}
+                          {f.email_enviado_a && (
+                            <span className={styles.emailEnviadoDot} title={`Enviada a ${f.email_enviado_a}`}>●</span>
+                          )}
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -572,7 +637,9 @@ export default function Facturacion() {
 
       </div>
 
-      {/* ── MODAL CLIENTE NUEVO ── */}
+      {/* ══════════════════════════════════════════════════════
+          MODAL: NUEVO CLIENTE
+      ══════════════════════════════════════════════════════ */}
       {modalCliente && (
         <div className={styles.modalOverlay} onClick={() => setModalCliente(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
@@ -626,7 +693,9 @@ export default function Facturacion() {
         </div>
       )}
 
-      {/* ── MODAL DETALLE FACTURA ── */}
+      {/* ══════════════════════════════════════════════════════
+          MODAL: DETALLE FACTURA
+      ══════════════════════════════════════════════════════ */}
       {facturaDetalle && (
         <div className={styles.modalOverlay} onClick={() => setFacturaDetalle(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
@@ -639,7 +708,8 @@ export default function Facturacion() {
                 <span>Tipo</span><strong>Factura {facturaDetalle.tipo}</strong>
               </div>
               <div className={styles.detalleRow}>
-                <span>Cliente</span><strong>{facturaDetalle.clientes?.nombre || 'Consumidor Final'}</strong>
+                <span>Cliente</span>
+                <strong>{facturaDetalle.clientes?.nombre || 'Consumidor Final'}</strong>
               </div>
               {facturaDetalle.clientes?.cuit && (
                 <div className={styles.detalleRow}>
@@ -647,7 +717,8 @@ export default function Facturacion() {
                 </div>
               )}
               <div className={styles.detalleRow}>
-                <span>Total</span><strong className={styles.resultadoTotal}>{fmtP(facturaDetalle.total)}</strong>
+                <span>Total</span>
+                <strong className={styles.resultadoTotal}>{fmtP(facturaDetalle.total)}</strong>
               </div>
               <div className={styles.detalleRow}>
                 <span>Estado</span><strong>{facturaDetalle.estado}</strong>
@@ -655,7 +726,84 @@ export default function Facturacion() {
               <div className={styles.detalleRow}>
                 <span>Fecha</span><strong>{fmtF(facturaDetalle.created_at)}</strong>
               </div>
+              {facturaDetalle.email_enviado_a && (
+                <div className={styles.detalleRow}>
+                  <span>Email enviado a</span>
+                  <strong className={styles.emailEnviadoInfo}>✉ {facturaDetalle.email_enviado_a}</strong>
+                </div>
+              )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════
+          MODAL: ENVIAR POR EMAIL  ← NUEVO
+      ══════════════════════════════════════════════════════ */}
+      {emailModal && (
+        <div className={styles.modalOverlay} onClick={cerrarModalEmail}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Enviar factura por email</h3>
+              <button className={styles.modalCerrar} onClick={cerrarModalEmail}>✕</button>
+            </div>
+
+            {/* Si ya se envió con éxito, mostramos confirmación */}
+            {emailFeedback?.ok ? (
+              <div className={styles.emailModalOk}>
+                <div className={styles.emailModalOkIcono}>✓</div>
+                <p>{emailFeedback.mensaje}</p>
+                <button className={styles.btnGuardar} onClick={cerrarModalEmail}>
+                  Cerrar
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={enviarEmail} className={styles.modalForm}>
+                <div className={styles.formGroup}>
+                  <label>Dirección de email del cliente *</label>
+                  <input
+                    type="email"
+                    className={styles.input}
+                    required
+                    autoFocus
+                    value={emailDest}
+                    onChange={e => setEmailDest(e.target.value)}
+                    placeholder="cliente@empresa.com"
+                  />
+                  <small className={styles.inputHint}>
+                    Se adjuntará el PDF de la factura con el comprobante electrónico y el código QR de ARCA.
+                  </small>
+                </div>
+
+                {/* Error de envío */}
+                {emailFeedback && !emailFeedback.ok && (
+                  <div className={styles.errorMsg}>{emailFeedback.mensaje}</div>
+                )}
+
+                <div className={styles.modalFooter}>
+                  <button
+                    type="button"
+                    className={styles.btnCancelar}
+                    onClick={cerrarModalEmail}
+                    disabled={enviandoEmail}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className={styles.btnGuardar}
+                    disabled={enviandoEmail || !emailDest.trim()}
+                  >
+                    {enviandoEmail ? (
+                      <span className={styles.btnEmitirCargando}>
+                        <span className={styles.spinner}></span>
+                        Enviando...
+                      </span>
+                    ) : '✉ Enviar factura'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

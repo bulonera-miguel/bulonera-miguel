@@ -547,6 +547,155 @@
   border-color: #00C8F0;
 }
 
+/* ── Botón Email en historial ── */
+.btnEmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-left: 6px;
+}
+.btnEmail:hover { background: #dbeafe; }
+
+/* Punto verde — ya fue enviada */
+.emailEnviadoDot {
+  color: #16a34a;
+  font-size: 8px;
+  margin-left: 2px;
+}
+
+/* Columna acciones en tabla historial */
+.tdAcciones {
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ── Botones en panel resultado (post-emisión) ── */
+.resultadoAcciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.btnPdfResultado {
+  padding: 8px 16px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnPdfResultado:hover { background: #e2e8f0; }
+
+.btnEmailResultado {
+  padding: 8px 16px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnEmailResultado:hover { background: #dbeafe; }
+
+/* ── Feedback email en panel resultado ── */
+.emailOk {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  color: #15803d;
+  font-size: 13px;
+}
+.emailError {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* ── Modal email — confirmación de éxito ── */
+.emailModalOk {
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.emailModalOkIcono {
+  width: 48px;
+  height: 48px;
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+.emailModalOk p {
+  color: #15803d;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ── Info email en detalle de factura ── */
+.emailEnviadoInfo { color: #2563eb; }
+
+/* ── Hint debajo del input ── */
+.inputHint {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* ── Botón Email — corregido para tema oscuro ── */
+.btnEmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  color: #00C8F0;
+  border: 1px solid rgba(0,200,240,0.30);
+  border-radius: 0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 6px;
+}
+.btnEmail:hover {
+  background: rgba(0,200,240,0.10);
+  border-color: #00C8F0;
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE — TABLET 768px
 ══════════════════════════════════════ */
@@ -554,6 +703,9 @@
   .contenido { padding: 16px; }
   .mainGrid { grid-template-columns: 1fr; }
   .detallePanel { order: -1; }
+  /* ── AGREGAR ESTO ── */
+  .resultadoAcciones { justify-content: flex-start; }
+  .tdAcciones { text-align: left; }
 }
 
 /* ══════════════════════════════════════
@@ -582,4 +734,28 @@
     font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
     color: rgba(200,228,244,0.40); flex-shrink: 0; margin-right: 8px;
   }
+    /* ── AGREGAR ESTO ── */
+  .resultadoAcciones {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btnPdfResultado,
+  .btnEmailResultado,
+  .btnNuevaFactura {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  .tdAcciones {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .btnEmail {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  .emailModalOk { padding: 16px; }
 }
