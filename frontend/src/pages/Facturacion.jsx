@@ -205,7 +205,13 @@ export default function Facturacion() {
   // ── FORMATEAR ─────────────────────────────────────────────
   const fmt     = (n) => Number(n).toLocaleString('es-AR')
   const fmtP    = (n) => `$${Number(n).toLocaleString('es-AR')}`
-  const fmtF    = (f) => f ? new Date(f).toLocaleDateString('es-AR') : '—'
+  // DESPUÉS — fuerza interpretación como UTC y convierte a zona local Argentina:
+  const fmtF = (f) => {
+    if (!f) return '—'
+    // Si el string no tiene Z ni offset, Supabase lo guarda en UTC → agregamos Z
+    const fecha = f.includes('Z') || f.includes('+') ? f : f + 'Z'
+    return new Date(fecha).toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })
+  }
 
   // ── RENDER ────────────────────────────────────────────────
   return (
@@ -529,23 +535,33 @@ export default function Facturacion() {
                     <th>Total</th>
                     <th>Estado</th>
                     <th>Fecha</th>
+                    <th>PDF</th>
                   </tr>
                 </thead>
                 <tbody>
                   {facturas.map(f => (
-                    <tr key={f.id} onClick={() => setFacturaDetalle(f)} className={styles.tablaFila}>
-                      <td data-label="Número" className={styles.tdNumero}>{f.numero}</td>
-                      <td data-label="Tipo">
-                        <span className={f.tipo === 'A' ? styles.badgeA : styles.badgeB}>
-                          Factura {f.tipo}
-                        </span>
+                    <tr key={f.id} className={styles.tablaFila}>
+                      <td data-label="Número" className={styles.tdNumero} onClick={() => setFacturaDetalle(f)}>{f.numero}</td>
+                      <td data-label="Tipo" onClick={() => setFacturaDetalle(f)}>
+                        <span className={f.tipo === 'A' ? styles.badgeA : styles.badgeB}>Factura {f.tipo}</span>
                       </td>
-                      <td data-label="Cliente">{f.clientes?.nombre || 'Consumidor Final'}</td>
-                      <td data-label="Total" className={styles.tdTotal}>{fmtP(f.total)}</td>
-                      <td data-label="Estado">
+                      <td data-label="Cliente" onClick={() => setFacturaDetalle(f)}>{f.clientes?.nombre || 'Consumidor Final'}</td>
+                      <td data-label="Total" className={styles.tdTotal} onClick={() => setFacturaDetalle(f)}>{fmtP(f.total)}</td>
+                      <td data-label="Estado" onClick={() => setFacturaDetalle(f)}>
                         <span className={styles.badgeEmitida}>{f.estado}</span>
                       </td>
-                      <td data-label="Fecha">{fmtF(f.created_at)}</td>
+                      <td data-label="Fecha" onClick={() => setFacturaDetalle(f)}>{fmtF(f.created_at)}</td>
+                      <td data-label="PDF">
+                        <a                        
+                          href={`http://localhost:8000/api/facturacion/facturas/${f.id}/pdf`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.btnPdf}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          ↓ PDF
+                        </a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -5,6 +5,10 @@ from datetime import datetime
 import os
 from app.database import supabase
 from app.afip_client import get_wsfe_client, get_auth, AFIP_PV, AFIP_MODO
+import io
+from fastapi.responses import StreamingResponse
+from app.pdf_factura import generar_pdf_factura
+
 
 router = APIRouter(
     prefix="/api/facturacion",
@@ -192,13 +196,16 @@ async def emitir_factura(datos: FacturaCreate):
 
         # PASO 6: Guardar factura
         factura_db = supabase.table("facturas").insert({
-            "numero":     numero_str,
-            "tipo":       datos.tipo,
-            "cliente_id": datos.cliente_id,
-            "subtotal":   subtotal,
-            "iva":        iva_21,
-            "total":      total,
-            "estado":     "emitida",
+            "numero":       numero_str,
+            "tipo":         datos.tipo,
+            "cliente_id":   datos.cliente_id,
+            "subtotal":     subtotal,
+            "iva":          iva_21,
+            "total":        total,
+            "estado":       "emitida",
+            "cae":          cae,
+            "cae_vto":      cae_vto,
+            "observaciones": datos.observaciones,
         }).execute()
         factura_id = factura_db.data[0]["id"]
 
@@ -281,4 +288,90 @@ async def detalle_factura(factura_id: str):
         )
         return {**factura.data, "items": items.data}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))    
+    
+
+@router.get("/facturas/{factura_id}/pdf")
+async def descargar_pdf_factura(factura_id: str):
+    try:
+        fac_res = (
+            supabase.table("facturas")
+            .select("*, clientes(nombre, cuit, direccion)")
+            .eq("id", factura_id)
+            .single()
+            .execute()
+        )
+        if not fac_res.data:
+            raise HTTPException(status_code=404, detail="Factura no encontrada")
+        fac = fac_res.data
+
+        # Validar CAE — si no tiene, el PDF no se puede generar
+        if not fac.get("cae"):
+            raise HTTPException(
+                status_code=400,
+                detail="Esta factura fue emitida antes de que se guardara el CAE. "
+                       "Reemitila o actualizá el CAE manualmente en Supabase."
+            )
+
+        items_res = (
+            supabase.table("factura_items")
+            .select("*, productos(codigo, nombre)")
+            .eq("factura_id", factura_id)
+            .execute()
+        )
+        items = items_res.data or []
+        cliente = fac.get("clientes") or {}
+
+        # Convertir fecha UTC a hora Argentina (UTC-3)
+        _created = fac.get("created_at", "")
+        if _created:
+            from datetime import timezone, timedelta
+            dt_utc = datetime.fromisoformat(str(_created).replace("Z", "+00:00"))
+            dt_arg = dt_utc.astimezone(timezone(timedelta(hours=-3)))
+            _fecha_emision = dt_arg.strftime("%Y-%m-%d")
+        else:
+            _fecha_emision = ""
+
+        factura_data = {
+            "numero_comprobante": fac.get("numero", ""),
+            "tipo_comprobante":   fac.get("tipo", "B").strip(),
+            "fecha_emision":      _fecha_emision,
+            "cae":                fac.get("cae", ""),
+            "cae_vencimiento":    fac.get("cae_vto", ""),
+            "cliente": {
+                "nombre":        cliente.get("nombre", "Consumidor Final"),
+                "cuit_dni":      cliente.get("cuit", ""),
+                "domicilio":     cliente.get("direccion", ""),
+                "condicion_iva": "Responsable Inscripto" if fac.get("tipo", "B").strip() == "A" else "Consumidor Final",
+            },
+            "items": [
+                {
+                    "descripcion":     (it.get("productos") or {}).get("nombre", "Producto"),
+                    "cantidad":        float(it.get("cantidad", 1)),
+                    "precio_unitario": float(it.get("precio_unitario", 0)),
+                    "subtotal":        float(it.get("subtotal", 0)),
+                }
+                for it in items
+            ],
+            "subtotal":       float(fac.get("subtotal", 0)),
+            "iva_porcentaje": 21.0,
+            "iva_monto":      float(fac.get("iva", 0)),
+            "total":          float(fac.get("total", 0)),
+            "observaciones":  fac.get("observaciones", "") or "",
+        }
+
+        pdf_bytes = generar_pdf_factura(factura_data)
+        nro = fac.get("numero", factura_id).replace("-", "_")
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="Factura_{nro}.pdf"',
+                "Content-Length": str(len(pdf_bytes)),
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")

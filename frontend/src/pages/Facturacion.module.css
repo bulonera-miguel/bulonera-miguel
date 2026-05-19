@@ -530,6 +530,23 @@
   font-size: 15px; color: #EAF4FF;
 }
 
+.btnPdf {
+  display: inline-block;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.30);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btnPdf:hover {
+  background: rgba(0,200,240,0.10);
+  border-color: #00C8F0;
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE — TABLET 768px
 ══════════════════════════════════════ */
