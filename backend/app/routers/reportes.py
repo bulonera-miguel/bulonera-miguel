@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from datetime import date
 from app.database import supabase
+from fastapi.responses import StreamingResponse
+import io
+from app.pdf_reportes import generar_pdf_reporte
+
 
 # ─── CONFIGURACIÓN DEL ROUTER ─────────────────────────────────────────────────
 
@@ -331,3 +335,224 @@ async def reporte_productos_baja(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en reporte productos baja: {str(e)}")
+
+
+
+@router.get("/stock-critico/pdf")
+async def reporte_stock_critico_pdf(
+    nombre:       Optional[str] = Query(None),
+    codigo:       Optional[str] = Query(None),
+    categoria_id: Optional[str] = Query(None),
+):
+    try:
+        query = (
+            supabase.table("productos")
+            .select("id, codigo, nombre, stock_actual, stock_minimo, precio, categoria_id")
+            .eq("activo", True)
+        )
+        if nombre:       query = query.ilike("nombre", f"%{nombre}%")
+        if codigo:       query = query.ilike("codigo", f"%{codigo}%")
+        if categoria_id: query = query.eq("categoria_id", categoria_id)
+
+        response = query.execute()
+        datos = [p for p in response.data if p["stock_actual"] <= p["stock_minimo"]]
+        datos.sort(key=lambda p: p["stock_actual"] - p["stock_minimo"])
+
+        filtros = {"nombre": nombre, "codigo": codigo, "categoria_id": categoria_id}
+        pdf_bytes = generar_pdf_reporte("stock-critico", datos, filtros)
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="Reporte_Stock_Critico.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+
+
+# ─── PDF 2: MÁS VENDIDOS ──────────────────────────────────────────────────────
+
+@router.get("/mas-vendidos/pdf")
+async def reporte_mas_vendidos_pdf(
+    desde:        Optional[date] = Query(None),
+    hasta:        Optional[date] = Query(None),
+    nombre:       Optional[str]  = Query(None),
+    codigo:       Optional[str]  = Query(None),
+    categoria_id: Optional[str]  = Query(None),
+):
+    try:
+        query = (
+            supabase.table("movimientos_stock")
+            .select("producto_id, cantidad, created_at, productos(id, codigo, nombre, precio, categoria_id, activo)")
+            .eq("tipo", "salida")
+        )
+        if desde: query = query.gte("created_at", desde.isoformat())
+        if hasta: query = query.lte("created_at", f"{hasta.isoformat()}T23:59:59")
+
+        response = query.execute()
+        totales = {}
+        for mov in response.data:
+            producto = mov.get("productos")
+            if not producto or not producto.get("activo"):
+                continue
+            if nombre and nombre.lower() not in producto["nombre"].lower():
+                continue
+            if codigo and codigo.lower() not in producto["codigo"].lower():
+                continue
+            if categoria_id and producto.get("categoria_id") != categoria_id:
+                continue
+            pid = mov["producto_id"]
+            if pid not in totales:
+                totales[pid] = {
+                    "codigo": producto["codigo"], "nombre": producto["nombre"],
+                    "precio": producto["precio"], "total_salidas": 0, "cantidad_movimientos": 0,
+                }
+            totales[pid]["total_salidas"]        += mov["cantidad"]
+            totales[pid]["cantidad_movimientos"] += 1
+
+        datos = sorted(totales.values(), key=lambda x: x["total_salidas"], reverse=True)
+        filtros = {
+            "desde": str(desde) if desde else "", "hasta": str(hasta) if hasta else "",
+            "nombre": nombre, "codigo": codigo, "categoria_id": categoria_id,
+        }
+        pdf_bytes = generar_pdf_reporte("mas-vendidos", datos, filtros)
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="Reporte_Mas_Vendidos.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+
+
+# ─── PDF 3: MENOS VENDIDOS ────────────────────────────────────────────────────
+
+@router.get("/menos-vendidos/pdf")
+async def reporte_menos_vendidos_pdf(
+    desde:        Optional[date] = Query(None),
+    hasta:        Optional[date] = Query(None),
+    nombre:       Optional[str]  = Query(None),
+    codigo:       Optional[str]  = Query(None),
+    categoria_id: Optional[str]  = Query(None),
+):
+    try:
+        query_prod = supabase.table("productos").select(
+            "id, codigo, nombre, precio, categoria_id, stock_actual"
+        ).eq("activo", True)
+        if nombre:       query_prod = query_prod.ilike("nombre", f"%{nombre}%")
+        if codigo:       query_prod = query_prod.ilike("codigo", f"%{codigo}%")
+        if categoria_id: query_prod = query_prod.eq("categoria_id", categoria_id)
+        todos = query_prod.execute().data
+
+        query_mov = (
+            supabase.table("movimientos_stock")
+            .select("producto_id, cantidad")
+            .eq("tipo", "salida")
+        )
+        if desde: query_mov = query_mov.gte("created_at", desde.isoformat())
+        if hasta: query_mov = query_mov.lte("created_at", f"{hasta.isoformat()}T23:59:59")
+        movimientos = query_mov.execute().data
+
+        salidas = {}
+        for m in movimientos:
+            salidas[m["producto_id"]] = salidas.get(m["producto_id"], 0) + m["cantidad"]
+
+        datos = sorted([
+            {**p, "total_salidas": salidas.get(p["id"], 0), "producto_id": p["id"]}
+            for p in todos
+        ], key=lambda x: x["total_salidas"])
+
+        filtros = {
+            "desde": str(desde) if desde else "", "hasta": str(hasta) if hasta else "",
+            "nombre": nombre, "codigo": codigo, "categoria_id": categoria_id,
+        }
+        pdf_bytes = generar_pdf_reporte("menos-vendidos", datos, filtros)
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="Reporte_Menos_Vendidos.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+
+
+# ─── PDF 4: INVENTARIO ACTUAL ─────────────────────────────────────────────────
+
+@router.get("/inventario-actual/pdf")
+async def reporte_inventario_actual_pdf(
+    nombre:       Optional[str] = Query(None),
+    codigo:       Optional[str] = Query(None),
+    categoria_id: Optional[str] = Query(None),
+):
+    try:
+        query = (
+            supabase.table("productos")
+            .select("id, codigo, nombre, descripcion, precio, stock_actual, stock_minimo, categoria_id, created_at")
+            .eq("activo", True)
+            .order("nombre")
+        )
+        if nombre:       query = query.ilike("nombre", f"%{nombre}%")
+        if codigo:       query = query.ilike("codigo", f"%{codigo}%")
+        if categoria_id: query = query.eq("categoria_id", categoria_id)
+
+        response = query.execute()
+        datos = [
+            {
+                **p,
+                "valor_en_stock": round(float(p["precio"]) * p["stock_actual"], 2),
+                "estado": "critico" if p["stock_actual"] <= p["stock_minimo"] else "normal",
+            }
+            for p in response.data
+        ]
+
+        filtros = {"nombre": nombre, "codigo": codigo, "categoria_id": categoria_id}
+        pdf_bytes = generar_pdf_reporte("inventario-actual", datos, filtros)
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="Reporte_Inventario_Actual.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+
+
+# ─── PDF 5: PRODUCTOS DE BAJA ─────────────────────────────────────────────────
+
+@router.get("/productos-baja/pdf")
+async def reporte_productos_baja_pdf(
+    desde:        Optional[date] = Query(None),
+    hasta:        Optional[date] = Query(None),
+    nombre:       Optional[str]  = Query(None),
+    codigo:       Optional[str]  = Query(None),
+    categoria_id: Optional[str]  = Query(None),
+):
+    try:
+        query = (
+            supabase.table("productos")
+            .select("id, codigo, nombre, precio, stock_actual, stock_minimo, categoria_id, updated_at")
+            .eq("activo", False)
+            .order("updated_at", desc=True)
+        )
+        if desde:        query = query.gte("updated_at", desde.isoformat())
+        if hasta:        query = query.lte("updated_at", f"{hasta.isoformat()}T23:59:59")
+        if nombre:       query = query.ilike("nombre", f"%{nombre}%")
+        if codigo:       query = query.ilike("codigo", f"%{codigo}%")
+        if categoria_id: query = query.eq("categoria_id", categoria_id)
+
+        datos = query.execute().data
+        filtros = {
+            "desde": str(desde) if desde else "", "hasta": str(hasta) if hasta else "",
+            "nombre": nombre, "codigo": codigo, "categoria_id": categoria_id,
+        }
+        pdf_bytes = generar_pdf_reporte("productos-baja", datos, filtros)
+
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="Reporte_Productos_Baja.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")

@@ -108,6 +108,18 @@ export default function Reportes() {
     }
   }, [reporteActivo, construirUrl])
 
+  const descargarPDF = () => {
+    const params = new URLSearchParams()
+    if (filtros.desde)        params.append('desde',        filtros.desde)
+    if (filtros.hasta)        params.append('hasta',        filtros.hasta)
+    if (filtros.nombre)       params.append('nombre',       filtros.nombre)
+    if (filtros.codigo)       params.append('codigo',       filtros.codigo)
+    if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
+    const qs = params.toString()
+    const url = `${BASE_URL}/api/reportes/${reporteActivo}/pdf${qs ? '?' + qs : ''}`
+    window.open(url, '_blank')
+  }
+
   // Ejecutar automáticamente al cambiar de reporte
   useEffect(() => {
     ejecutarReporte(reporteActivo)
@@ -626,6 +638,13 @@ export default function Reportes() {
             <span className={styles.vistaHint}>
               Clic en una fila de la tabla para resaltar en el gráfico
             </span>
+            <button
+              className={styles.btnDescargarPDF}
+              onClick={descargarPDF}
+              title="Descargar reporte como PDF con los filtros actuales"
+            >
+              ↓ PDF
+            </button>
           </div>
         )}
 

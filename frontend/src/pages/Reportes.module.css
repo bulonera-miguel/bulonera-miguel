@@ -431,6 +431,25 @@
   color: #00C8F0;
 }
 
+.btnDescargarPDF {
+  margin-left: auto;
+  padding: 5px 14px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.30);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btnDescargarPDF:hover {
+  background: rgba(0,200,240,0.10);
+  border-color: #00C8F0;
+}
+
 /* ══════════════════════════════════════════════
    RESPONSIVE — TABLET 768px
    ══════════════════════════════════════════════ */
@@ -486,6 +505,7 @@
   .vistaToggle { gap: 6px; }
   .vistaHint { display: none; }
   .vistaBtn { padding: 5px 10px; font-size: 11px; }
+  .btnDescargarPDF { margin-left: 0; }   /* ← agregar esto */
 
   /* Tabla responsive: data-label */
   .tabla thead { display: none; }
