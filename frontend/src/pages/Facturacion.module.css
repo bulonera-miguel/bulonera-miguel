@@ -35,11 +35,11 @@
   border: 1px solid rgba(255,184,0,0.25);
   font-family: "Barlow Condensed", sans-serif;
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: #FFB800;
+  color: #00E87A;
 }
 .modoDot {
   width: 7px; height: 7px; border-radius: 50%;
-  background: #FFB800;
+  background: #00E87A;
   box-shadow: 0 0 8px rgba(255,184,0,0.6);
   animation: pulse 2s infinite;
 }

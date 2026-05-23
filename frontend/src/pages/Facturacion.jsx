@@ -261,7 +261,7 @@ export default function Facturacion() {
           </div>
           <div className={styles.modoBadge}>
             <span className={styles.modoDot}></span>
-            Homologación
+            Producción
           </div>
         </div>
 
@@ -726,6 +726,16 @@ export default function Facturacion() {
               <div className={styles.detalleRow}>
                 <span>Fecha</span><strong>{fmtF(facturaDetalle.created_at)}</strong>
               </div>
+              {facturaDetalle.cae && (
+                <div className={styles.detalleRow}>
+                  <span>CAE</span><strong>{facturaDetalle.cae}</strong>
+                </div>
+              )}
+              {facturaDetalle.cae_vto && (
+                <div className={styles.detalleRow}>
+                  <span>Vto. CAE</span><strong>{facturaDetalle.cae_vto}</strong>
+                </div>
+              )}
               {facturaDetalle.email_enviado_a && (
                 <div className={styles.detalleRow}>
                   <span>Email enviado a</span>
