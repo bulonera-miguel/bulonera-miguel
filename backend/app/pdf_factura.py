@@ -34,21 +34,19 @@ GRIS_TEXTO    = HexColor("#475569")   # Texto secundario
 VERDE_CAE     = HexColor("#16a34a")   # Sección CAE
 ROJO_TIPO     = HexColor("#dc2626")   # Letra del comprobante (A = rojo)
 
-
 # ─── Datos de la empresa (ajustar en producción) ──────────────────────────────
 EMPRESA = {
     "nombre":       "BULONERA MIGUEL S.R.L.",
     "razon_social": "Bulonera Miguel S.R.L.",
-    "cuit":         "20-18572102-8",       
-    "domicilio":    "Av Buchardo 2268, Posadas, Argentina, N3300",
-    "telefono":     "0376 494-7546",
-    "email":        "ventas@buloneramiguel.com.ar",
-    "ingresos_brutos": "123-456789-0",     # ← reemplazar
-    "inicio_actividades": "01/03/2010",
+    "cuit":         "20-18572102-8",
+    "domicilio":    "Av. Buchardo 2268, Posadas, Misiones",
+    "telefono":     "3764-236105",
+    "email":        "bulonera.miguel@gmail.com",
+    "ingresos_brutos": "20185721028",
+    "inicio_actividades": "01/01/2025",
     "condicion_iva": "Responsable Inscripto",
     "punto_venta":  "0001",
 }
-
 
 # ─── Función principal ────────────────────────────────────────────────────────
 def generar_pdf_factura(factura: dict) -> bytes:
