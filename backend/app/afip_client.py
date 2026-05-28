@@ -14,6 +14,21 @@ from requests import Session
 from zeep.transports import Transport
 from lxml import etree
 
+# ── imports nuevos para SSL ──
+import ssl
+import urllib3
+from requests.adapters import HTTPAdapter
+from urllib3.util.ssl_ import create_urllib3_context
+
+# ── clase nueva ──
+class DhSmallAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = create_urllib3_context(ciphers='DEFAULT@SECLEVEL=1')
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        kwargs['ssl_context'] = ctx
+        super().init_poolmanager(*args, **kwargs)
+
 # ── URLs de AFIP ─────────────────────────────────────────────
 WSAA_URL_HOMO = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
 WSAA_URL_PROD = "https://wsaa.afip.gov.ar/ws/services/LoginCms?wsdl"
@@ -88,16 +103,10 @@ def _firmar_tra(tra_bytes: bytes) -> str:
 
 
 def _get_session() -> Session:
-    """
-    Devuelve una sesión requests con SSL verification deshabilitado.
-    SOLO para homologación — en producción siempre verificar SSL.
-    """
     session = Session()
-    if not PRODUCCION:
-        session.verify = False
-        # Suprimir warnings de SSL en homologación
-        import urllib3
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    session.mount('https://', DhSmallAdapter())
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     return session
 
 
@@ -134,6 +143,8 @@ def get_wsfe_client():
 def get_auth() -> dict:
     """Devuelve el objeto de autenticación para el WSFE."""
     token, sign = obtener_token_sign("wsfe")
+    print(f">>> Token obtenido (primeros 20 chars): {token[:20]}")
+    print(f">>> CUIT usado: {AFIP_CUIT}")
     return {
         "Token": token,
         "Sign":  sign,

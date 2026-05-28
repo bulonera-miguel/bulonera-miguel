@@ -117,15 +117,14 @@ async def ultimo_comprobante(tipo: str):
 
 @router.post("/emitir", status_code=201)
 async def emitir_factura(datos: FacturaCreate):
-    try:
-        # PASO 1: Calcular totales
+    try:        
+       # PASO 1: Calcular totales
         subtotal = round(sum(i.cantidad * i.precio_unitario for i in datos.items), 2)
         if datos.tipo == "A":
             neto   = round(subtotal / 1.21, 2)
             iva_21 = round(neto * 0.21, 2)
             total  = subtotal
         else:
-            # Factura B: IVA incluido en el precio, se desglosa igual
             neto   = round(subtotal / 1.21, 2)
             iva_21 = round(neto * 0.21, 2)
             total  = subtotal
@@ -139,20 +138,31 @@ async def emitir_factura(datos: FacturaCreate):
             PtoVta   = AFIP_PV,
             CbteTipo = tipo_cbte,
         )
+        print(f">>> Último comprobante en ARCA producción: {ultimo.CbteNro}")
         numero_cbte = ultimo.CbteNro + 1
+        print(f">>> Intentando emitir número: {numero_cbte}")
         fecha_hoy   = datetime.now().strftime("%Y%m%d")
 
         # PASO 3: Datos del receptor
-        if datos.tipo == "A" and datos.cliente_id:
-            cliente_db    = supabase.table("clientes").select("*").eq("id", datos.cliente_id).single().execute()
-            cuit_receptor = int(cliente_db.data["cuit"].replace("-", "").replace(" ", ""))
-            doc_tipo      = 80
+        if datos.cliente_id:
+            cliente_db = supabase.table("clientes").select("*").eq("id", datos.cliente_id).single().execute()
+            if datos.tipo == "A":
+                cuit_receptor = int(cliente_db.data["cuit"].replace("-", "").replace(" ", ""))
+                doc_tipo      = 80
+            else:
+                # Factura B con cliente — usar DNI/CUIT si tiene, sino consumidor final
+                cuit_str = cliente_db.data.get("cuit", "")
+                if cuit_str:
+                    cuit_receptor = int(cuit_str.replace("-", "").replace(" ", ""))
+                    doc_tipo      = 80
+                else:
+                    cuit_receptor = 0
+                    doc_tipo      = 99
         else:
             cuit_receptor = 0
             doc_tipo      = 99
 
         # PASO 4: Armar comprobante
-        # Tanto A como B requieren desglose de IVA según RG 5616
         detalle_iva = [{"Id": 5, "BaseImp": neto, "Importe": iva_21}]
 
         comprobante = {
@@ -163,10 +173,9 @@ async def emitir_factura(datos: FacturaCreate):
             },
             "FeDetReq": {
                 "FECAEDetRequest": [{
-                    "Concepto":   1,
+                    "Concepto":   1,                    
                     "DocTipo":    80 if datos.tipo == "A" else 99,
-                    "DocNro":     cuit_receptor if datos.tipo == "A" else 0,
-                    "CondicionIVAReceptorId": 1 if datos.tipo == "A" else 5,
+                    "DocNro":     cuit_receptor if datos.tipo == "A" else 0,                   
                     "CbteDesde":  numero_cbte,
                     "CbteHasta":  numero_cbte,
                     "CbteFch":    fecha_hoy,
@@ -177,22 +186,36 @@ async def emitir_factura(datos: FacturaCreate):
                     "ImpIVA":     iva_21,
                     "ImpTrib":    0,
                     "MonId":      "PES",
-                    "MonCotiz":   1,
+                    "MonCotiz":   "1",
                     "Iva":        {"AlicIva": detalle_iva} if detalle_iva else None,
                 }]
             }
         }
 
+        print(f">>> Enviando a ARCA: neto={neto}, iva={iva_21}, total={total}, subtotal={subtotal}")
+        print(f">>> ImpTotal={total}, ImpNeto={neto}, ImpOpEx=0, ImpIVA={iva_21}")
         # PASO 5: Enviar a AFIP
         resultado = client.service.FECAESolicitar(Auth=auth, FeCAEReq=comprobante)
         detalle   = resultado.FeDetResp.FECAEDetResponse[0]
 
         if detalle.Resultado != "A":
             errores = []
-            if detalle.Observaciones:
-                for obs in detalle.Observaciones.Obs:
-                    errores.append(f"{obs.Code}: {obs.Msg}")
-            raise HTTPException(status_code=400, detail=f"AFIP rechazó: {', '.join(errores)}")
+            try:
+                if detalle.Observaciones:
+                    for obs in detalle.Observaciones.Obs:
+                        errores.append(f"{obs.Code}: {obs.Msg}")
+            except Exception:
+                pass
+            try:
+                if hasattr(detalle, 'Errors') and detalle.Errors:
+                    for err in detalle.Errors.Err:
+                        errores.append(f"ERROR {err.Code}: {err.Msg}")
+            except Exception:
+                pass
+            raise HTTPException(
+                status_code=400,
+                detail=f"AFIP rechazó. Resultado: {detalle.Resultado}. Detalle: {errores if errores else str(detalle)}"
+            )
 
         cae        = detalle.CAE
         cae_vto    = detalle.CAEFchVto
@@ -255,6 +278,9 @@ async def emitir_factura(datos: FacturaCreate):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al emitir factura: {str(e)}")
+    except Exception as soap_error:
+        print(f">>> Error SOAP crítico: {str(soap_error)}")
+        raise HTTPException(status_code=400, detail=f"Error SOAP: {str(soap_error)}")
 
 # ─── LISTAR FACTURAS ──────────────────────────────────────────────────────────
 
