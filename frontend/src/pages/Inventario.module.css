@@ -303,6 +303,114 @@
 }
 .btnGuardar:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,200,240,0.35); }
 
+/* ── Botón categorías ── */
+.btnCategorias {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.30);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btnCategorias:hover { background: rgba(0,200,240,0.10); }
+
+/* ── Modal categorías ── */
+.modalBody { padding: 20px; }
+
+.formCategoria { margin-bottom: 16px; }
+
+.formCategoriaRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inputCategoria {
+  flex: 1;
+  padding: 9px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+.inputCategoria:focus { border-color: #00C8F0; }
+
+.errorCategoria {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.25);
+  color: #FF4444;
+  font-size: 12px;
+}
+
+.listaCategorias {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.sinCategorias {
+  text-align: center;
+  padding: 20px;
+  color: rgba(200,228,244,0.35);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.categoriaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(0,200,240,0.04);
+  border: 1px solid rgba(0,200,240,0.10);
+}
+
+.categoriaNombre {
+  font-family: "Barlow", sans-serif;
+  font-size: 13px;
+  color: #EAF4FF;
+}
+
+.categoriaAcciones { display: flex; gap: 6px; }
+
+.btnEditarCat {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.25);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btnEditarCat:hover { background: rgba(0,200,240,0.10); }
+
+.btnEliminarCat {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(255,68,68,0.25);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btnEliminarCat:hover { background: rgba(255,68,68,0.08); }
+
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .header { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
@@ -326,6 +434,11 @@
   .logo { 
     display: none; 
   }
+
+  .formCategoriaRow { flex-direction: column; }
+  .inputCategoria { width: 100%; }
+  .btnEditarCat, .btnEliminarCat { padding: 6px 12px; }
+  .categoriaItem { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
 /* ── CARDS EN MOBILE (reemplaza la tabla) ── */
@@ -371,4 +484,9 @@
     border-top: 1px solid rgba(0,200,240,0.10);
     margin-top: 4px;
   }
+
+  .formCategoriaRow { flex-direction: column; }
+  .inputCategoria { width: 100%; }
+  .btnEditarCat, .btnEliminarCat { padding: 6px 12px; }
+  .categoriaItem { flex-direction: column; align-items: flex-start; gap: 8px; }
 }

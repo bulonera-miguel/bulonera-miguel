@@ -72,6 +72,39 @@ export const categoriasApi = {
     if (!res.ok) throw new Error('Error al listar categorías')
     return res.json()
   },
+
+  crear: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/categorias/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al crear categoría')
+    }
+    return res.json()
+  },
+
+  actualizar: async (id, datos) => {
+    const res = await fetch(`${BASE_URL}/api/categorias/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al actualizar categoría')
+    }
+    return res.json()
+  },
+
+  eliminar: async (id) => {
+    const res = await fetch(`${BASE_URL}/api/categorias/${id}`, {
+      method: 'DELETE'
+    })
+    if (!res.ok) throw new Error('Error al eliminar categoría')
+  },
 }
 
 // ── PORTADA ────────────────────────────────────────────────

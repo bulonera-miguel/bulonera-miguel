@@ -203,6 +203,8 @@ async def crear_producto(producto: ProductoCreate):
             # Importante para el negocio: cada bulón tiene un código único alfanumérico.
 
         nuevo_producto = producto.model_dump()
+        if nuevo_producto.get('categoria_id'):
+            nuevo_producto['categoria_id'] = str(nuevo_producto['categoria_id'])
         # .model_dump(): convierte el objeto Pydantic a un diccionario Python plano.
         # Resultado: {"codigo": "BUL-001", "nombre": "Bulón M6", "precio": 150.0, ...}
         # Esto es exactamente lo que Supabase necesita para insertar en la tabla.

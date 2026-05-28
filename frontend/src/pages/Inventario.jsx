@@ -22,6 +22,11 @@ export default function Inventario() {
     categoria_id: ''
   })
 
+const [modalCategorias, setModalCategorias] = useState(false)
+const [formCategoria, setFormCategoria]     = useState({ nombre: '' })
+const [categoriaEditar, setCategoriaEditar] = useState(null)
+const [errorCategoria, setErrorCategoria]   = useState(null)
+
   // ── CARGAR DATOS AL MONTAR ─────────────────────────────────
   useEffect(() => {
     cargarProductos()
@@ -49,6 +54,53 @@ export default function Inventario() {
       setCategorias(data)
     } catch (e) {
       console.error('Error al cargar categorías:', e)
+    }
+  }
+
+  const abrirModalCategorias = () => {
+    setFormCategoria({ nombre: '' })
+    setCategoriaEditar(null)
+    setErrorCategoria(null)
+    setModalCategorias(true)
+  }
+
+  const cerrarModalCategorias = () => {
+    setModalCategorias(false)
+    setCategoriaEditar(null)
+    setFormCategoria({ nombre: '' })
+    setErrorCategoria(null)
+  }
+
+  const guardarCategoria = async (e) => {
+    e.preventDefault()
+    try {
+      setErrorCategoria(null)
+      if (categoriaEditar) {
+        await categoriasApi.actualizar(categoriaEditar.id, formCategoria)
+      } else {
+        await categoriasApi.crear(formCategoria)
+      }
+      setFormCategoria({ nombre: '' })
+      setCategoriaEditar(null)
+      cargarCategorias()
+    } catch (e) {
+      setErrorCategoria(e.message)
+    }
+  }
+
+  const editarCategoria = (cat) => {
+    setCategoriaEditar(cat)
+    setFormCategoria({ nombre: cat.nombre })
+    setErrorCategoria(null)
+  }
+
+  const eliminarCategoria = async (id, nombre) => {
+    if (!confirm(`¿Eliminar la categoría "${nombre}"? Solo se puede eliminar si no tiene productos asociados.`)) return
+    try {
+      await categoriasApi.eliminar(id)
+      cargarCategorias()
+    } catch (e) {
+      alert('No se puede eliminar: la categoría tiene productos asociados.')
     }
   }
 
@@ -161,6 +213,9 @@ export default function Inventario() {
         </div>
         <div className={styles.headerRight}>
           <Link to="/" className={styles.btnVolver}>← Inicio</Link>
+          <button className={styles.btnCategorias} onClick={abrirModalCategorias}>
+            ☰ Categorías
+          </button>
           <button className={styles.btnNuevo} onClick={abrirModalCrear}>
             + Nuevo producto
           </button>
@@ -346,6 +401,78 @@ export default function Inventario() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL CATEGORÍAS ── */}
+      {modalCategorias && (
+        <div className={styles.modalOverlay} onClick={cerrarModalCategorias}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Gestión de Categorías</h3>
+              <button className={styles.modalCerrar} onClick={cerrarModalCategorias}>✕</button>
+            </div>
+
+            <div className={styles.modalBody}>
+
+              {/* Formulario alta/edición */}
+              <form onSubmit={guardarCategoria} className={styles.formCategoria}>
+                <div className={styles.formCategoriaRow}>
+                  <input
+                    type="text"
+                    placeholder="Nombre de la categoría..."
+                    value={formCategoria.nombre}
+                    onChange={e => setFormCategoria({ nombre: e.target.value })}
+                    required
+                    className={styles.inputCategoria}
+                  />
+                  <button type="submit" className={styles.btnGuardar}>
+                    {categoriaEditar ? 'Guardar' : '+ Agregar'}
+                  </button>
+                  {categoriaEditar && (
+                    <button
+                      type="button"
+                      className={styles.btnCancelar}
+                      onClick={() => { setCategoriaEditar(null); setFormCategoria({ nombre: '' }) }}
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
+                {errorCategoria && (
+                  <div className={styles.errorCategoria}>{errorCategoria}</div>
+                )}
+              </form>
+
+              {/* Lista de categorías */}
+              <div className={styles.listaCategorias}>
+                {categorias.length === 0 ? (
+                  <div className={styles.sinCategorias}>No hay categorías creadas todavía</div>
+                ) : (
+                  categorias.map(cat => (
+                    <div key={cat.id} className={styles.categoriaItem}>
+                      <span className={styles.categoriaNombre}>{cat.nombre}</span>
+                      <div className={styles.categoriaAcciones}>
+                        <button
+                          className={styles.btnEditarCat}
+                          onClick={() => editarCategoria(cat)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className={styles.btnEliminarCat}
+                          onClick={() => eliminarCategoria(cat.id, cat.nombre)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+            </div>
           </div>
         </div>
       )}
