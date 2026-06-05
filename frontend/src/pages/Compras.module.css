@@ -1,0 +1,456 @@
+/* ============================================================
+   Compras.module.css — mismo estilo que Facturacion.module.css
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #07111F;
+  color: #C8E4F4;
+  font-family: "Barlow", sans-serif;
+}
+
+.contenido { padding: 24px 28px; }
+
+/* ── HEADER ── */
+.pageHeader {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+  padding-bottom: 16px;
+}
+.pageTitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 32px; letter-spacing: 3px;
+  color: #EAF4FF; margin: 0;
+}
+.pageSubtitle {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; opacity: 0.75;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,200,240,0.12);
+}
+.tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none; border-bottom: 2px solid transparent;
+  color: rgba(200,228,244,0.50);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: #EAF4FF; }
+.tabActivo { color: #00C8F0; border-bottom-color: #00C8F0; }
+
+/* ── LAYOUT PRINCIPAL ── */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── PANEL FORMULARIO ── */
+.formPanel {
+  display: flex; flex-direction: column;
+  background: rgba(0,200,240,0.02);
+  border: 1px solid rgba(0,200,240,0.12);
+}
+.seccion {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0,200,240,0.08);
+}
+.seccion:last-child { border-bottom: none; }
+.seccionTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.50);
+  margin-bottom: 10px; display: block;
+}
+
+/* ── INPUTS ── */
+.input {
+  width: 100%; padding: 10px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.2s; box-sizing: border-box;
+}
+.input:focus { border-color: #00C8F0; }
+.input::placeholder { color: rgba(200,228,244,0.28); }
+
+.textarea {
+  width: 100%; padding: 10px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+  box-sizing: border-box; resize: vertical;
+}
+.textarea:focus { border-color: #00C8F0; }
+.textarea::placeholder { color: rgba(200,228,244,0.28); }
+
+/* ── BUSCADOR ── */
+.buscadorWrap { position: relative; }
+.sugerencias {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: #0D1F2D;
+  border: 1px solid rgba(0,200,240,0.25); border-top: none;
+  list-style: none; z-index: 100;
+  max-height: 240px; overflow-y: auto;
+  margin: 0; padding: 0;
+}
+.sugerItem {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+  transition: background 0.15s;
+}
+.sugerItem:hover { background: rgba(0,200,240,0.07); }
+.sugerNombre { font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF; }
+.sugerSub { font-family: "Barlow Condensed", sans-serif; font-size: 11px; color: rgba(200,228,244,0.45); }
+.sugerProdLeft { display: flex; flex-direction: column; gap: 2px; }
+.sugerProdRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.sugerPrecio { font-family: "Bebas Neue", sans-serif; font-size: 16px; color: #00C8F0; }
+.sugerStock { font-family: "Barlow Condensed", sans-serif; font-size: 10px; color: rgba(200,228,244,0.40); }
+
+/* ── PROVEEDOR SELECCIONADO ── */
+.proveedorInfo {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding: 10px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+}
+.proveedorDatos { display: flex; flex-direction: column; gap: 2px; }
+.proveedorNombre { font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF; }
+.proveedorSub { font-family: "Barlow Condensed", sans-serif; font-size: 11px; color: rgba(200,228,244,0.50); }
+.btnQuitar {
+  background: transparent; border: none;
+  color: rgba(200,228,244,0.40); cursor: pointer; font-size: 14px;
+  transition: color 0.2s; padding: 2px 6px;
+}
+.btnQuitar:hover { color: #FF4444; }
+
+/* ── ERROR ── */
+.errorMsg {
+  margin: 0 18px 16px; padding: 10px 14px;
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.25);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif; font-size: 12px; letter-spacing: 1px;
+}
+
+/* ── PANEL DETALLE ── */
+.detallePanel {
+  background: rgba(0,200,240,0.02);
+  border: 1px solid rgba(0,200,240,0.12);
+  min-height: 400px;
+}
+.detallePanelHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.10);
+}
+.panelTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #00C8F0;
+}
+.itemsCount {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; color: rgba(200,228,244,0.40);
+}
+.itemsVacio {
+  padding: 50px 20px; text-align: center;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.25);
+}
+
+/* ── ITEMS ── */
+.itemsList { display: flex; flex-direction: column; }
+.itemRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+  gap: 12px; transition: background 0.15s;
+}
+.itemRow:hover { background: rgba(0,200,240,0.03); }
+.itemInfo { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.itemNombre {
+  font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.itemCodigo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 1px; color: rgba(200,228,244,0.40);
+}
+.itemControles { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.itemCantidad { display: flex; align-items: center; }
+.btnCantidad {
+  width: 24px; height: 28px;
+  background: rgba(0,200,240,0.08);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #00C8F0; cursor: pointer; font-size: 14px;
+  transition: background 0.15s; display: flex; align-items: center; justify-content: center;
+}
+.btnCantidad:hover { background: rgba(0,200,240,0.15); }
+.inputCantidad {
+  width: 44px; height: 28px; text-align: center;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18); border-left: none; border-right: none;
+  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px; outline: none;
+}
+.itemPrecioWrap { display: flex; align-items: center; gap: 2px; }
+.itemPrecioLabel { font-family: "Barlow Condensed", sans-serif; font-size: 12px; color: rgba(200,228,244,0.50); }
+.inputPrecio {
+  width: 80px; height: 28px; padding: 0 6px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
+  outline: none; text-align: right;
+}
+.inputPrecio:focus { border-color: #00C8F0; }
+.itemSubtotal {
+  font-family: "Bebas Neue", sans-serif; font-size: 18px;
+  color: #EAF4FF; min-width: 80px; text-align: right;
+}
+.btnEliminarItem {
+  background: transparent; border: none;
+  color: rgba(200,228,244,0.30); cursor: pointer; font-size: 13px;
+  transition: color 0.2s; padding: 4px;
+}
+.btnEliminarItem:hover { color: #FF4444; }
+
+/* ── TOTALES ── */
+.totalesWrap {
+  padding: 16px 16px 20px;
+  border-top: 1px solid rgba(0,200,240,0.10);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.totalRow {
+  display: flex; justify-content: space-between;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 1px; color: rgba(200,228,244,0.65);
+}
+.totalFinal {
+  font-size: 16px; font-weight: 600; color: #EAF4FF;
+  padding-top: 8px; border-top: 1px solid rgba(0,200,240,0.15); margin-top: 4px;
+}
+.totalFinal span:last-child {
+  font-family: "Bebas Neue", sans-serif; font-size: 24px; color: #00C8F0;
+}
+.btnRegistrar {
+  width: 100%; padding: 15px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  border: none; cursor: pointer; margin-top: 8px;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 0 20px rgba(0,200,240,0.25);
+}
+.btnRegistrar:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.btnRegistrar:disabled { opacity: 0.50; cursor: not-allowed; }
+.btnCargando { display: flex; align-items: center; gap: 10px; justify-content: center; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(7,17,31,0.3);
+  border-top-color: #07111F; border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.nota {
+  text-align: center; font-family: "Barlow", sans-serif; font-size: 11px;
+  color: rgba(200,228,244,0.25); font-style: italic; margin-top: 4px;
+}
+
+/* ── RESULTADO ── */
+.resultadoWrap {
+  display: flex; align-items: flex-start; gap: 20px; padding: 24px;
+  background: rgba(0,232,122,0.05);
+  border: 1px solid rgba(0,232,122,0.25); margin-bottom: 20px;
+}
+.resultadoIcono {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(0,232,122,0.15); border: 1px solid rgba(0,232,122,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #00E87A; flex-shrink: 0;
+}
+.resultadoTextos { flex: 1; }
+.resultadoTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00E87A; margin-bottom: 12px;
+}
+.resultadoGrid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; }
+.resultadoItem { display: flex; flex-direction: column; gap: 2px; }
+.resultadoItem span {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45);
+}
+.resultadoItem strong {
+  font-family: "Barlow Condensed", sans-serif; font-size: 15px; color: #EAF4FF;
+}
+.resultadoTotal { color: #00C8F0 !important; font-size: 20px !important; }
+.resultadoNota {
+  font-family: "Barlow", sans-serif; font-size: 12px;
+  color: rgba(0,232,122,0.70); margin-top: 6px;
+}
+.btnNuevaCompra {
+  padding: 10px 18px; flex-shrink: 0;
+  background: transparent; border: 1px solid rgba(0,232,122,0.35); color: #00E87A;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btnNuevaCompra:hover { background: rgba(0,232,122,0.08); }
+
+/* ── FILTROS HISTORIAL ── */
+.filtrosWrap {
+  display: flex; gap: 12px; align-items: flex-end;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.filtroGrupo { display: flex; flex-direction: column; gap: 4px; }
+.filtroGrupo label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45);
+}
+.filtroInput {
+  padding: 8px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+}
+.filtroInput:focus { border-color: #00C8F0; }
+.btnFiltrar {
+  padding: 8px 16px; background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer; transition: opacity 0.2s;
+}
+.btnFiltrar:hover { opacity: 0.85; }
+.btnLimpiarFiltro {
+  padding: 8px 14px; background: transparent;
+  border: 1px solid rgba(200,228,244,0.18); color: rgba(200,228,244,0.55);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btnLimpiarFiltro:hover { border-color: rgba(200,228,244,0.40); color: #EAF4FF; }
+
+/* ── TABLA HISTORIAL ── */
+.tabla {
+  width: 100%; border-collapse: collapse;
+  font-family: "Barlow", sans-serif; font-size: 13px;
+}
+.tabla thead tr { background: rgba(0,200,240,0.05); }
+.tabla th {
+  padding: 10px 14px; text-align: left;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.55);
+  border-bottom: 1px solid rgba(0,200,240,0.15); white-space: nowrap;
+}
+.tabla td {
+  padding: 12px 14px; color: rgba(200,228,244,0.85);
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+}
+.tablaFila { cursor: pointer; transition: background 0.15s; }
+.tablaFila:hover { background: rgba(0,200,240,0.04); }
+.tdNumero { font-family: "Barlow Condensed", sans-serif; letter-spacing: 1px; color: #00C8F0; }
+.tdTotal { font-family: "Bebas Neue", sans-serif; font-size: 18px; color: #EAF4FF; }
+.tdCenter { text-align: center; }
+.tdRight { text-align: right; }
+
+/* ── ESTADO VACÍO ── */
+.estado {
+  padding: 50px; text-align: center;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.30);
+}
+
+/* ── MODAL ── */
+.modalOverlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(7,17,31,0.85);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal {
+  background: #0D1F2D; border: 1px solid rgba(0,200,240,0.20);
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+}
+.modalHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; border-bottom: 1px solid rgba(0,200,240,0.12);
+}
+.modalHeader h3 {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00C8F0; margin: 0;
+}
+.modalCerrar {
+  background: transparent; border: none;
+  color: rgba(200,228,244,0.50); font-size: 16px; cursor: pointer; padding: 4px 8px;
+}
+.modalCerrar:hover { color: #EAF4FF; }
+.modalBody { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.detalleRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 10px; border-bottom: 1px solid rgba(0,200,240,0.08);
+}
+.detalleRow span {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45);
+}
+.detalleRow strong { font-family: "Barlow Condensed", sans-serif; font-size: 15px; color: #EAF4FF; }
+
+/* ── TABLA ITEMS EN MODAL ── */
+.detalleItemsWrap { margin-top: 8px; }
+.detalleItemsTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45); margin-bottom: 8px;
+}
+.detalleItemsTabla {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.detalleItemsTabla th {
+  padding: 6px 10px; text-align: left;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  color: rgba(200,228,244,0.45);
+  border-bottom: 1px solid rgba(0,200,240,0.15);
+}
+.detalleItemsTabla td {
+  padding: 8px 10px; color: rgba(200,228,244,0.85);
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1023px) {
+  .mainGrid { grid-template-columns: 1fr; }
+  .detallePanel { order: -1; }
+}
+@media (max-width: 600px) {
+  .contenido { padding: 12px; }
+  .pageHeader { flex-direction: column; gap: 10px; }
+  .mainGrid { grid-template-columns: 1fr; }
+  .itemRow { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .itemControles { width: 100%; justify-content: space-between; }
+  .resultadoWrap { flex-direction: column; }
+  .filtrosWrap { flex-direction: column; }
+  .filtroInput { width: 100%; }
+}

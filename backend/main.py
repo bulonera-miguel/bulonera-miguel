@@ -8,6 +8,12 @@ from app.routers import portada    # ← agregar
 from app.routers import reportes
 from app.routers import usuarios
 from app.routers import facturacion
+from app.routers import proveedores
+from app.routers import compras
+from app.routers import ventas
+from app.routers import cuenta_corriente
+from app.routers import cuenta_corriente_proveedores
+from app.routers import flujo_caja
 
 app = FastAPI(title="Bulonera Miguel API", version="1.0.0")
 
@@ -27,6 +33,12 @@ app.include_router(portada.router) # ← agregar
 app.include_router(reportes.router)
 app.include_router(usuarios.router)
 app.include_router(facturacion.router)
+app.include_router(proveedores.router)
+app.include_router(compras.router)
+app.include_router(ventas.router)
+app.include_router(cuenta_corriente.router)
+app.include_router(cuenta_corriente_proveedores.router)
+app.include_router(flujo_caja.router)
 
 @app.get("/")
 def root():

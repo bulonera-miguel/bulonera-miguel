@@ -87,6 +87,9 @@ def generar_pdf_reporte(reporte_id: str, datos: list, filtros: dict = None) -> b
         "menos-vendidos":    _pdf_menos_vendidos,
         "inventario-actual": _pdf_inventario_actual,
         "productos-baja":    _pdf_productos_baja,
+        "compras-proveedor": _pdf_compras_proveedor,   # NUEVO
+        "ventas-clientes":   _pdf_ventas_clientes,     # NUEVO
+        "flujo-caja":        _pdf_flujo_caja,          # NUEVO
     }
     fn = gen.get(reporte_id)
     if not fn:
@@ -416,6 +419,268 @@ def _pdf_productos_baja(datos, filtros):
     story += _pie(st)
     doc.build(story)
     return buf.getvalue()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REPORTE 6 — COMPRAS POR PROVEEDOR
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _pdf_compras_proveedor(datos, filtros):
+    buf = io.BytesIO()
+    st  = _build_styles()
+    doc = _make_doc(buf, "Compras por Proveedor")
+    story = []
+
+    total_general = sum(float(p.get("total_comprado", 0)) for p in datos)
+    total_compras = sum(int(p.get("cant_compras", 0)) for p in datos)
+    kpis = [
+        ("Total proveedores",  str(len(datos)),             AZUL_MEDIO, AZUL_CLARO),
+        ("Total compras",      str(total_compras),          AMARILLO,   AMARILLO_BG),
+        ("Total comprado",     _fmt_moneda(total_general),  ROJO,       ROJO_BG),
+    ]
+
+    story += _encabezado(
+        "Compras por Proveedor",
+        "Total comprado a cada proveedor en el período seleccionado",
+        "₱", filtros, len(datos), st
+    )
+    story.append(Spacer(1, 4*mm))
+    story.append(_kpi_row(kpis, st))
+    story.append(Spacer(1, 4*mm))
+
+    # ── Gráficos ──────────────────────────────────────────────────────────────
+    top12   = datos[:12]
+    nombres = [_short(p["nombre"], 16) for p in top12]
+    totales = [float(p.get("total_comprado", 0)) for p in top12]
+
+    g1 = _chart_barras_h(nombres, totales, MC["cyan"],
+                         "Total comprado por proveedor ($)", fmt_k=True)
+    g2 = _chart_donut(nombres, totales, PALETA_PIE,
+                      "Participación por proveedor (%)")
+    story.append(_chart_row(g1, g2))
+    story.append(Spacer(1, 4*mm))
+
+    story.append(_seccion_label("DATOS DETALLADOS", st))
+    headers = ["Proveedor", "CUIT", "Cant. Compras", "Total Comprado"]
+    widths  = [_w(.40), _w(.25), _w(.17), _w(.18)]
+    filas   = [_hr(headers, st)]
+    for p in datos:
+        filas.append([
+            _c(p.get("nombre", ""), st),
+            _c(p.get("cuit", "—"), st),
+            _c(str(p.get("cant_compras", 0)), st, align=TA_CENTER),
+            _c(_fmt_moneda(p.get("total_comprado", 0)), st,
+               color=AZUL_MEDIO, bold=True, align=TA_RIGHT),
+        ])
+    # Fila total
+    filas.append([
+        _c("TOTAL", st, bold=True),
+        _c("", st),
+        _c(str(total_compras), st, align=TA_CENTER),
+        _c(_fmt_moneda(total_general), st, color=AZUL_MEDIO, bold=True, align=TA_RIGHT),
+    ])
+    story.append(_tabla(filas, widths, fila_total=True))
+    story += _pie(st)
+    doc.build(story)
+    return buf.getvalue()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REPORTE 7 — VENTAS POR CLIENTE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _pdf_ventas_clientes(datos, filtros):
+    buf = io.BytesIO()
+    st  = _build_styles()
+    doc = _make_doc(buf, "Ventas por Cliente")
+    story = []
+
+    total_general = sum(float(p.get("total_ventas", 0)) for p in datos)
+    total_ventas  = sum(int(p.get("cant_ventas", 0)) for p in datos)
+    top1 = datos[0]["nombre"] if datos else "—"
+    kpis = [
+        ("Total clientes",    str(len(datos)),             AZUL_MEDIO, AZUL_CLARO),
+        ("Total ventas",      str(total_ventas),           VERDE,      VERDE_BG),
+        ("Total facturado",   _fmt_moneda(total_general),  VERDE,      VERDE_BG),
+    ]
+
+    story += _encabezado(
+        "Ventas por Cliente",
+        "Total facturado a cada cliente en el período seleccionado",
+        "$", filtros, len(datos), st
+    )
+    story.append(Spacer(1, 4*mm))
+    story.append(_kpi_row(kpis, st))
+    story.append(Spacer(1, 4*mm))
+
+    # ── Gráficos ──────────────────────────────────────────────────────────────
+    top10   = datos[:10]
+    nombres = [_short(p["nombre"], 14) for p in top10]
+    totales = [float(p.get("total_ventas", 0)) for p in top10]
+
+    g1 = _chart_barras_v(nombres, totales, MC["verde"],
+                         "Top 10 — ingreso por cliente ($)")
+    g2 = _chart_donut(nombres, totales, PALETA_PIE,
+                      "Participación por cliente (%)")
+    story.append(_chart_row(g1, g2))
+    story.append(Spacer(1, 4*mm))
+
+    story.append(_seccion_label("DATOS DETALLADOS", st))
+    headers = ["Cliente", "CUIT", "Cant. Ventas", "Total Vendido"]
+    widths  = [_w(.42), _w(.25), _w(.15), _w(.18)]
+    filas   = [_hr(headers, st)]
+    for p in datos:
+        filas.append([
+            _c(p.get("nombre", ""), st),
+            _c(p.get("cuit", "—"), st),
+            _c(str(p.get("cant_ventas", 0)), st, align=TA_CENTER),
+            _c(_fmt_moneda(p.get("total_ventas", 0)), st,
+               color=VERDE, bold=True, align=TA_RIGHT),
+        ])
+    filas.append([
+        _c("TOTAL", st, bold=True),
+        _c("", st),
+        _c(str(total_ventas), st, align=TA_CENTER),
+        _c(_fmt_moneda(total_general), st, color=VERDE, bold=True, align=TA_RIGHT),
+    ])
+    story.append(_tabla(filas, widths, fila_total=True))
+    story += _pie(st)
+    doc.build(story)
+    return buf.getvalue()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REPORTE 8 — FLUJO DE CAJA
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _pdf_flujo_caja(datos, filtros):
+    buf = io.BytesIO()
+    st  = _build_styles()
+    doc = _make_doc(buf, "Flujo de Caja")
+    story = []
+
+    total_ing  = sum(float(d.get("ingresos", 0)) for d in datos)
+    total_egr  = sum(float(d.get("egresos",  0)) for d in datos)
+    total_neto = total_ing - total_egr
+    kpis = [
+        ("Total ingresos cobrados",   _fmt_moneda(total_ing),  VERDE,      VERDE_BG),
+        ("Total egresos pagados",     _fmt_moneda(total_egr),  ROJO,       ROJO_BG),
+        ("Resultado neto del período",_fmt_moneda(total_neto),
+         VERDE if total_neto >= 0 else ROJO,
+         VERDE_BG if total_neto >= 0 else ROJO_BG),
+    ]
+
+    story += _encabezado(
+        "Flujo de Caja",
+        "Ingresos cobrados de clientes vs egresos pagados a proveedores",
+        "⇅", filtros, len(datos), st
+    )
+    story.append(Spacer(1, 4*mm))
+    story.append(_kpi_row(kpis, st))
+    story.append(Spacer(1, 4*mm))
+
+    # ── Gráficos ──────────────────────────────────────────────────────────────
+    meses    = [d["mes_nombre"] for d in datos]
+    ingresos = [float(d.get("ingresos", 0)) for d in datos]
+    egresos  = [float(d.get("egresos",  0)) for d in datos]
+    netos    = [float(d.get("neto",     0)) for d in datos]
+
+    # Gráfico 1: barras dobles ingresos vs egresos
+    g1 = _chart_barras_doble_ingresos_egresos(
+        meses, ingresos, egresos,
+        "Ingresos vs Egresos por mes"
+    )
+    # Gráfico 2: línea de resultado neto
+    g2 = _chart_linea_neto(meses, netos, "Resultado neto por mes")
+
+    story.append(_chart_row(g1, g2))
+    story.append(Spacer(1, 4*mm))
+
+    story.append(_seccion_label("DATOS DETALLADOS", st))
+    headers = ["Mes", "Ingresos cobrados", "Egresos pagados", "Resultado neto", "Estado"]
+    widths  = [_w(.22), _w(.22), _w(.22), _w(.20), _w(.14)]
+    filas   = [_hr(headers, st)]
+    for d in datos:
+        neto     = float(d.get("neto", 0))
+        positivo = neto >= 0
+        filas.append([
+            _c(d.get("mes_nombre", ""), st, bold=True),
+            _c(_fmt_moneda(d.get("ingresos", 0)), st, color=VERDE, align=TA_RIGHT),
+            _c(_fmt_moneda(d.get("egresos",  0)), st, color=ROJO,  align=TA_RIGHT),
+            _c(_fmt_moneda(neto), st,
+               color=VERDE if positivo else ROJO, bold=True, align=TA_RIGHT),
+            _c("✓ Positivo" if positivo else "✕ Negativo", st,
+               color=VERDE if positivo else ROJO, bold=True, align=TA_CENTER),
+        ])
+    # Fila totales
+    filas.append([
+        _c("TOTAL PERÍODO", st, bold=True),
+        _c(_fmt_moneda(total_ing),  st, color=VERDE, bold=True, align=TA_RIGHT),
+        _c(_fmt_moneda(total_egr),  st, color=ROJO,  bold=True, align=TA_RIGHT),
+        _c(_fmt_moneda(total_neto), st,
+           color=VERDE if total_neto >= 0 else ROJO, bold=True, align=TA_RIGHT),
+        _c("", st),
+    ])
+    story.append(_tabla(filas, widths, fila_total=True))
+    story += _pie(st)
+    doc.build(story)
+    return buf.getvalue()
+
+
+# ── Gráficos auxiliares para flujo de caja ────────────────────────────────────
+
+def _chart_barras_doble_ingresos_egresos(meses, ingresos, egresos, titulo):
+    """Barras verticales dobles: ingresos (verde) vs egresos (rojo)."""
+    fig, ax = _fig_base(titulo)
+    x = np.arange(len(meses))
+    w = 0.35
+    ax.bar(x - w/2, ingresos, width=w, color=MC["verde"], alpha=0.85,
+           label="Ingresos", zorder=3)
+    ax.bar(x + w/2, egresos,  width=w, color=MC["rojo"],  alpha=0.85,
+           label="Egresos",   zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(meses, rotation=35, ha="right", fontsize=6)
+    ax.yaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda v, _: f"${v/1000:.0f}k"))
+    ax.legend(fontsize=6, loc="upper right",
+              framealpha=0.8, edgecolor=MC["gris_gr"])
+    ax.set_axisbelow(True)
+    fig.tight_layout()
+    return _fig_to_buf(fig)
+
+
+def _chart_linea_neto(meses, netos, titulo):
+    """Línea del resultado neto — verde si positivo, rojo si negativo."""
+    fig, ax = _fig_base(titulo)
+    colores_punto = [MC["verde"] if n >= 0 else MC["rojo"] for n in netos]
+    x = range(len(meses))
+    if len(meses) > 1:
+        ax.plot(list(x), netos, color=MC["cyan"], linewidth=2, zorder=3)
+        ax.fill_between(list(x), netos, 0,
+                        where=[n >= 0 for n in netos],
+                        alpha=0.12, color=MC["verde"], label="Positivo")
+        ax.fill_between(list(x), netos, 0,
+                        where=[n < 0 for n in netos],
+                        alpha=0.12, color=MC["rojo"], label="Negativo")
+        for xi, yi, col in zip(x, netos, colores_punto):
+            ax.scatter(xi, yi, color=col, s=30, zorder=4,
+                       edgecolors="white", linewidths=0.8)
+            ax.annotate(f"${yi/1000:.0f}k", (xi, yi),
+                        textcoords="offset points", xytext=(0, 6),
+                        ha="center", fontsize=5.5, color=col, fontweight="bold")
+        ax.axhline(0, color=MC["gris_txt"], linewidth=0.8, linestyle="--", alpha=0.6)
+    else:
+        color = MC["verde"] if (netos[0] if netos else 0) >= 0 else MC["rojo"]
+        ax.bar(meses, netos, color=color, alpha=0.85, width=0.4, zorder=3)
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(meses, rotation=35, ha="right", fontsize=6)
+    ax.yaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda v, _: f"${v/1000:.0f}k"))
+    ax.legend(fontsize=6, loc="upper right",
+              framealpha=0.8, edgecolor=MC["gris_gr"])
+    ax.set_axisbelow(True)
+    fig.tight_layout()
+    return _fig_to_buf(fig)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -32,9 +32,12 @@ export default function Navbar() {
       <ul className={styles.navLinksDesktop}>
         <li><Link to="/"           className={esActivo('/')}>Inicio</Link></li>
         <li><Link to="/inventario" className={esActivo('/inventario')}>Inventario</Link></li>
-        <li><Link to="/stock"      className={esActivo('/stock')}>Stock</Link></li>
-        <li><Link to="/reportes"   className={esActivo('/reportes')}>Reportes</Link></li>
+        <li><Link to="/compras" className={esActivo('/compras')}>Compras</Link></li>
+        <li><Link to="/ventas"     className={esActivo('/ventas')}>Ventas</Link></li>        
         <li><Link to="/facturacion" className={esActivo('/facturacion')}>Facturación</Link></li>
+        <li><Link to="/reportes"   className={esActivo('/reportes')}>Reportes</Link></li> 
+        <li><Link to="/clientes"   className={esActivo('/clientes')}>Clientes</Link></li>
+        <li><Link to="/proveedores" className={esActivo('/proveedores')}>Proveedores</Link></li>        
         {/* Usuarios solo visible para admin */}
         {esAdmin && (
           <li><Link to="/usuarios" className={esActivo('/usuarios')}>Usuarios</Link></li>
@@ -47,9 +50,13 @@ export default function Navbar() {
           <ul className={`${styles.navLinks} ${menuAbierto ? styles.navLinksOpen : ''}`}>
             <li><Link to="/"           className={esActivo('/')}           onClick={() => setMenuAbierto(false)}>Inicio</Link></li>
             <li><Link to="/inventario" className={esActivo('/inventario')} onClick={() => setMenuAbierto(false)}>Inventario</Link></li>
-            <li><Link to="/stock"      className={esActivo('/stock')}      onClick={() => setMenuAbierto(false)}>Stock</Link></li>
-            <li><Link to="/reportes"   className={esActivo('/reportes')}   onClick={() => setMenuAbierto(false)}>Reportes</Link></li>
+            <li><Link to="/compras" className={esActivo('/compras')}>Compras</Link></li>
+            <li><Link to="/ventas"     className={esActivo('/ventas')}     onClick={() => setMenuAbierto(false)}>Ventas</Link></li>                     
             <li><Link to="/facturacion" className={esActivo('/facturacion')}>Facturación</Link></li>
+            <li><Link to="/reportes"   className={esActivo('/reportes')}   onClick={() => setMenuAbierto(false)}>Reportes</Link></li>   
+            <li><Link to="/clientes"   className={esActivo('/clientes')}   onClick={() => setMenuAbierto(false)}>Clientes</Link></li>         
+            <li><Link to="/proveedores" className={esActivo('/proveedores')} onClick={() => setMenuAbierto(false)}>Proveedores</Link></li>
+            
             {esAdmin && (
               <li><Link to="/usuarios" className={esActivo('/usuarios')}   onClick={() => setMenuAbierto(false)}>Usuarios</Link></li>
             )}

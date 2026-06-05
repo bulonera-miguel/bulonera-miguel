@@ -1,0 +1,177 @@
+/* ============================================================
+   Footer.module.css — Pie de página
+   Bulonera Miguel — Sistema de Gestión
+   ============================================================ */
+
+.footer {
+  background: #07111F;
+  border-top: 1px solid rgba(0,200,240,0.18);
+  margin-top: auto;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+}
+
+/* ── CONTENIDO PRINCIPAL ────────────────────────────────────── */
+.contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 48px 28px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 48px;
+}
+
+/* ── COLUMNAS ───────────────────────────────────────────────── */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── LOGO ───────────────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.logoIcono {
+  flex-shrink: 0;
+}
+
+.logoSvg {
+  width: 40px;
+  height: 40px;
+}
+
+.logoNombre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #EAF4FF;
+  line-height: 1.1;
+}
+
+.logoSub {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #00C8F0;
+  opacity: 0.7;
+}
+
+/* ── DATOS EMPRESA ──────────────────────────────────────────── */
+.empresa {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.empresa span {
+  font-size: 0.92rem;
+  color: rgba(200,228,244,0.55);
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+/* ── TÍTULOS COLUMNA ────────────────────────────────────────── */
+.colTitulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #00C8F0;
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,200,240,0.2);
+}
+
+/* ── ITEMS COLUMNA ──────────────────────────────────────────── */
+.colItems {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.colItems span {
+  font-size: 0.92rem;
+  color: rgba(200,228,244,0.55);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* ── DIVIDER ────────────────────────────────────────────────── */
+.divider {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 1px;
+  background: rgba(200,228,244,0.08);
+  margin-left: 48px;
+  margin-right: 48px;
+}
+
+/* ── BARRA INFERIOR ─────────────────────────────────────────── */
+.barraInferior {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.copyright {
+  font-size: 0.85rem;
+  color: rgba(200,228,244,0.35);
+  letter-spacing: 0.04em;
+}
+
+.desarrollado {
+  font-size: 0.85rem;
+  color: rgba(200,228,244,0.35);
+  letter-spacing: 0.04em;
+}
+
+.dev {
+  color: #00C8F0;
+  font-weight: 600;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    padding: 32px 32px 24px;
+  }
+  .col:first-child {
+    grid-column: 1 / -1;
+  }
+  .divider {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+  .barraInferior {
+    padding: 14px 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .contenido {
+    grid-template-columns: 1fr;
+    padding: 24px 20px 16px;
+    gap: 24px;
+  }
+  .divider {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  .barraInferior {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 20px;
+  }
+}

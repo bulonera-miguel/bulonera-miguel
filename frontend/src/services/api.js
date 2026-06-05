@@ -107,6 +107,136 @@ export const categoriasApi = {
   },
 }
 
+
+// ── PROVEEDORES ────────────────────────────────────────────
+
+export const proveedoresApi = {
+
+  listar: async () => {
+    const res = await fetch(`${BASE_URL}/api/proveedores/`)
+    if (!res.ok) throw new Error('Error al listar proveedores')
+    return res.json()
+  },
+
+  buscar: async (texto) => {
+    const res = await fetch(`${BASE_URL}/api/proveedores/buscar?q=${encodeURIComponent(texto)}`)
+    if (!res.ok) throw new Error('Error al buscar proveedores')
+    return res.json()
+  },
+
+  crear: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/proveedores/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al crear proveedor')
+    }
+    return res.json()
+  },
+
+  actualizar: async (id, datos) => {
+    const res = await fetch(`${BASE_URL}/api/proveedores/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al actualizar proveedor')
+    }
+    return res.json()
+  },
+
+  eliminar: async (id) => {
+    const res = await fetch(`${BASE_URL}/api/proveedores/${id}`, {
+      method: 'DELETE'
+    })
+    if (!res.ok) throw new Error('Error al eliminar proveedor')
+  },
+}
+
+
+// ── COMPRAS ────────────────────────────────────────────────
+
+export const comprasApi = {
+
+  listar: async (params = {}) => {
+    const p = new URLSearchParams()
+    if (params.proveedor_id) p.append('proveedor_id', params.proveedor_id)
+    if (params.desde)        p.append('desde', params.desde)
+    if (params.hasta)        p.append('hasta', params.hasta)
+    const qs = p.toString()
+    const res = await fetch(`${BASE_URL}/api/compras/${qs ? '?' + qs : ''}`)
+    if (!res.ok) throw new Error('Error al listar compras')
+    return res.json()
+  },
+
+  detalle: async (id) => {
+    const res = await fetch(`${BASE_URL}/api/compras/${id}`)
+    if (!res.ok) throw new Error('Error al obtener detalle de compra')
+    return res.json()
+  },
+
+  registrar: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/compras/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al registrar compra')
+    }
+    return res.json()
+  },
+
+  reporteDeudaMensual: async (anio, mes) => {
+    const res = await fetch(
+      `${BASE_URL}/api/compras/reportes/deuda-mensual?anio=${anio}&mes=${mes}`
+    )
+    if (!res.ok) throw new Error('Error al obtener reporte')
+    return res.json()
+  },
+}
+
+// ── VENTAS ─────────────────────────────────────────────────
+
+export const ventasApi = {
+
+  listar: async (params = {}) => {
+    const p = new URLSearchParams()
+    if (params.cliente_id) p.append('cliente_id', params.cliente_id)
+    if (params.desde)      p.append('desde', params.desde)
+    if (params.hasta)      p.append('hasta', params.hasta)
+    const qs = p.toString()
+    const res = await fetch(`${BASE_URL}/api/ventas/${qs ? '?' + qs : ''}`)
+    if (!res.ok) throw new Error('Error al listar ventas')
+    return res.json()
+  },
+
+  detalle: async (id) => {
+    const res = await fetch(`${BASE_URL}/api/ventas/${id}`)
+    if (!res.ok) throw new Error('Error al obtener detalle de venta')
+    return res.json()
+  },
+
+  registrar: async (datos) => {
+    const res = await fetch(`${BASE_URL}/api/ventas/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.detail || 'Error al registrar venta')
+    }
+    return res.json()
+  },
+}
+
 // ── PORTADA ────────────────────────────────────────────────
 
 export const portadaApi = {

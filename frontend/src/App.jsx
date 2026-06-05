@@ -3,11 +3,15 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute  from './components/ProtectedRoute'
 import Home       from './pages/Home'
 import Inventario from './pages/Inventario'
-import Stock      from './pages/Stock'
 import Reportes   from './pages/Reportes'
 import Login      from './pages/Login'
 import Usuarios   from './pages/Usuarios'
 import Facturacion from './pages/Facturacion'
+import Proveedores from './pages/Proveedores'
+import Compras from './pages/Compras'
+import Ventas from './pages/Ventas'
+import Clientes from './pages/Clientes'
+import Footer from './components/Footer'
 
 export default function App() {
   return (
@@ -21,11 +25,7 @@ export default function App() {
           {/* Rutas protegidas — requieren login */}
           <Route path="/inventario" element={
             <ProtectedRoute><Inventario /></ProtectedRoute>
-          } />
-
-          <Route path="/stock" element={
-            <ProtectedRoute><Stock /></ProtectedRoute>
-          } />
+          } />         
 
           <Route path="/reportes" element={
             <ProtectedRoute><Reportes /></ProtectedRoute>
@@ -38,8 +38,26 @@ export default function App() {
 
           <Route path="/facturacion" element={
             <ProtectedRoute><Facturacion /></ProtectedRoute>
-          } />          
+          } />
+
+          <Route path="/clientes" element=
+            {
+              <ProtectedRoute><Clientes /></ProtectedRoute>
+            } />
+
+          <Route path="/proveedores" element={
+            <ProtectedRoute><Proveedores /></ProtectedRoute>
+          } />  
+
+          <Route path="/compras" element={
+            <ProtectedRoute><Compras /></ProtectedRoute>
+          } />        
+
+          <Route path="/ventas" element={
+            <ProtectedRoute><Ventas /></ProtectedRoute>
+          } />        
         </Routes>
+        <Footer />
       </AuthProvider>
     </BrowserRouter>
   )

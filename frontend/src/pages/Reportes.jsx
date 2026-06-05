@@ -5,18 +5,21 @@ import styles from './Reportes.module.css'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend, LineChart, Line, ScatterChart, Scatter,
-  ReferenceLine, LabelList
+  ReferenceLine, LabelList, ComposedChart, Area
 } from 'recharts'
 
 // ── CONFIGURACIÓN DE REPORTES ──────────────────────────────────────────────────
 const BASE_URL = 'http://localhost:8000'
 
 const REPORTES = [
-  { id: 'stock-critico',     label: 'Stock Crítico',      icono: '⚠',  desc: 'Productos bajo el mínimo' },
-  { id: 'mas-vendidos',      label: 'Más Vendidos',        icono: '↑',  desc: 'Mayor rotación de salidas' },
-  { id: 'menos-vendidos',    label: 'Menos Vendidos',      icono: '↓',  desc: 'Menor rotación de salidas' },
-  { id: 'inventario-actual', label: 'Inventario Actual',   icono: '▦',  desc: 'Estado actual del stock' },
-  { id: 'productos-baja',    label: 'Productos de Baja',   icono: '✕',  desc: 'Dados de baja del sistema' },
+  { id: 'stock-critico',     label: 'Stock Crítico',        icono: '⚠',  desc: 'Productos bajo el mínimo' },
+  { id: 'mas-vendidos',      label: 'Más Vendidos',          icono: '↑',  desc: 'Mayor rotación de salidas' },
+  { id: 'menos-vendidos',    label: 'Menos Vendidos',        icono: '↓',  desc: 'Menor rotación de salidas' },
+  { id: 'inventario-actual', label: 'Inventario Actual',     icono: '▦',  desc: 'Estado actual del stock' },
+  { id: 'productos-baja',    label: 'Productos de Baja',     icono: '✕',  desc: 'Dados de baja del sistema' },
+  { id: 'deuda-proveedores', label: 'Compras por Proveedor', icono: '₱',  desc: 'Total comprado por proveedor' },
+  { id: 'ventas-clientes',   label: 'Ventas por Cliente',    icono: '$',  desc: 'Ingreso por cliente' },
+  { id: 'flujo-caja',        label: 'Flujo de Caja',         icono: '⇅',  desc: 'Ingresos y egresos reales' },
 ]
 
 // Colores del sistema
@@ -56,12 +59,8 @@ export default function Reportes() {
   const [cargando, setCargando]             = useState(false)
   const [error, setError]                   = useState(null)
   const [filaResaltada, setFilaResaltada]   = useState(null)
-  // filaResaltada: índice de la fila clickeada — resalta en tabla y gráfico
-
-  // Vista: 'ambos' | 'tabla' | 'grafico'
   const [vista, setVista]                   = useState('ambos')
 
-  // Filtros
   const [filtros, setFiltros] = useState({
     desde:        '',
     hasta:        '',
@@ -70,6 +69,8 @@ export default function Reportes() {
     categoria_id: '',
   })
 
+  const [filtroProveedor, setFiltroProveedor] = useState('')
+
   // ── CARGAR CATEGORÍAS ────────────────────────────────────
   useEffect(() => {
     categoriasApi.listar().then(setCategorias).catch(console.error)
@@ -77,6 +78,25 @@ export default function Reportes() {
 
   // ── CONSTRUIR URL CON FILTROS ────────────────────────────
   const construirUrl = useCallback((reporteId) => {
+    if (reporteId === 'deuda-proveedores') {
+      const p = new URLSearchParams()
+      if (filtros.desde)   p.append('desde',  filtros.desde)
+      if (filtros.hasta)   p.append('hasta',  filtros.hasta)
+      if (filtroProveedor) p.append('nombre', filtroProveedor)
+      return `${BASE_URL}/api/compras/reportes/deuda-mensual?${p.toString()}`
+    }
+    if (reporteId === 'ventas-clientes') {
+      const p = new URLSearchParams()
+      if (filtros.desde) p.append('desde', filtros.desde)
+      if (filtros.hasta) p.append('hasta', filtros.hasta)
+      return `${BASE_URL}/api/ventas/reportes/ventas-clientes?${p.toString()}`
+    }
+    if (reporteId === 'flujo-caja') {
+      const p = new URLSearchParams()
+      if (filtros.desde) p.append('desde', filtros.desde)
+      if (filtros.hasta) p.append('hasta', filtros.hasta)
+      return `${BASE_URL}/api/flujo-caja/?${p.toString()}`
+    }
     const params = new URLSearchParams()
     if (filtros.desde)        params.append('desde',        filtros.desde)
     if (filtros.hasta)        params.append('hasta',        filtros.hasta)
@@ -85,7 +105,39 @@ export default function Reportes() {
     if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
     const qs = params.toString()
     return `${BASE_URL}/api/reportes/${reporteId}${qs ? '?' + qs : ''}`
-  }, [filtros])
+  }, [filtros, filtroProveedor])
+
+  // ── CONSTRUIR URL PDF ────────────────────────────────────
+  const construirUrlPDF = useCallback(() => {
+    if (reporteActivo === 'deuda-proveedores') {
+      const p = new URLSearchParams()
+      if (filtros.desde)   p.append('desde',  filtros.desde)
+      if (filtros.hasta)   p.append('hasta',  filtros.hasta)
+      if (filtroProveedor) p.append('nombre', filtroProveedor)
+      return `${BASE_URL}/api/compras/reportes/deuda-mensual/pdf?${p.toString()}`
+    }
+    if (reporteActivo === 'ventas-clientes') {
+      const p = new URLSearchParams()
+      if (filtros.desde) p.append('desde', filtros.desde)
+      if (filtros.hasta) p.append('hasta', filtros.hasta)
+      return `${BASE_URL}/api/ventas/reportes/ventas-clientes/pdf?${p.toString()}`
+    }
+    if (reporteActivo === 'flujo-caja') {
+      const p = new URLSearchParams()
+      if (filtros.desde) p.append('desde', filtros.desde)
+      if (filtros.hasta) p.append('hasta', filtros.hasta)
+      return `${BASE_URL}/api/flujo-caja/pdf?${p.toString()}`
+    }
+    // Reportes estándar
+    const params = new URLSearchParams()
+    if (filtros.desde)        params.append('desde',        filtros.desde)
+    if (filtros.hasta)        params.append('hasta',        filtros.hasta)
+    if (filtros.nombre)       params.append('nombre',       filtros.nombre)
+    if (filtros.codigo)       params.append('codigo',       filtros.codigo)
+    if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
+    const qs = params.toString()
+    return `${BASE_URL}/api/reportes/${reporteActivo}/pdf${qs ? '?' + qs : ''}`
+  }, [reporteActivo, filtros, filtroProveedor])
 
   // ── EJECUTAR REPORTE ─────────────────────────────────────
   const ejecutarReporte = useCallback(async (reporteId = reporteActivo) => {
@@ -109,15 +161,7 @@ export default function Reportes() {
   }, [reporteActivo, construirUrl])
 
   const descargarPDF = () => {
-    const params = new URLSearchParams()
-    if (filtros.desde)        params.append('desde',        filtros.desde)
-    if (filtros.hasta)        params.append('hasta',        filtros.hasta)
-    if (filtros.nombre)       params.append('nombre',       filtros.nombre)
-    if (filtros.codigo)       params.append('codigo',       filtros.codigo)
-    if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
-    const qs = params.toString()
-    const url = `${BASE_URL}/api/reportes/${reporteActivo}/pdf${qs ? '?' + qs : ''}`
-    window.open(url, '_blank')
+    window.open(construirUrlPDF(), '_blank')
   }
 
   // Ejecutar automáticamente al cambiar de reporte
@@ -134,25 +178,19 @@ export default function Reportes() {
   }
 
   // ── FORMATEAR NÚMEROS ────────────────────────────────────
-  const fmt  = (n) => Number(n).toLocaleString('es-AR')
-  const fmtP = (n) => `$${Number(n).toLocaleString('es-AR')}`
+  const fmt      = (n) => Number(n).toLocaleString('es-AR')
+  const fmtP     = (n) => `$${Number(n).toLocaleString('es-AR')}`
   const fmtFecha = (f) => f ? new Date(f).toLocaleDateString('es-AR') : '—'
-
-  // ── NOMBRE CORTO PARA GRÁFICOS ───────────────────────────
   const nombreCorto = (nombre, max = 18) =>
     nombre?.length > max ? nombre.slice(0, max) + '…' : nombre
-
-  // ════════════════════════════════════════════════════════
-  // CONFIGURACIÓN DE CADA REPORTE
-  // ════════════════════════════════════════════════════════
 
   // ── COLUMNAS DE TABLA ─────────────────────────────────────
   const columnas = {
     'stock-critico': [
-      { key: 'codigo',       label: 'Código'        },
-      { key: 'nombre',       label: 'Producto'      },
-      { key: 'stock_actual', label: 'Stock actual',  render: (v) => <span className={styles.valorRojo}>{v}</span> },
-      { key: 'stock_minimo', label: 'Stock mínimo'  },
+      { key: 'codigo',       label: 'Código'       },
+      { key: 'nombre',       label: 'Producto'     },
+      { key: 'stock_actual', label: 'Stock actual', render: (v) => <span className={styles.valorRojo}>{v}</span> },
+      { key: 'stock_minimo', label: 'Stock mínimo' },
       { key: '_deficit',     label: 'Déficit',
         render: (_, row) => <span className={styles.valorRojo}>-{row.stock_minimo - row.stock_actual}</span> },
     ],
@@ -171,23 +209,49 @@ export default function Reportes() {
       { key: 'precio',        label: 'Precio unit.', render: (v) => fmtP(v) },
     ],
     'inventario-actual': [
-      { key: 'codigo',          label: 'Código'    },
-      { key: 'nombre',          label: 'Producto'  },
-      { key: 'stock_actual',    label: 'Stock',    render: (v, row) =>
+      { key: 'codigo',         label: 'Código'   },
+      { key: 'nombre',         label: 'Producto' },
+      { key: 'stock_actual',   label: 'Stock',   render: (v, row) =>
           <span className={row.estado === 'critico' ? styles.valorRojo : styles.valorVerde}>{v}</span> },
-      { key: 'precio',          label: 'Precio',   render: (v) => fmtP(v) },
-      { key: 'valor_en_stock',  label: 'Valor total', render: (v) => <span className={styles.valorCyan}>{fmtP(v)}</span> },
-      { key: 'estado',          label: 'Estado',   render: (v) =>
+      { key: 'precio',         label: 'Precio',  render: (v) => fmtP(v) },
+      { key: 'valor_en_stock', label: 'Valor total', render: (v) => <span className={styles.valorCyan}>{fmtP(v)}</span> },
+      { key: 'estado',         label: 'Estado',  render: (v) =>
           <span className={v === 'critico' ? styles.badgeCritico : styles.badgeNormal}>
             {v === 'critico' ? '⚠ Crítico' : '✓ Normal'}
           </span> },
     ],
     'productos-baja': [
-      { key: 'codigo',      label: 'Código'    },
-      { key: 'nombre',      label: 'Producto'  },
-      { key: 'precio',      label: 'Precio',   render: (v) => fmtP(v) },
-      { key: 'stock_actual',label: 'Stock al dar de baja' },
-      { key: 'updated_at',  label: 'Fecha de baja', render: (v) => fmtFecha(v) },
+      { key: 'codigo',       label: 'Código'    },
+      { key: 'nombre',       label: 'Producto'  },
+      { key: 'precio',       label: 'Precio',   render: (v) => fmtP(v) },
+      { key: 'stock_actual', label: 'Stock al dar de baja' },
+      { key: 'updated_at',   label: 'Fecha de baja', render: (v) => fmtFecha(v) },
+    ],
+    'deuda-proveedores': [
+      { key: 'nombre',         label: 'Proveedor'     },
+      { key: 'cuit',           label: 'CUIT'          },
+      { key: 'cant_compras',   label: 'Cant. compras' },
+      { key: 'total_comprado', label: 'Total comprado',
+        render: (v) => <span className={styles.valorCyan}>{fmtP(v)}</span> },
+    ],
+    'ventas-clientes': [
+      { key: 'nombre',      label: 'Cliente'       },
+      { key: 'cant_ventas', label: 'Cant. ventas'  },
+      { key: 'total_ventas',label: 'Total vendido',
+        render: (v) => <span className={styles.valorVerde}>{fmtP(v)}</span> },
+    ],
+    'flujo-caja': [
+      { key: 'mes_nombre', label: 'Mes' },
+      { key: 'ingresos',   label: 'Ingresos cobrados',
+        render: (v) => <span className={styles.valorVerde}>{fmtP(v)}</span> },
+      { key: 'egresos',    label: 'Egresos pagados',
+        render: (v) => <span className={styles.valorRojo}>{fmtP(v)}</span> },
+      { key: 'neto',       label: 'Resultado neto',
+        render: (v) => <span className={v >= 0 ? styles.valorVerde : styles.valorRojo}>{fmtP(v)}</span> },
+      { key: 'estado',     label: 'Estado',
+        render: (v) => <span className={v === 'positivo' ? styles.badgeNormal : styles.badgeCritico}>
+          {v === 'positivo' ? '✓ Positivo' : '✕ Negativo'}
+        </span> },
     ],
   }
 
@@ -195,13 +259,11 @@ export default function Reportes() {
   const renderGraficos = () => {
     if (!datos.length) return null
 
-    // Paleta para resaltar la fila clickeada
     const colorBarra = (index, baseColor) =>
       filaResaltada === null || filaResaltada === index ? baseColor : 'rgba(200,228,244,0.12)'
 
     switch (reporteActivo) {
 
-      // ── STOCK CRÍTICO: barra doble (actual vs mínimo) + barra de déficit ──
       case 'stock-critico': {
         const chartData = datos.slice(0, 15).map((p, i) => ({
           name:    nombreCorto(p.nombre),
@@ -250,19 +312,10 @@ export default function Reportes() {
         )
       }
 
-      // ── MÁS VENDIDOS: barra vertical + donut de participación ──
       case 'mas-vendidos': {
         const top10 = datos.slice(0, 10)
-        const chartBar = top10.map((p, i) => ({
-          name:   nombreCorto(p.nombre),
-          ventas: p.total_salidas,
-          index:  i,
-        }))
-        const chartPie = top10.map((p, i) => ({
-          name:  nombreCorto(p.nombre, 14),
-          value: p.total_salidas,
-          index: i,
-        }))
+        const chartBar = top10.map((p, i) => ({ name: nombreCorto(p.nombre), ventas: p.total_salidas, index: i }))
+        const chartPie = top10.map((p, i) => ({ name: nombreCorto(p.nombre, 14), value: p.total_salidas, index: i }))
         const COLORES_PIE = [C.cyan, C.verde, C.amarillo, '#7B61FF', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF', '#FF8B94', '#C3A6FF']
         return (
           <div className={styles.graficosWrap}>
@@ -285,27 +338,15 @@ export default function Reportes() {
               <div className={styles.graficoTitulo}>Participación en ventas (%)</div>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie
-                    data={chartPie} cx="50%" cy="45%"
-                    innerRadius={55} outerRadius={100}
-                    paddingAngle={2} dataKey="value"
-                  >
+                  <Pie data={chartPie} cx="50%" cy="45%" innerRadius={55} outerRadius={100} paddingAngle={2} dataKey="value">
                     {chartPie.map((_, i) => (
-                      <Cell
-                        key={i}
-                        fill={filaResaltada === null || filaResaltada === i
-                          ? COLORES_PIE[i % COLORES_PIE.length]
-                          : 'rgba(200,228,244,0.08)'}
-                        stroke="transparent"
-                      />
+                      <Cell key={i}
+                        fill={filaResaltada === null || filaResaltada === i ? COLORES_PIE[i % COLORES_PIE.length] : 'rgba(200,228,244,0.08)'}
+                        stroke="transparent" />
                     ))}
                   </Pie>
                   <Tooltip content={<TooltipCustom />} />
-                  <Legend
-                    formatter={(v) => <span style={{ color: C.textMid, fontSize: 11 }}>{v}</span>}
-                    iconType="circle" iconSize={8}
-                    wrapperStyle={{ paddingTop: 8 }}
-                  />
+                  <Legend formatter={(v) => <span style={{ color: C.textMid, fontSize: 11 }}>{v}</span>} iconType="circle" iconSize={8} wrapperStyle={{ paddingTop: 8 }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -313,20 +354,10 @@ export default function Reportes() {
         )
       }
 
-      // ── MENOS VENDIDOS: barra horizontal + scatter stock vs ventas ──
       case 'menos-vendidos': {
         const top15 = datos.slice(0, 15)
-        const chartBar = top15.map((p, i) => ({
-          name:   nombreCorto(p.nombre),
-          ventas: p.total_salidas,
-          index:  i,
-        }))
-        const chartScatter = top15.map((p, i) => ({
-          stock:  p.stock_actual,
-          ventas: p.total_salidas,
-          name:   p.nombre,
-          index:  i,
-        }))
+        const chartBar     = top15.map((p, i) => ({ name: nombreCorto(p.nombre), ventas: p.total_salidas, index: i }))
+        const chartScatter = top15.map((p, i) => ({ stock: p.stock_actual, ventas: p.total_salidas, name: p.nombre, index: i }))
         return (
           <div className={styles.graficosWrap}>
             <div className={styles.graficoBloque}>
@@ -357,8 +388,7 @@ export default function Reportes() {
                     {chartScatter.map((_, i) => (
                       <Cell key={i}
                         fill={filaResaltada === i ? C.cyan : colorBarra(i, C.amarillo)}
-                        opacity={filaResaltada === null || filaResaltada === i ? 1 : 0.3}
-                      />
+                        opacity={filaResaltada === null || filaResaltada === i ? 1 : 0.3} />
                     ))}
                   </Scatter>
                 </ScatterChart>
@@ -368,19 +398,14 @@ export default function Reportes() {
         )
       }
 
-      // ── INVENTARIO ACTUAL: barra valor en stock + donut estado ──
       case 'inventario-actual': {
         const top12 = [...datos].sort((a, b) => b.valor_en_stock - a.valor_en_stock).slice(0, 12)
-        const chartBar = top12.map((p, i) => ({
-          name:  nombreCorto(p.nombre),
-          valor: p.valor_en_stock,
-          index: datos.indexOf(p),
-        }))
+        const chartBar = top12.map((p, i) => ({ name: nombreCorto(p.nombre), valor: p.valor_en_stock, index: datos.indexOf(p) }))
         const criticos = datos.filter(p => p.estado === 'critico').length
-        const normales  = datos.length - criticos
+        const normales = datos.length - criticos
         const chartPie = [
-          { name: 'Normal',  value: normales,  color: C.verde },
-          { name: 'Crítico', value: criticos,  color: C.rojo  },
+          { name: 'Normal',  value: normales, color: C.verde },
+          { name: 'Crítico', value: criticos, color: C.rojo  },
         ]
         const valorTotal = datos.reduce((s, p) => s + p.valor_en_stock, 0)
         return (
@@ -390,8 +415,7 @@ export default function Reportes() {
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={chartBar} layout="vertical" barCategoryGap="28%">
                   <CartesianGrid strokeDasharray="3 3" stroke={C.dim} horizontal={false} />
-                  <XAxis type="number" tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false}
-                    tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+                  <XAxis type="number" tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
                   <YAxis type="category" dataKey="name" tick={{ fill: C.text, fontSize: 11 }} width={120} axisLine={false} tickLine={false} />
                   <Tooltip content={<TooltipCustom />} formatter={(v) => [`$${fmt(v)}`, 'Valor en stock']} />
                   <Bar dataKey="valor" name="Valor en stock" radius={[0,3,3,0]}>
@@ -421,9 +445,7 @@ export default function Reportes() {
         )
       }
 
-      // ── PRODUCTOS BAJA: KPI cards + línea de bajas por mes ──
       case 'productos-baja': {
-        // Agrupamos bajas por mes para el gráfico de línea
         const bajasPorMes = {}
         datos.forEach(p => {
           const mes = p.updated_at
@@ -433,7 +455,6 @@ export default function Reportes() {
         })
         const chartLine = Object.entries(bajasPorMes).map(([mes, cantidad]) => ({ mes, cantidad }))
         const valorStockPerdido = datos.reduce((s, p) => s + (p.precio * p.stock_actual), 0)
-
         return (
           <div className={styles.graficosWrap}>
             <div className={styles.graficoBloque}>
@@ -465,6 +486,140 @@ export default function Reportes() {
         )
       }
 
+      case 'deuda-proveedores': {
+        const chartBar = datos.slice(0, 12).map((p, i) => ({ name: nombreCorto(p.nombre, 16), total: p.total_comprado, index: i }))
+        const totalGeneral = datos.reduce((s, p) => s + p.total_comprado, 0)
+        return (
+          <div className={styles.graficosWrap}>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Compras por proveedor</div>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={chartBar} layout="vertical" barCategoryGap="28%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.dim} horizontal={false} />
+                  <XAxis type="number" tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: C.text, fontSize: 11 }} width={120} axisLine={false} tickLine={false} />
+                  <Tooltip content={<TooltipCustom />} formatter={(v) => [`$${fmt(v)}`, 'Total comprado']} />
+                  <Bar dataKey="total" name="Total comprado" radius={[0,3,3,0]}>
+                    {chartBar.map((_, i) => <Cell key={i} fill={colorBarra(i, C.cyan)} />)}
+                    <LabelList dataKey="total" position="right" formatter={v => `$${(v/1000).toFixed(0)}k`} style={{ fill: C.cyan, fontSize: 11, fontFamily: 'Barlow Condensed' }} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Resumen del período</div>
+              <div className={styles.kpiGrid}>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total proveedores</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.cyan }}>{datos.length}</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total comprado</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.amarillo }}>{fmtP(totalGeneral)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      case 'ventas-clientes': {
+        const chartBar = datos.slice(0, 10).map((p, i) => ({ name: nombreCorto(p.nombre, 16), ventas: p.total_ventas, index: i }))
+        const totalGeneral = datos.reduce((s, p) => s + p.total_ventas, 0)
+        return (
+          <div className={styles.graficosWrap}>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Top 10 — ingreso por cliente</div>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={chartBar} barCategoryGap="30%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.dim} vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: C.textMid, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<TooltipCustom />} formatter={(v) => [`$${fmt(v)}`, 'Total vendido']} />
+                  <Bar dataKey="ventas" name="Total vendido" radius={[4,4,0,0]}>
+                    {chartBar.map((_, i) => <Cell key={i} fill={colorBarra(i, C.verde)} />)}
+                    <LabelList dataKey="ventas" position="top" formatter={v => `$${(v/1000).toFixed(0)}k`} style={{ fill: C.verde, fontSize: 11, fontFamily: 'Barlow Condensed' }} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Resumen del período</div>
+              <div className={styles.kpiGrid}>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total clientes</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.verde }}>{datos.length}</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total facturado</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.cyan }}>{fmtP(totalGeneral)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      // ── FLUJO DE CAJA ──────────────────────────────────────
+      case 'flujo-caja': {
+        const totalIngresos = datos.reduce((s, d) => s + d.ingresos, 0)
+        const totalEgresos  = datos.reduce((s, d) => s + d.egresos,  0)
+        const totalNeto     = totalIngresos - totalEgresos
+        return (
+          <div className={styles.graficosWrap}>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Ingresos vs Egresos por mes</div>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={datos} barCategoryGap="25%">
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.dim} vertical={false} />
+                  <XAxis dataKey="mes_nombre" tick={{ fill: C.textMid, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<TooltipCustom />} formatter={(v) => [`$${fmt(v)}`]} />
+                  <Bar dataKey="ingresos" name="Ingresos" fill={C.verde} radius={[3,3,0,0]} />
+                  <Bar dataKey="egresos"  name="Egresos"  fill={C.rojo}  radius={[3,3,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className={styles.graficoBloque}>
+              <div className={styles.graficoTitulo}>Resultado neto por mes</div>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={datos}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.dim} />
+                  <XAxis dataKey="mes_nombre" tick={{ fill: C.textMid, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<TooltipCustom />} formatter={(v) => [`$${fmt(v)}`, 'Neto']} />
+                  <ReferenceLine y={0} stroke={C.textMid} strokeDasharray="4 2" />
+                  <Line type="monotone" dataKey="neto" name="Neto" stroke={C.cyan} strokeWidth={2}
+                    dot={(props) => {
+                      const { cx, cy, payload } = props
+                      return <circle key={cx} cx={cx} cy={cy} r={4}
+                        fill={payload.neto >= 0 ? C.verde : C.rojo}
+                        stroke="transparent" />
+                    }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+              <div className={styles.kpiGrid} style={{ marginTop: 12 }}>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total ingresos</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.verde }}>{fmtP(totalIngresos)}</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Total egresos</span>
+                  <span className={styles.kpiCardValor} style={{ color: C.rojo }}>{fmtP(totalEgresos)}</span>
+                </div>
+                <div className={styles.kpiCard}>
+                  <span className={styles.kpiCardLabel}>Resultado neto</span>
+                  <span className={styles.kpiCardValor} style={{ color: totalNeto >= 0 ? C.verde : C.rojo }}>
+                    {fmtP(totalNeto)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
       default: return null
     }
   }
@@ -481,23 +636,17 @@ export default function Reportes() {
       <div className={styles.tablaWrap}>
         <table className={styles.tabla}>
           <thead>
-            <tr>
-              {cols.map(c => <th key={c.key}>{c.label}</th>)}
-            </tr>
+            <tr>{cols.map(c => <th key={c.key}>{c.label}</th>)}</tr>
           </thead>
           <tbody>
             {datos.map((row, i) => (
-              <tr
-                key={i}
+              <tr key={i}
                 className={`${filaResaltada === i ? styles.filaResaltada : ''}`}
                 onClick={() => setFilaResaltada(filaResaltada === i ? null : i)}
-                title="Clic para resaltar en el gráfico"
-              >
+                title="Clic para resaltar en el gráfico">
                 {cols.map(c => (
                   <td key={c.key} data-label={c.label}>
-                    {c.render
-                      ? c.render(row[c.key], row)
-                      : row[c.key] ?? '—'}
+                    {c.render ? c.render(row[c.key], row) : row[c.key] ?? '—'}
                   </td>
                 ))}
               </tr>
@@ -508,17 +657,15 @@ export default function Reportes() {
     )
   }
 
-  // ── REPORTE INFO ──────────────────────────────────────────
   const reporteInfo = REPORTES.find(r => r.id === reporteActivo)
 
   // ── RENDER ────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <Navbar />
-
       <div className={styles.contenido}>
 
-        {/* ── HEADER ── */}
+        {/* HEADER */}
         <div className={styles.pageHeader}>
           <div>
             <h2 className={styles.pageTitle}>Reportes</h2>
@@ -532,14 +679,12 @@ export default function Reportes() {
           )}
         </div>
 
-        {/* ── SELECTOR DE REPORTE ── */}
+        {/* SELECTOR */}
         <div className={styles.selectorReportes}>
           {REPORTES.map(r => (
-            <button
-              key={r.id}
+            <button key={r.id}
               className={`${styles.selectorBtn} ${reporteActivo === r.id ? styles.selectorBtnActivo : ''}`}
-              onClick={() => cambiarReporte(r.id)}
-            >
+              onClick={() => cambiarReporte(r.id)}>
               <span className={styles.selectorIcono}>{r.icono}</span>
               <span className={styles.selectorLabel}>{r.label}</span>
               <span className={styles.selectorDesc}>{r.desc}</span>
@@ -547,12 +692,47 @@ export default function Reportes() {
           ))}
         </div>
 
-        {/* ── FILTROS ── */}
+        {/* FILTROS */}
         <div className={styles.filtrosPanel}>
           <div className={styles.filtrosTitulo}>Filtros</div>
           <div className={styles.filtrosGrid}>
 
-            {/* Fechas — solo para reportes que las usan */}
+            {/* Nombre — solo reportes de productos */}
+            {reporteActivo !== 'deuda-proveedores' && reporteActivo !== 'ventas-clientes' && reporteActivo !== 'flujo-caja' && (
+              <div className={styles.filtroGrupo}>
+                <label>Nombre</label>
+                <input type="text" className={styles.filtroInput}
+                  placeholder="Buscar por nombre..."
+                  value={filtros.nombre}
+                  onChange={e => setFiltros({...filtros, nombre: e.target.value})} />
+              </div>
+            )}
+
+            {/* Código — solo reportes de productos */}
+            {reporteActivo !== 'deuda-proveedores' && reporteActivo !== 'ventas-clientes' && reporteActivo !== 'flujo-caja' && (
+              <div className={styles.filtroGrupo}>
+                <label>Código</label>
+                <input type="text" className={styles.filtroInput}
+                  placeholder="Ej: BUL-M10"
+                  value={filtros.codigo}
+                  onChange={e => setFiltros({...filtros, codigo: e.target.value})} />
+              </div>
+            )}
+
+            {/* Categoría — solo reportes de productos */}
+            {reporteActivo !== 'deuda-proveedores' && reporteActivo !== 'ventas-clientes' && reporteActivo !== 'flujo-caja' && (
+              <div className={styles.filtroGrupo}>
+                <label>Categoría</label>
+                <select className={styles.filtroInput}
+                  value={filtros.categoria_id}
+                  onChange={e => setFiltros({...filtros, categoria_id: e.target.value})}>
+                  <option value="">Todas</option>
+                  {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                </select>
+              </div>
+            )}
+
+            {/* Fechas */}
             {reporteActivo !== 'stock-critico' && reporteActivo !== 'inventario-actual' && (
               <>
                 <div className={styles.filtroGrupo}>
@@ -570,31 +750,27 @@ export default function Reportes() {
               </>
             )}
 
-            <div className={styles.filtroGrupo}>
-              <label>Nombre</label>
-              <input type="text" className={styles.filtroInput}
-                placeholder="Buscar por nombre..."
-                value={filtros.nombre}
-                onChange={e => setFiltros({...filtros, nombre: e.target.value})} />
-            </div>
+            {/* Filtro Proveedor */}
+            {reporteActivo === 'deuda-proveedores' && (
+              <div className={styles.filtroGrupo}>
+                <label>Proveedor</label>
+                <input type="text" className={styles.filtroInput}
+                  placeholder="Nombre del proveedor..."
+                  value={filtroProveedor}
+                  onChange={e => setFiltroProveedor(e.target.value)} />
+              </div>
+            )}
 
-            <div className={styles.filtroGrupo}>
-              <label>Código</label>
-              <input type="text" className={styles.filtroInput}
-                placeholder="Ej: BUL-M10"
-                value={filtros.codigo}
-                onChange={e => setFiltros({...filtros, codigo: e.target.value})} />
-            </div>
-
-            <div className={styles.filtroGrupo}>
-              <label>Categoría</label>
-              <select className={styles.filtroInput}
-                value={filtros.categoria_id}
-                onChange={e => setFiltros({...filtros, categoria_id: e.target.value})}>
-                <option value="">Todas</option>
-                {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-              </select>
-            </div>
+            {/* Filtro Cliente */}
+            {reporteActivo === 'ventas-clientes' && (
+              <div className={styles.filtroGrupo}>
+                <label>Cliente</label>
+                <input type="text" className={styles.filtroInput}
+                  placeholder="Nombre del cliente..."
+                  value={filtroProveedor}
+                  onChange={e => setFiltroProveedor(e.target.value)} />
+              </div>
+            )}
 
             <div className={styles.filtroAcciones}>
               <button className={styles.btnAplicar} onClick={() => ejecutarReporte()}>
@@ -602,15 +778,18 @@ export default function Reportes() {
               </button>
               <button className={styles.btnLimpiar} onClick={() => {
                 setFiltros({ desde: '', hasta: '', nombre: '', codigo: '', categoria_id: '' })
+                setFiltroProveedor('')
+                setDatos([])
+                setError(null)
+                setFilaResaltada(null)
               }}>
                 ✕ Limpiar
               </button>
             </div>
-
           </div>
         </div>
 
-        {/* ── ERROR ── */}
+        {/* ERROR */}
         {error && (
           <div className={styles.errorMsg}>
             <span className={styles.errorIcono}>⚠</span>
@@ -618,7 +797,7 @@ export default function Reportes() {
           </div>
         )}
 
-        {/* ── TOGGLE DE VISTA ── */}
+        {/* TOGGLE VISTA */}
         {!cargando && datos.length > 0 && (
           <div className={styles.vistaToggle}>
             <span className={styles.vistaLabel}>Vista:</span>
@@ -627,28 +806,23 @@ export default function Reportes() {
               { id: 'tabla',   label: '≡ Solo tabla'        },
               { id: 'grafico', label: '◉ Solo gráficos'     },
             ].map(v => (
-              <button
-                key={v.id}
+              <button key={v.id}
                 className={`${styles.vistaBtn} ${vista === v.id ? styles.vistaBtnActivo : ''}`}
-                onClick={() => setVista(v.id)}
-              >
+                onClick={() => setVista(v.id)}>
                 {v.label}
               </button>
             ))}
             <span className={styles.vistaHint}>
               Clic en una fila de la tabla para resaltar en el gráfico
             </span>
-            <button
-              className={styles.btnDescargarPDF}
-              onClick={descargarPDF}
-              title="Descargar reporte como PDF con los filtros actuales"
-            >
+            <button className={styles.btnDescargarPDF} onClick={descargarPDF}
+              title="Descargar reporte como PDF">
               ↓ PDF
             </button>
           </div>
         )}
 
-        {/* ── CARGANDO ── */}
+        {/* CARGANDO */}
         {cargando && (
           <div className={styles.cargando}>
             <div className={styles.cargandoSpinner}></div>
@@ -656,11 +830,9 @@ export default function Reportes() {
           </div>
         )}
 
-        {/* ── CONTENIDO PRINCIPAL: TABLA + GRÁFICOS ── */}
+        {/* CONTENIDO */}
         {!cargando && datos.length > 0 && (
           <div className={`${styles.mainGrid} ${styles['mainGrid_' + vista]}`}>
-
-            {/* TABLA */}
             {(vista === 'ambos' || vista === 'tabla') && (
               <div className={styles.tablaPanel}>
                 <div className={styles.tablaPanelHeader}>
@@ -670,8 +842,6 @@ export default function Reportes() {
                 {renderTabla()}
               </div>
             )}
-
-            {/* GRÁFICOS */}
             {(vista === 'ambos' || vista === 'grafico') && (
               <div className={styles.graficosPanel}>
                 <div className={styles.graficosHeader}>
@@ -680,7 +850,6 @@ export default function Reportes() {
                 {renderGraficos()}
               </div>
             )}
-
           </div>
         )}
 

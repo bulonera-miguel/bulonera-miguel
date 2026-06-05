@@ -8,6 +8,7 @@ Instalar: pip install reportlab qrcode[pil] Pillow
 
 import io
 import qrcode
+import os
 from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm, cm
@@ -134,7 +135,12 @@ def _encabezado(factura: dict, tipo: str, styles) -> Table:
     [Datos empresa]  |  [Letra grande]  |  [Tipo + Número]
     """
     # Columna izquierda — empresa
-    col_empresa = [
+    logo_path = os.path.join(os.path.dirname(__file__), "static", "logo-bm-blueprint.png")
+    col_empresa = []
+    if os.path.exists(logo_path):
+        col_empresa.append(Image(logo_path, width=38*mm, height=18*mm))
+        col_empresa.append(Spacer(1, 2*mm))
+    col_empresa += [
         Paragraph(EMPRESA["nombre"], styles["empresa_nombre"]),
         Paragraph(EMPRESA["domicilio"], styles["empresa_sub"]),
         Paragraph(f"Tel: {EMPRESA['telefono']}", styles["empresa_sub"]),

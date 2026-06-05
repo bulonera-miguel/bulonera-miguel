@@ -523,3 +523,16 @@ async def enviar_email_factura(factura_id: str, datos: EmailRequest):
             status_code=500,
             detail=f"Error al enviar email: {str(e)}",
         )
+    
+
+@router.patch("/clientes/{cliente_id}")
+async def actualizar_cliente(cliente_id: str, datos: dict):
+    try:
+        res = supabase.table("clientes").update(datos).eq("id", cliente_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Cliente no encontrado")
+        return res.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
