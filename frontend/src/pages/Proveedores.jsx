@@ -8,7 +8,7 @@ import Navbar from '../components/Navbar'
 import { proveedoresApi } from '../services/api'
 import styles from './Proveedores.module.css'
 
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const TABS = [
   { id: 'proveedores',       label: '≡ Proveedores'        },

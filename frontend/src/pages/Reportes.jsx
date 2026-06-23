@@ -9,7 +9,7 @@ import {
 } from 'recharts'
 
 // ── CONFIGURACIÓN DE REPORTES ──────────────────────────────────────────────────
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const REPORTES = [
   { id: 'stock-critico',     label: 'Stock Crítico',        icono: '⚠',  desc: 'Productos bajo el mínimo' },
