@@ -40,7 +40,10 @@ export default function Navbar() {
         <li><Link to="/proveedores" className={esActivo('/proveedores')}>Proveedores</Link></li>        
         {/* Usuarios solo visible para admin */}
         {esAdmin && (
-          <li><Link to="/usuarios" className={esActivo('/usuarios')}>Usuarios</Link></li>
+          <li>
+            {/* <Link to="/usuarios" className={esActivo('/usuarios')}>Usuarios</Link> */}
+            <a className={styles.linkDeshabilitado}>Usuarios</a>
+          </li>
         )}
       </ul>
 
@@ -58,7 +61,10 @@ export default function Navbar() {
             <li><Link to="/proveedores" className={esActivo('/proveedores')} onClick={() => setMenuAbierto(false)}>Proveedores</Link></li>
             
             {esAdmin && (
-              <li><Link to="/usuarios" className={esActivo('/usuarios')}   onClick={() => setMenuAbierto(false)}>Usuarios</Link></li>
+            <li> 
+              {/* <Link to="/usuarios" className={esActivo('/usuarios')}   onClick={() => setMenuAbierto(false)}>Usuarios</Link> */}
+              <a className={styles.linkDeshabilitado}>Usuarios</a>
+            </li>  
             )}
             {/* Cerrar sesión en mobile */}
             {usuario && (

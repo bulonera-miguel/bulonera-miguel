@@ -184,8 +184,8 @@
 .btnLogoutDeshabilitado {
   padding: 4px 10px;
   background: transparent;
-  border: 1px solid rgba(255,68,68,0.10);
-  color: rgba(255,68,68,0.25);
+  border: 1px solid rgba(255,68,68,0.35);
+  color: rgba(255,68,68,0.50);
   font-family: "Barlow Condensed", sans-serif;
   font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
   cursor: not-allowed;
@@ -198,7 +198,7 @@
   background: transparent; border: none;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 20px; letter-spacing: 3px; text-transform: uppercase;
-  color: rgba(255,68,68,0.20);
+  color: rgba(255,68,68,0.50);
   padding: 16px 0; width: 100%; text-align: left;
   cursor: not-allowed;
 }
