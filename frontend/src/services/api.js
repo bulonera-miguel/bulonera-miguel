@@ -3,7 +3,8 @@
 // Todos los componentes importan desde acá, no hacen fetch directo
 // ============================================================
 
-const BASE_URL = 'http://localhost:8000'
+//const BASE_URL = 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 // BASE_URL: la dirección base del backend FastAPI.
 // Cuando el backend se suba a Oracle Cloud, solo cambiamos esta línea.
 
