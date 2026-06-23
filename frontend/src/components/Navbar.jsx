@@ -63,7 +63,8 @@ export default function Navbar() {
             {/* Cerrar sesión en mobile */}
             {usuario && (
               <li>
-                <button className={styles.btnLogoutMobile} onClick={() => { handleLogout(); setMenuAbierto(false) }}>
+                {/* <button className={styles.btnLogoutMobile} onClick={() => { handleLogout(); setMenuAbierto(false) }}> */}
+                <button className={styles.btnLogoutMobileDeshabilitado} disabled>
                   Cerrar sesión
                 </button>
               </li>
@@ -94,7 +95,8 @@ export default function Navbar() {
                 {perfil?.rol || ''}
               </span>
             </div>
-            <button className={styles.btnLogout} onClick={handleLogout}>
+            {/* <button className={styles.btnLogout} onClick={handleLogout}> */}
+            <button className={styles.btnLogoutDeshabilitado} disabled>
               Salir
             </button>
           </div>

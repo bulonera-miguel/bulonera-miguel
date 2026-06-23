@@ -180,6 +180,29 @@
 }
 .navLinks li a:hover { color: #00C8F0; }
 
+/* ── BOTÓN LOGOUT DESHABILITADO ── */
+.btnLogoutDeshabilitado {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(255,68,68,0.10);
+  color: rgba(255,68,68,0.25);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: not-allowed;
+  clip-path: polygon(4px 0%,100% 0%,100% calc(100% - 4px),calc(100% - 4px) 100%,0% 100%,0% 4px);
+  white-space: nowrap;
+}
+
+/* ── BOTÓN LOGOUT MOBILE DESHABILITADO ── */
+.btnLogoutMobileDeshabilitado {
+  background: transparent; border: none;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 20px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,68,68,0.20);
+  padding: 16px 0; width: 100%; text-align: left;
+  cursor: not-allowed;
+}
+
 /* ── RESPONSIVE TABLET ── */
 @media (max-width: 1023px) {
   .navLinksDesktop { display: none; }
