@@ -1,5 +1,5 @@
 /* ============================================================
-   Ventas.module.css
+   Compras.module.css — mismo estilo que Facturacion.module.css
    ============================================================ */
 
 .page {
@@ -20,7 +20,8 @@
 }
 .pageTitle {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 32px; letter-spacing: 3px; color: #EAF4FF; margin: 0;
+  font-size: 32px; letter-spacing: 3px;
+  color: #EAF4FF; margin: 0;
 }
 .pageSubtitle {
   font-family: "Barlow Condensed", sans-serif;
@@ -30,24 +31,29 @@
 
 /* ── TABS ── */
 .tabs {
-  display: flex; gap: 0; margin-bottom: 20px;
+  display: flex; gap: 0;
+  margin-bottom: 20px;
   border-bottom: 1px solid rgba(0,200,240,0.12);
 }
 .tab {
-  padding: 10px 20px; background: transparent;
+  padding: 10px 20px;
+  background: transparent;
   border: none; border-bottom: 2px solid transparent;
   color: rgba(200,228,244,0.50);
   font-family: "Barlow Condensed", sans-serif;
   font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-  cursor: pointer; transition: all 0.2s; margin-bottom: -1px;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: -1px;
 }
 .tab:hover { color: #EAF4FF; }
 .tabActivo { color: #00C8F0; border-bottom-color: #00C8F0; }
 
-/* ── LAYOUT ── */
+/* ── LAYOUT PRINCIPAL ── */
 .mainGrid {
-  display: grid; grid-template-columns: 400px 1fr;
-  gap: 20px; align-items: start;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
 /* ── PANEL FORMULARIO ── */
@@ -64,36 +70,8 @@
 .seccionTitulo {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: rgba(200,228,244,0.50); margin-bottom: 10px; display: block;
-}
-.seccionTituloRow {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 10px;
-}
-
-/* ── TOGGLE ── */
-.toggleWrap {
-  display: flex; align-items: center; gap: 6px; cursor: pointer;
-}
-.toggleWrap input { cursor: pointer; accent-color: #00C8F0; width: 16px; height: 16px; }
-.toggleLabel {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-  color: #00C8F0;
-}
-
-/* ── FACTURA VINCULADA ── */
-.facturaVinculada {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-top: 8px; padding: 8px 12px;
-  background: rgba(0,232,122,0.05);
-  border: 1px solid rgba(0,232,122,0.25);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 13px; color: #00E87A;
-}
-.facturaVinculadaInfo {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 12px; color: #00E87A; margin-bottom: 4px;
+  color: rgba(200,228,244,0.50);
+  margin-bottom: 10px; display: block;
 }
 
 /* ── INPUTS ── */
@@ -101,16 +79,19 @@
   width: 100%; padding: 10px 12px;
   background: rgba(0,200,240,0.05);
   border: 1px solid rgba(0,200,240,0.18);
-  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif; font-size: 13px;
   outline: none; transition: border-color 0.2s; box-sizing: border-box;
 }
 .input:focus { border-color: #00C8F0; }
 .input::placeholder { color: rgba(200,228,244,0.28); }
+
 .textarea {
   width: 100%; padding: 10px 12px;
   background: rgba(0,200,240,0.05);
   border: 1px solid rgba(0,200,240,0.18);
-  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
+  color: #EAF4FF;
+  font-family: "Barlow", sans-serif; font-size: 13px;
   outline: none; transition: border-color 0.2s;
   box-sizing: border-box; resize: vertical;
 }
@@ -121,14 +102,17 @@
 .buscadorWrap { position: relative; }
 .sugerencias {
   position: absolute; top: 100%; left: 0; right: 0;
-  background: #0D1F2D; border: 1px solid rgba(0,200,240,0.25); border-top: none;
-  list-style: none; z-index: 100; max-height: 240px; overflow-y: auto;
+  background: #0D1F2D;
+  border: 1px solid rgba(0,200,240,0.25); border-top: none;
+  list-style: none; z-index: 100;
+  max-height: 240px; overflow-y: auto;
   margin: 0; padding: 0;
 }
 .sugerItem {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 14px; cursor: pointer;
-  border-bottom: 1px solid rgba(0,200,240,0.06); transition: background 0.15s;
+  border-bottom: 1px solid rgba(0,200,240,0.06);
+  transition: background 0.15s;
 }
 .sugerItem:hover { background: rgba(0,200,240,0.07); }
 .sugerNombre { font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF; }
@@ -138,19 +122,16 @@
 .sugerPrecio { font-family: "Bebas Neue", sans-serif; font-size: 16px; color: #00C8F0; }
 .sugerStock { font-family: "Barlow Condensed", sans-serif; font-size: 10px; color: rgba(200,228,244,0.40); }
 
-/* ── CLIENTE INFO ── */
-.clienteInfo {
+/* ── PROVEEDOR SELECCIONADO ── */
+.proveedorInfo {
   display: flex; align-items: center; justify-content: space-between;
   margin-top: 8px; padding: 10px 12px;
-  background: rgba(0,200,240,0.05); border: 1px solid rgba(0,200,240,0.18);
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
 }
-.clienteDatos { display: flex; flex-direction: column; gap: 2px; }
-.clienteNombre { font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF; }
-.clienteSub { font-family: "Barlow Condensed", sans-serif; font-size: 11px; color: rgba(200,228,244,0.50); }
-.sinCliente {
-  margin-top: 8px; font-family: "Barlow Condensed", sans-serif;
-  font-size: 12px; letter-spacing: 1px; color: rgba(200,228,244,0.35);
-}
+.proveedorDatos { display: flex; flex-direction: column; gap: 2px; }
+.proveedorNombre { font-family: "Barlow", sans-serif; font-size: 13px; color: #EAF4FF; }
+.proveedorSub { font-family: "Barlow Condensed", sans-serif; font-size: 11px; color: rgba(200,228,244,0.50); }
 .btnQuitar {
   background: transparent; border: none;
   color: rgba(200,228,244,0.40); cursor: pointer; font-size: 14px;
@@ -161,19 +142,22 @@
 /* ── ERROR ── */
 .errorMsg {
   margin: 0 18px 16px; padding: 10px 14px;
-  background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.25);
-  color: #FF4444; font-family: "Barlow Condensed", sans-serif;
-  font-size: 12px; letter-spacing: 1px;
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.25);
+  color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif; font-size: 12px; letter-spacing: 1px;
 }
 
 /* ── PANEL DETALLE ── */
 .detallePanel {
   background: rgba(0,200,240,0.02);
-  border: 1px solid rgba(0,200,240,0.12); min-height: 400px;
+  border: 1px solid rgba(0,200,240,0.12);
+  min-height: 400px;
 }
 .detallePanelHeader {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 16px; border-bottom: 1px solid rgba(0,200,240,0.10);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.10);
 }
 .panelTitulo {
   font-family: "Barlow Condensed", sans-serif;
@@ -194,7 +178,8 @@
 .itemsList { display: flex; flex-direction: column; }
 .itemRow {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 16px; border-bottom: 1px solid rgba(0,200,240,0.06);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,200,240,0.06);
   gap: 12px; transition: background 0.15s;
 }
 .itemRow:hover { background: rgba(0,200,240,0.03); }
@@ -207,17 +192,14 @@
   font-family: "Barlow Condensed", sans-serif;
   font-size: 10px; letter-spacing: 1px; color: rgba(200,228,244,0.40);
 }
-.itemSinStock {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 10px; letter-spacing: 1px; color: #FF4444;
-}
 .itemControles { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .itemCantidad { display: flex; align-items: center; }
 .btnCantidad {
-  width: 24px; height: 28px; background: rgba(0,200,240,0.08);
-  border: 1px solid rgba(0,200,240,0.18); color: #00C8F0; cursor: pointer;
-  font-size: 14px; transition: background 0.15s;
-  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 28px;
+  background: rgba(0,200,240,0.08);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #00C8F0; cursor: pointer; font-size: 14px;
+  transition: background 0.15s; display: flex; align-items: center; justify-content: center;
 }
 .btnCantidad:hover { background: rgba(0,200,240,0.15); }
 .inputCantidad {
@@ -230,7 +212,8 @@
 .itemPrecioLabel { font-family: "Barlow Condensed", sans-serif; font-size: 12px; color: rgba(200,228,244,0.50); }
 .inputPrecio {
   width: 80px; height: 28px; padding: 0 6px;
-  background: rgba(0,200,240,0.05); border: 1px solid rgba(0,200,240,0.18);
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
   color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
   outline: none; text-align: right;
 }
@@ -248,7 +231,8 @@
 
 /* ── TOTALES ── */
 .totalesWrap {
-  padding: 16px 16px 20px; border-top: 1px solid rgba(0,200,240,0.10);
+  padding: 16px 16px 20px;
+  border-top: 1px solid rgba(0,200,240,0.10);
   display: flex; flex-direction: column; gap: 8px;
 }
 .totalRow {
@@ -264,7 +248,8 @@
   font-family: "Bebas Neue", sans-serif; font-size: 24px; color: #00C8F0;
 }
 .btnRegistrar {
-  width: 100%; padding: 15px; background: #00C8F0; color: #07111F;
+  width: 100%; padding: 15px;
+  background: #00C8F0; color: #07111F;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
   border: none; cursor: pointer; margin-top: 8px;
@@ -276,7 +261,8 @@
 .btnRegistrar:disabled { opacity: 0.50; cursor: not-allowed; }
 .btnCargando { display: flex; align-items: center; gap: 10px; justify-content: center; }
 .spinner {
-  width: 16px; height: 16px; border: 2px solid rgba(7,17,31,0.3);
+  width: 16px; height: 16px;
+  border: 2px solid rgba(7,17,31,0.3);
   border-top-color: #07111F; border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -289,8 +275,8 @@
 /* ── RESULTADO ── */
 .resultadoWrap {
   display: flex; align-items: flex-start; gap: 20px; padding: 24px;
-  background: rgba(0,232,122,0.05); border: 1px solid rgba(0,232,122,0.25);
-  margin-bottom: 20px;
+  background: rgba(0,232,122,0.05);
+  border: 1px solid rgba(0,232,122,0.25); margin-bottom: 20px;
 }
 .resultadoIcono {
   width: 44px; height: 44px; border-radius: 50%;
@@ -319,16 +305,16 @@
   font-family: "Barlow", sans-serif; font-size: 12px;
   color: rgba(0,232,122,0.70); margin-top: 6px;
 }
-.btnNuevaVenta {
-  padding: 10px 18px; flex-shrink: 0; background: transparent;
-  border: 1px solid rgba(0,232,122,0.35); color: #00E87A;
+.btnNuevaCompra {
+  padding: 10px 18px; flex-shrink: 0;
+  background: transparent; border: 1px solid rgba(0,232,122,0.35); color: #00E87A;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
   cursor: pointer; transition: all 0.2s; white-space: nowrap;
 }
-.btnNuevaVenta:hover { background: rgba(0,232,122,0.08); }
+.btnNuevaCompra:hover { background: rgba(0,232,122,0.08); }
 
-/* ── FILTROS ── */
+/* ── FILTROS HISTORIAL ── */
 .filtrosWrap {
   display: flex; gap: 12px; align-items: flex-end;
   margin-bottom: 16px; flex-wrap: wrap;
@@ -340,9 +326,10 @@
   color: rgba(200,228,244,0.45);
 }
 .filtroInput {
-  padding: 8px 12px; background: rgba(0,200,240,0.05);
-  border: 1px solid rgba(0,200,240,0.18); color: #EAF4FF;
-  font-family: "Barlow", sans-serif; font-size: 13px;
+  padding: 8px 12px;
+  background: rgba(0,200,240,0.05);
+  border: 1px solid rgba(0,200,240,0.18);
+  color: #EAF4FF; font-family: "Barlow", sans-serif; font-size: 13px;
   outline: none; transition: border-color 0.2s;
 }
 .filtroInput:focus { border-color: #00C8F0; }
@@ -362,8 +349,11 @@
 }
 .btnLimpiarFiltro:hover { border-color: rgba(200,228,244,0.40); color: #EAF4FF; }
 
-/* ── TABLA ── */
-.tabla { width: 100%; border-collapse: collapse; font-family: "Barlow", sans-serif; font-size: 13px; }
+/* ── TABLA HISTORIAL ── */
+.tabla {
+  width: 100%; border-collapse: collapse;
+  font-family: "Barlow", sans-serif; font-size: 13px;
+}
 .tabla thead tr { background: rgba(0,200,240,0.05); }
 .tabla th {
   padding: 10px 14px; text-align: left;
@@ -382,83 +372,8 @@
 .tdTotal { font-family: "Bebas Neue", sans-serif; font-size: 18px; color: #EAF4FF; }
 .tdCenter { text-align: center; }
 .tdRight { text-align: right; }
-.badgeFactura {
-  padding: 2px 8px; background: rgba(0,232,122,0.08);
-  border: 1px solid rgba(0,232,122,0.25); color: #00E87A;
-  font-family: "Barlow Condensed", sans-serif; font-size: 11px; letter-spacing: 1px;
-}
 
-/* ── TARJETAS MÓVIL (historial) ── */
-.tarjetasList {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-}
-.tarjeta {
-  background: rgba(0,200,240,0.03);
-  border: 1px solid rgba(0,200,240,0.14);
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-.tarjeta:active { background: rgba(0,200,240,0.07); }
-.tarjetaTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-.tarjetaNumero {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-  color: #00C8F0;
-}
-.tarjetaTotal {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 22px;
-  color: #EAF4FF;
-  line-height: 1;
-}
-.tarjetaCliente {
-  font-family: "Barlow", sans-serif;
-  font-size: 14px;
-  color: #EAF4FF;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tarjetaFila {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-}
-.tarjetaFecha {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(200,228,244,0.40);
-}
-.tarjetaBadgeFactura {
-  padding: 2px 8px;
-  background: rgba(0,232,122,0.08);
-  border: 1px solid rgba(0,232,122,0.25);
-  color: #00E87A;
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 10px; letter-spacing: 1px;
-}
-.tarjetaVerDetalle {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0,200,240,0.08);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: rgba(0,200,240,0.55);
-}
-
-/* ── ESTADO ── */
+/* ── ESTADO VACÍO ── */
 .estado {
   padding: 50px; text-align: center;
   font-family: "Barlow Condensed", sans-serif;
@@ -501,38 +416,35 @@
   color: rgba(200,228,244,0.45);
 }
 .detalleRow strong { font-family: "Barlow Condensed", sans-serif; font-size: 15px; color: #EAF4FF; }
+
+/* ── TABLA ITEMS EN MODAL ── */
 .detalleItemsWrap { margin-top: 8px; }
 .detalleItemsTitulo {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
   color: rgba(200,228,244,0.45); margin-bottom: 8px;
 }
-.detalleItemsTabla { width: 100%; border-collapse: collapse; font-size: 12px; }
+.detalleItemsTabla {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
 .detalleItemsTabla th {
   padding: 6px 10px; text-align: left;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(200,228,244,0.45); border-bottom: 1px solid rgba(0,200,240,0.15);
+  color: rgba(200,228,244,0.45);
+  border-bottom: 1px solid rgba(0,200,240,0.15);
 }
 .detalleItemsTabla td {
   padding: 8px 10px; color: rgba(200,228,244,0.85);
   border-bottom: 1px solid rgba(0,200,240,0.06);
 }
 
-/* ── RESPONSIVE 1023px ── */
+/* ── RESPONSIVE ── */
 @media (max-width: 1023px) {
   .mainGrid { grid-template-columns: 1fr; }
   .detallePanel { order: -1; }
 }
 
-/* ── RESPONSIVE 768px ── */
-@media (max-width: 768px) {
-  .contenido { padding: 16px; }
-  .mainGrid { grid-template-columns: 1fr; }
-  .filtrosWrap { flex-wrap: wrap; }
-}
-
-/* ── RESPONSIVE 600px ── */
 @media (max-width: 600px) {
   .contenido { padding: 12px; }
   .pageHeader { flex-direction: column; gap: 10px; }
@@ -541,17 +453,37 @@
   .itemControles { width: 100%; justify-content: space-between; }
   .resultadoWrap { flex-direction: column; }
 
+  /* Filtros alineados en móvil */
   .filtrosWrap {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  .filtroGrupo { width: 100%; }
-  .filtroInput { width: 100%; box-sizing: border-box; }
-  .btnFiltrar { width: 100%; text-align: center; }
-  .btnLimpiarFiltro { width: 100%; text-align: center; }
+  .filtroGrupo {
+    width: 100%;
+  }
+  .filtroInput {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .btnFiltrar {
+    width: 100%;
+    text-align: center;
+  }
+  .btnLimpiarFiltro {
+    width: 100%;
+    text-align: center;
+  }
 
-  /* Ocultar tabla, mostrar tarjetas */
-  .tabla { display: none; }
-  .tarjetasList { display: flex; }
+  /* Tabla scrolleable horizontalmente */
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 11px;
+  }
+  .tabla th, .tabla td {
+    padding: 8px 8px;
+    white-space: nowrap;
+  }
 }

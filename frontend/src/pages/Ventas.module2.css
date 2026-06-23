@@ -1,5 +1,5 @@
 /* ============================================================
-   Ventas.module.css
+   Ventas.module.css — mismo estilo que Compras.module.css
    ============================================================ */
 
 .page {
@@ -388,76 +388,6 @@
   font-family: "Barlow Condensed", sans-serif; font-size: 11px; letter-spacing: 1px;
 }
 
-/* ── TARJETAS MÓVIL (historial) ── */
-.tarjetasList {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-}
-.tarjeta {
-  background: rgba(0,200,240,0.03);
-  border: 1px solid rgba(0,200,240,0.14);
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-.tarjeta:active { background: rgba(0,200,240,0.07); }
-.tarjetaTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-.tarjetaNumero {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-  color: #00C8F0;
-}
-.tarjetaTotal {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 22px;
-  color: #EAF4FF;
-  line-height: 1;
-}
-.tarjetaCliente {
-  font-family: "Barlow", sans-serif;
-  font-size: 14px;
-  color: #EAF4FF;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tarjetaFila {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-}
-.tarjetaFecha {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(200,228,244,0.40);
-}
-.tarjetaBadgeFactura {
-  padding: 2px 8px;
-  background: rgba(0,232,122,0.08);
-  border: 1px solid rgba(0,232,122,0.25);
-  color: #00E87A;
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 10px; letter-spacing: 1px;
-}
-.tarjetaVerDetalle {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0,200,240,0.08);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: rgba(0,200,240,0.55);
-}
-
 /* ── ESTADO ── */
 .estado {
   padding: 50px; text-align: center;
@@ -519,20 +449,12 @@
   border-bottom: 1px solid rgba(0,200,240,0.06);
 }
 
-/* ── RESPONSIVE 1023px ── */
+/* ── RESPONSIVE ── */
 @media (max-width: 1023px) {
   .mainGrid { grid-template-columns: 1fr; }
   .detallePanel { order: -1; }
 }
 
-/* ── RESPONSIVE 768px ── */
-@media (max-width: 768px) {
-  .contenido { padding: 16px; }
-  .mainGrid { grid-template-columns: 1fr; }
-  .filtrosWrap { flex-wrap: wrap; }
-}
-
-/* ── RESPONSIVE 600px ── */
 @media (max-width: 600px) {
   .contenido { padding: 12px; }
   .pageHeader { flex-direction: column; gap: 10px; }
@@ -541,17 +463,37 @@
   .itemControles { width: 100%; justify-content: space-between; }
   .resultadoWrap { flex-direction: column; }
 
+  /* Filtros alineados en móvil */
   .filtrosWrap {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  .filtroGrupo { width: 100%; }
-  .filtroInput { width: 100%; box-sizing: border-box; }
-  .btnFiltrar { width: 100%; text-align: center; }
-  .btnLimpiarFiltro { width: 100%; text-align: center; }
+  .filtroGrupo {
+    width: 100%;
+  }
+  .filtroInput {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .btnFiltrar {
+    width: 100%;
+    text-align: center;
+  }
+  .btnLimpiarFiltro {
+    width: 100%;
+    text-align: center;
+  }
 
-  /* Ocultar tabla, mostrar tarjetas */
-  .tabla { display: none; }
-  .tarjetasList { display: flex; }
+  /* Tabla scrolleable horizontalmente */
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 11px;
+  }
+  .tabla th, .tabla td {
+    padding: 8px 8px;
+    white-space: nowrap;
+  }
 }

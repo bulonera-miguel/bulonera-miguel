@@ -833,6 +833,136 @@
   color: #EAF4FF;
 }
 
+/* ── HISTORIAL DE VENTAS ────────────────────────────────────── */
+.histSeleccionarMsg {
+  padding: 16px 20px;
+  background: rgba(0,200,240,0.06);
+  border: 1px solid rgba(0,200,240,0.15);
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: rgba(200,228,244,0.7);
+}
+
+.inlineBtn {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0,200,240,0.12);
+  border: 1px solid rgba(0,200,240,0.3);
+  border-radius: 3px;
+  color: #00C8F0;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.histResumen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.histTotal {
+  font-size: 0.8rem;
+  color: rgba(200,228,244,0.5);
+  letter-spacing: 0.06em;
+}
+
+.histMonto {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #00C8F0;
+}
+
+.btnVerHist {
+  background: rgba(0,200,240,0.08);
+  border: 1px solid rgba(0,200,240,0.2);
+  color: #00C8F0;
+  padding: 5px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btnVerHist:hover { background: rgba(0,200,240,0.16); }
+
+.histLista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.histCard {
+  background: rgba(200,228,244,0.04);
+  border: 1px solid rgba(200,228,244,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.histCard:hover { border-color: rgba(0,200,240,0.25); }
+
+.histCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.histCardHeader:hover { background: rgba(0,200,240,0.04); }
+
+.histCardLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.histNumero {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #EAF4FF;
+  font-family: monospace;
+}
+
+.histFecha {
+  font-size: 0.85rem;
+  color: rgba(200,228,244,0.55);
+}
+
+.histObs {
+  font-size: 0.82rem;
+  color: rgba(200,228,244,0.4);
+  font-style: italic;
+}
+
+.histCardRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.histExpandir {
+  font-size: 0.78rem;
+  color: rgba(200,228,244,0.4);
+  letter-spacing: 0.04em;
+}
+
+.histDetalle {
+  border-top: 1px solid rgba(200,228,244,0.08);
+  padding: 0;
+}
+
+.histCodigo {
+  font-size: 0.78rem;
+  color: rgba(200,228,244,0.4);
+}
+
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .kpiRow      { grid-template-columns: repeat(2, 1fr); }
@@ -845,9 +975,79 @@
   .formRow { grid-template-columns: 1fr; }
   .tabla   { font-size: 0.82rem; }
   .contenido { padding: 16px; }
+  
+  .histCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .histCardRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .histCardLeft {
+    gap: 8px;
+  }
+
+  .histMonto {
+    font-size: 1rem;
+  }
+
+  .histResumen {
+    align-items: flex-start;
+  }
+
+  .histSeleccionarMsg {
+    font-size: 0.85rem;
+    padding: 12px 14px;
+  }
+
+  .btnVerHist {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+  }
 }
 
 @media (max-width: 600px) {
   .kpiRow  { grid-template-columns: 1fr 1fr; }
   .tipoWrap { flex-direction: column; }
+  .histCardHeader { padding: 12px 14px; }
+  .histNumero { font-size: 0.85rem; }
+  .histFecha { font-size: 0.78rem; }
+  .histCardLeft { gap: 6px; }
+  .histLista { gap: 6px; }
+  .histCard { border-radius: 6px; }
+
+  /* Ocultar columnas menos importantes en móvil */
+  .tabla th:nth-child(3),
+  .tabla td:nth-child(3),
+  .tabla th:nth-child(4),
+  .tabla td:nth-child(4),
+  .tabla th:nth-child(5),
+  .tabla td:nth-child(5) {
+    display: none;
+  }
+
+  /* La tabla se hace scrolleable horizontalmente */
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Acciones en columna vertical */
+  .tdAcciones {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .tab {
+    white-space: nowrap;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+    letter-spacing: 0.05em;
+  }
 }

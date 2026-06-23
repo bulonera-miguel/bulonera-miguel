@@ -1,43 +1,50 @@
 // ============================================================
-// Compras.jsx — Registro de compras a proveedores
+// Ventas.jsx — Registro de ventas
 // ============================================================
 
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { comprasApi, proveedoresApi, productosApi } from '../services/api'
-import styles from './Compras.module.css'
+import { ventasApi, facturacionApi, productosApi } from '../services/api'
+import styles from './Ventas.module.css'
 
 const TABS = [
-  { id: 'nueva',     label: '+ Nueva compra'  },
-  { id: 'historial', label: '≡ Historial'     },
+  { id: 'nueva',     label: '+ Nueva venta' },
+  { id: 'historial', label: '≡ Historial'   },
 ]
 
-export default function Compras() {
+export default function Ventas() {
 
   const [tab, setTab] = useState('nueva')
 
-  // ── FORMULARIO NUEVA COMPRA ───────────────────────────────
-  const [proveedor, setProveedor]           = useState(null)
-  const [busqProv, setBusqProv]             = useState('')
-  const [sugerProv, setSugerProv]           = useState([])
-  const [mostrarSugerProv, setMostrarSugerProv] = useState(false)
+  // ── FORMULARIO ────────────────────────────────────────────
+  const [cliente, setCliente]               = useState(null)
+  const [busqCliente, setBusqCliente]       = useState('')
+  const [sugerClientes, setSugerClientes]   = useState([])
+  const [mostrarSugerC, setMostrarSugerC]   = useState(false)
   const [fecha, setFecha]                   = useState(new Date().toISOString().split('T')[0])
   const [observaciones, setObservaciones]   = useState('')
   const [items, setItems]                   = useState([])
   const [busqProd, setBusqProd]             = useState('')
   const [sugerProd, setSugerProd]           = useState([])
-  const [mostrarSugerProd, setMostrarSugerProd] = useState(false)
+  const [mostrarSugerP, setMostrarSugerP]   = useState(false)
+
+  // Vincular factura
+  const [vincularFactura, setVincularFactura]   = useState(false)
+  const [busqFactura, setBusqFactura]           = useState('')
+  const [facturas, setFacturas]                 = useState([])
+  const [facturaSeleccionada, setFacturaSeleccionada] = useState(null)
+  const [mostrarSugerF, setMostrarSugerF]       = useState(false)
+
   const [guardando, setGuardando]           = useState(false)
   const [resultado, setResultado]           = useState(null)
   const [error, setError]                   = useState(null)
 
   // ── HISTORIAL ─────────────────────────────────────────────
-  const [compras, setCompras]               = useState([])
+  const [ventas, setVentas]                 = useState([])
   const [cargandoHist, setCargandoHist]     = useState(false)
   const [filtroDesde, setFiltroDesde]       = useState('')
   const [filtroHasta, setFiltroHasta]       = useState('')
-  const [compraDetalle, setCompraDetalle]   = useState(null)
+  const [ventaDetalle, setVentaDetalle]     = useState(null)
   const [detalleItems, setDetalleItems]     = useState([])
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
@@ -48,8 +55,8 @@ export default function Compras() {
   const cargarHistorial = async (params = {}) => {
     try {
       setCargandoHist(true)
-      const data = await comprasApi.listar(params)
-      setCompras(data)
+      const data = await ventasApi.listar(params)
+      setVentas(data)
     } catch (e) {
       console.error(e)
     } finally {
@@ -57,43 +64,60 @@ export default function Compras() {
     }
   }
 
-  // ── BUSCADOR PROVEEDORES ──────────────────────────────────
+  // ── BUSCADOR CLIENTES ─────────────────────────────────────
   useEffect(() => {
-    if (busqProv.trim().length < 2) { setMostrarSugerProv(false); return }
+    if (busqCliente.trim().length < 2) { setMostrarSugerC(false); return }
     const t = setTimeout(async () => {
       try {
-        const data = await proveedoresApi.buscar(busqProv)
-        setSugerProv(data)
-        setMostrarSugerProv(true)
+        const data = await facturacionApi.buscarClientes(busqCliente)
+        setSugerClientes(data)
+        setMostrarSugerC(true)
       } catch (e) { console.error(e) }
     }, 300)
     return () => clearTimeout(t)
-  }, [busqProv])
+  }, [busqCliente])
 
   // ── BUSCADOR PRODUCTOS ────────────────────────────────────
   useEffect(() => {
-    if (busqProd.trim().length < 2) { setMostrarSugerProd(false); return }
+    if (busqProd.trim().length < 2) { setMostrarSugerP(false); return }
     const t = setTimeout(async () => {
       try {
         const data = await productosApi.buscar(busqProd)
         setSugerProd(data)
-        setMostrarSugerProd(true)
+        setMostrarSugerP(true)
       } catch (e) { console.error(e) }
     }, 300)
     return () => clearTimeout(t)
   }, [busqProd])
 
-  // ── SELECCIONAR PROVEEDOR ─────────────────────────────────
-  const seleccionarProveedor = (p) => {
-    setProveedor(p)
-    setBusqProv(p.nombre)
-    setMostrarSugerProv(false)
+  // ── BUSCADOR FACTURAS ─────────────────────────────────────
+  useEffect(() => {
+    if (!vincularFactura) return
+    const cargarFacturas = async () => {
+      try {
+        const data = await facturacionApi.listarFacturas()
+        setFacturas(data)
+      } catch (e) { console.error(e) }
+    }
+    cargarFacturas()
+  }, [vincularFactura])
+
+  const facturasFiltradas = facturas.filter(f =>
+    busqFactura.trim() === '' ||
+    f.numero?.toLowerCase().includes(busqFactura.toLowerCase())
+  )
+
+  // ── SELECCIONAR CLIENTE ───────────────────────────────────
+  const seleccionarCliente = (c) => {
+    setCliente(c)
+    setBusqCliente(c.nombre)
+    setMostrarSugerC(false)
   }
 
   // ── AGREGAR PRODUCTO ──────────────────────────────────────
   const agregarProducto = (p) => {
     setBusqProd('')
-    setMostrarSugerProd(false)
+    setMostrarSugerP(false)
     const existe = items.find(i => i.producto_id === p.id)
     if (existe) {
       setItems(items.map(i =>
@@ -109,6 +133,7 @@ export default function Compras() {
         cantidad:        1,
         precio_unitario: p.precio,
         subtotal:        p.precio,
+        stock_actual:    p.stock_actual,
       }])
     }
   }
@@ -135,17 +160,17 @@ export default function Compras() {
 
   const total = items.reduce((s, i) => s + i.subtotal, 0)
 
-  // ── REGISTRAR COMPRA ──────────────────────────────────────
-  const registrarCompra = async () => {
-    if (!proveedor)    { setError('Seleccioná un proveedor'); return }
+  // ── REGISTRAR VENTA ───────────────────────────────────────
+  const registrarVenta = async () => {
     if (!items.length) { setError('Agregá al menos un producto'); return }
     setError(null)
     setGuardando(true)
     try {
-      const res = await comprasApi.registrar({
-        proveedor_id:  proveedor.id,
+      const res = await ventasApi.registrar({
+        cliente_id:    cliente?.id || null,
         fecha,
         observaciones: observaciones || null,
+        factura_id:    facturaSeleccionada?.id || null,
         items: items.map(i => ({
           producto_id:     i.producto_id,
           cantidad:        i.cantidad,
@@ -154,9 +179,12 @@ export default function Compras() {
       })
       setResultado(res)
       setItems([])
-      setProveedor(null)
-      setBusqProv('')
+      setCliente(null)
+      setBusqCliente('')
       setObservaciones('')
+      setFacturaSeleccionada(null)
+      setBusqFactura('')
+      setVincularFactura(false)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -164,25 +192,26 @@ export default function Compras() {
     }
   }
 
-  const nuevaCompra = () => {
+  const nuevaVenta = () => {
     setResultado(null)
     setError(null)
     setItems([])
-    setProveedor(null)
-    setBusqProv('')
+    setCliente(null)
+    setBusqCliente('')
     setObservaciones('')
+    setFacturaSeleccionada(null)
+    setBusqFactura('')
+    setVincularFactura(false)
     setFecha(new Date().toISOString().split('T')[0])
   }
 
   // ── VER DETALLE ───────────────────────────────────────────
-  const verDetalle = async (compra) => {
+  const verDetalle = async (venta) => {
     try {
-      const data = await comprasApi.detalle(compra.id)
-      setCompraDetalle(data)
+      const data = await ventasApi.detalle(venta.id)
+      setVentaDetalle(data)
       setDetalleItems(data.items || [])
-    } catch (e) {
-      console.error(e)
-    }
+    } catch (e) { console.error(e) }
   }
 
   // ── FORMATEO ──────────────────────────────────────────────
@@ -203,8 +232,8 @@ export default function Compras() {
         {/* HEADER */}
         <div className={styles.pageHeader}>
           <div>
-            <h2 className={styles.pageTitle}>Compras</h2>
-            <span className={styles.pageSubtitle}>Registro de compras a proveedores</span>
+            <h2 className={styles.pageTitle}>Ventas</h2>
+            <span className={styles.pageSubtitle}>Registro de ventas con o sin factura</span>
           </div>
         </div>
 
@@ -221,9 +250,7 @@ export default function Compras() {
           ))}
         </div>
 
-        {/* ══════════════════════════════════════════════
-            TAB: NUEVA COMPRA
-        ══════════════════════════════════════════════ */}
+        {/* ══════ TAB: NUEVA VENTA ══════ */}
         {tab === 'nueva' && (
           <div>
 
@@ -232,13 +259,13 @@ export default function Compras() {
               <div className={styles.resultadoWrap}>
                 <div className={styles.resultadoIcono}>✓</div>
                 <div className={styles.resultadoTextos}>
-                  <div className={styles.resultadoTitulo}>Compra registrada correctamente</div>
+                  <div className={styles.resultadoTitulo}>Venta registrada correctamente</div>
                   <div className={styles.resultadoGrid}>
                     <div className={styles.resultadoItem}>
                       <span>Número</span><strong>{resultado.numero}</strong>
                     </div>
                     <div className={styles.resultadoItem}>
-                      <span>Proveedor</span><strong>{resultado.proveedor}</strong>
+                      <span>Cliente</span><strong>{resultado.cliente}</strong>
                     </div>
                     <div className={styles.resultadoItem}>
                       <span>Productos</span><strong>{resultado.items} ítems</strong>
@@ -249,11 +276,11 @@ export default function Compras() {
                     </div>
                   </div>
                   <div className={styles.resultadoNota}>
-                    ✓ El stock de los productos fue actualizado automáticamente
+                    ✓ El stock fue descontado automáticamente
                   </div>
                 </div>
-                <button className={styles.btnNuevaCompra} onClick={nuevaCompra}>
-                  + Nueva compra
+                <button className={styles.btnNuevaVenta} onClick={nuevaVenta}>
+                  + Nueva venta
                 </button>
               </div>
             )}
@@ -264,56 +291,120 @@ export default function Compras() {
                 {/* PANEL IZQUIERDO */}
                 <div className={styles.formPanel}>
 
-                  {/* PROVEEDOR */}
+                  {/* CLIENTE */}
                   <div className={styles.seccion}>
-                    <div className={styles.seccionTitulo}>Proveedor *</div>
+                    <div className={styles.seccionTitulo}>Cliente (opcional)</div>
                     <div className={styles.buscadorWrap}>
                       <input
                         type="text"
                         className={styles.input}
-                        placeholder="Buscar proveedor por nombre..."
-                        value={busqProv}
+                        placeholder="Buscar cliente por nombre..."
+                        value={busqCliente}
                         onChange={e => {
-                          setBusqProv(e.target.value)
-                          if (!e.target.value) setProveedor(null)
+                          setBusqCliente(e.target.value)
+                          if (!e.target.value) setCliente(null)
                         }}
                       />
-                      {mostrarSugerProv && sugerProv.length > 0 && (
+                      {mostrarSugerC && sugerClientes.length > 0 && (
                         <ul className={styles.sugerencias}>
-                          {sugerProv.map(p => (
-                            <li key={p.id} className={styles.sugerItem}
-                              onClick={() => seleccionarProveedor(p)}>
-                              <span className={styles.sugerNombre}>{p.nombre}</span>
-                              {p.cuit && <span className={styles.sugerSub}>CUIT: {p.cuit}</span>}
+                          {sugerClientes.map(c => (
+                            <li key={c.id} className={styles.sugerItem}
+                              onClick={() => seleccionarCliente(c)}>
+                              <span className={styles.sugerNombre}>{c.nombre}</span>
+                              {c.cuit && <span className={styles.sugerSub}>CUIT: {c.cuit}</span>}
                             </li>
                           ))}
                         </ul>
                       )}
                     </div>
-                    {proveedor && (
-                      <div className={styles.proveedorInfo}>
-                        <div className={styles.proveedorDatos}>
-                          <span className={styles.proveedorNombre}>{proveedor.nombre}</span>
-                          {proveedor.cuit && (
-                            <span className={styles.proveedorSub}>CUIT: {proveedor.cuit}</span>
-                          )}
+                    {cliente && (
+                      <div className={styles.clienteInfo}>
+                        <div className={styles.clienteDatos}>
+                          <span className={styles.clienteNombre}>{cliente.nombre}</span>
+                          {cliente.cuit && <span className={styles.clienteSub}>CUIT: {cliente.cuit}</span>}
                         </div>
                         <button className={styles.btnQuitar}
-                          onClick={() => { setProveedor(null); setBusqProv('') }}>✕</button>
+                          onClick={() => { setCliente(null); setBusqCliente('') }}>✕</button>
+                      </div>
+                    )}
+                    {!cliente && (
+                      <div className={styles.sinCliente}>
+                        ○ Sin cliente → se registra como Consumidor Final
                       </div>
                     )}
                   </div>
 
                   {/* FECHA */}
                   <div className={styles.seccion}>
-                    <div className={styles.seccionTitulo}>Fecha de compra</div>
+                    <div className={styles.seccionTitulo}>Fecha de venta</div>
                     <input
                       type="date"
                       className={styles.input}
                       value={fecha}
                       onChange={e => setFecha(e.target.value)}
-                      lang="es-AR"
                     />
+                  </div>
+
+                  {/* VINCULAR FACTURA */}
+                  <div className={styles.seccion}>
+                    <div className={styles.seccionTituloRow}>
+                      <span className={styles.seccionTitulo}>Vincular factura (opcional)</span>
+                      <label className={styles.toggleWrap}>
+                        <input
+                          type="checkbox"
+                          checked={vincularFactura}
+                          onChange={e => {
+                            setVincularFactura(e.target.checked)
+                            if (!e.target.checked) {
+                              setFacturaSeleccionada(null)
+                              setBusqFactura('')
+                            }
+                          }}
+                        />
+                        <span className={styles.toggleLabel}>
+                          {vincularFactura ? 'Sí' : 'No'}
+                        </span>
+                      </label>
+                    </div>
+
+                    {vincularFactura && (
+                      <div className={styles.buscadorWrap}>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder="Buscar por número de factura..."
+                          value={busqFactura}
+                          onChange={e => {
+                            setBusqFactura(e.target.value)
+                            setMostrarSugerF(true)
+                          }}
+                        />
+                        {mostrarSugerF && facturasFiltradas.length > 0 && busqFactura && (
+                          <ul className={styles.sugerencias}>
+                            {facturasFiltradas.slice(0, 8).map(f => (
+                              <li key={f.id} className={styles.sugerItem}
+                                onClick={() => {
+                                  setFacturaSeleccionada(f)
+                                  setBusqFactura(f.numero)
+                                  setMostrarSugerF(false)
+                                }}>
+                                <span className={styles.sugerNombre}>{f.numero}</span>
+                                <span className={styles.sugerSub}>
+                                  {f.clientes?.nombre || 'Consumidor Final'} — {fmtP(f.total)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {facturaSeleccionada && (
+                          <div className={styles.facturaVinculada}>
+                            <span>✓ {facturaSeleccionada.numero}</span>
+                            <button className={styles.btnQuitar}
+                              onClick={() => { setFacturaSeleccionada(null); setBusqFactura('') }}>✕</button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* OBSERVACIONES */}
@@ -321,16 +412,16 @@ export default function Compras() {
                     <div className={styles.seccionTitulo}>Observaciones (opcional)</div>
                     <textarea
                       className={styles.textarea}
-                      placeholder="Notas sobre esta compra..."
+                      placeholder="Notas sobre esta venta..."
                       value={observaciones}
                       onChange={e => setObservaciones(e.target.value)}
-                      rows={3}
+                      rows={2}
                     />
                   </div>
 
                   {/* PRODUCTOS */}
                   <div className={styles.seccion}>
-                    <div className={styles.seccionTitulo}>Agregar productos</div>
+                    <div className={styles.seccionTitulo}>Agregar productos *</div>
                     <div className={styles.buscadorWrap}>
                       <input
                         type="text"
@@ -339,7 +430,7 @@ export default function Compras() {
                         value={busqProd}
                         onChange={e => setBusqProd(e.target.value)}
                       />
-                      {mostrarSugerProd && sugerProd.length > 0 && (
+                      {mostrarSugerP && sugerProd.length > 0 && (
                         <ul className={styles.sugerencias}>
                           {sugerProd.map(p => (
                             <li key={p.id} className={styles.sugerItem}
@@ -366,7 +457,7 @@ export default function Compras() {
                 {/* PANEL DERECHO */}
                 <div className={styles.detallePanel}>
                   <div className={styles.detallePanelHeader}>
-                    <span className={styles.panelTitulo}>Detalle de la compra</span>
+                    <span className={styles.panelTitulo}>Detalle de la venta</span>
                     {items.length > 0 && (
                       <span className={styles.itemsCount}>
                         {items.length} ítem{items.length !== 1 ? 's' : ''}
@@ -376,7 +467,7 @@ export default function Compras() {
 
                   {items.length === 0 ? (
                     <div className={styles.itemsVacio}>
-                      Seleccioná un proveedor y agregá productos
+                      Agregá productos para comenzar
                     </div>
                   ) : (
                     <div className={styles.itemsList}>
@@ -385,6 +476,9 @@ export default function Compras() {
                           <div className={styles.itemInfo}>
                             <span className={styles.itemNombre}>{item.nombre}</span>
                             <span className={styles.itemCodigo}>{item.codigo}</span>
+                            {item.stock_actual <= 0 && (
+                              <span className={styles.itemSinStock}>⚠ Sin stock</span>
+                            )}
                           </div>
                           <div className={styles.itemControles}>
                             <div className={styles.itemCantidad}>
@@ -422,12 +516,17 @@ export default function Compras() {
                   {items.length > 0 && (
                     <div className={styles.totalesWrap}>
                       <div className={`${styles.totalRow} ${styles.totalFinal}`}>
-                        <span>Total Compra</span>
+                        <span>Total Venta</span>
                         <span>{fmtP(total)}</span>
                       </div>
+                      {facturaSeleccionada && (
+                        <div className={styles.facturaVinculadaInfo}>
+                          ✓ Vinculada a factura {facturaSeleccionada.numero}
+                        </div>
+                      )}
                       <button
                         className={styles.btnRegistrar}
-                        onClick={registrarCompra}
+                        onClick={registrarVenta}
                         disabled={guardando}
                       >
                         {guardando ? (
@@ -435,10 +534,10 @@ export default function Compras() {
                             <span className={styles.spinner}></span>
                             Registrando...
                           </span>
-                        ) : '▶ Registrar Compra'}
+                        ) : '▶ Registrar Venta'}
                       </button>
                       <div className={styles.nota}>
-                        El stock se actualizará automáticamente al registrar
+                        El stock se descontará automáticamente al registrar
                       </div>
                     </div>
                   )}
@@ -449,25 +548,19 @@ export default function Compras() {
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════
-            TAB: HISTORIAL
-        ══════════════════════════════════════════════ */}
+        {/* ══════ TAB: HISTORIAL ══════ */}
         {tab === 'historial' && (
           <div>
-
-            {/* FILTROS */}
             <div className={styles.filtrosWrap}>
               <div className={styles.filtroGrupo}>
                 <label>Desde</label>
                 <input type="date" className={styles.filtroInput}
-                  value={filtroDesde}
-                  onChange={e => setFiltroDesde(e.target.value)} />
+                  value={filtroDesde} onChange={e => setFiltroDesde(e.target.value)} />
               </div>
               <div className={styles.filtroGrupo}>
                 <label>Hasta</label>
                 <input type="date" className={styles.filtroInput}
-                  value={filtroHasta}
-                  onChange={e => setFiltroHasta(e.target.value)} />
+                  value={filtroHasta} onChange={e => setFiltroHasta(e.target.value)} />
               </div>
               <button className={styles.btnFiltrar}
                 onClick={() => cargarHistorial({ desde: filtroDesde, hasta: filtroHasta })}>
@@ -480,95 +573,74 @@ export default function Compras() {
             </div>
 
             {cargandoHist ? (
-              <div className={styles.estado}>Cargando compras...</div>
-            ) : compras.length === 0 ? (
-              <div className={styles.estado}>No hay compras registradas</div>
+              <div className={styles.estado}>Cargando ventas...</div>
+            ) : ventas.length === 0 ? (
+              <div className={styles.estado}>No hay ventas registradas</div>
             ) : (
-              <>
-                {/* TABLA — desktop/tablet */}
-                <table className={styles.tabla}>
-                  <thead>
-                    <tr>
-                      <th>Número</th>
-                      <th>Proveedor</th>
-                      <th>Fecha</th>
-                      <th>Productos</th>
-                      <th>Total</th>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Número</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Factura</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ventas.map(v => (
+                    <tr key={v.id} className={styles.tablaFila} onClick={() => verDetalle(v)}>
+                      <td className={styles.tdNumero}>V-{v.id.slice(0,8).toUpperCase()}</td>
+                      <td>{v.clientes?.nombre || 'Consumidor Final'}</td>
+                      <td>{fmtF(v.fecha)}</td>
+                      <td>{v.factura_id ? <span className={styles.badgeFactura}>✓ Con factura</span> : '—'}</td>
+                      <td className={styles.tdTotal}>{fmtP(v.total)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {compras.map(c => (
-                      <tr key={c.id} className={styles.tablaFila}
-                        onClick={() => verDetalle(c)}>
-                        <td className={styles.tdNumero}>
-                          C-{c.id.slice(0, 8).toUpperCase()}
-                        </td>
-                        <td>{c.proveedores?.nombre || '—'}</td>
-                        <td>{fmtF(c.fecha)}</td>
-                        <td className={styles.tdCenter}>—</td>
-                        <td className={styles.tdTotal}>{fmtP(c.total)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* TARJETAS — móvil */}
-                <div className={styles.tarjetasList}>
-                  {compras.map(c => (
-                    <div key={c.id} className={styles.tarjeta} onClick={() => verDetalle(c)}>
-                      <div className={styles.tarjetaTop}>
-                        <span className={styles.tarjetaNumero}>
-                          C-{c.id.slice(0, 8).toUpperCase()}
-                        </span>
-                        <span className={styles.tarjetaTotal}>{fmtP(c.total)}</span>
-                      </div>
-                      <div className={styles.tarjetaProveedor}>
-                        {c.proveedores?.nombre || '—'}
-                      </div>
-                      <div className={styles.tarjetaFecha}>{fmtF(c.fecha)}</div>
-                      <div className={styles.tarjetaVerDetalle}>Ver detalle ›</div>
-                    </div>
                   ))}
-                </div>
-              </>
+                </tbody>
+              </table>
             )}
           </div>
         )}
 
       </div>
 
-      {/* ── MODAL DETALLE COMPRA ── */}
-      {compraDetalle && (
-        <div className={styles.modalOverlay} onClick={() => setCompraDetalle(null)}>
+      {/* ── MODAL DETALLE ── */}
+      {ventaDetalle && (
+        <div className={styles.modalOverlay} onClick={() => setVentaDetalle(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3>Compra C-{compraDetalle.id?.slice(0, 8).toUpperCase()}</h3>
-              <button className={styles.modalCerrar}
-                onClick={() => setCompraDetalle(null)}>✕</button>
+              <h3>Venta V-{ventaDetalle.id?.slice(0,8).toUpperCase()}</h3>
+              <button className={styles.modalCerrar} onClick={() => setVentaDetalle(null)}>✕</button>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.detalleRow}>
-                <span>Proveedor</span>
-                <strong>{compraDetalle.proveedores?.nombre || '—'}</strong>
+                <span>Cliente</span>
+                <strong>{ventaDetalle.clientes?.nombre || 'Consumidor Final'}</strong>
               </div>
               <div className={styles.detalleRow}>
                 <span>Fecha</span>
-                <strong>{fmtF(compraDetalle.fecha)}</strong>
+                <strong>{fmtF(ventaDetalle.fecha)}</strong>
               </div>
               <div className={styles.detalleRow}>
                 <span>Total</span>
-                <strong className={styles.resultadoTotal}>{fmtP(compraDetalle.total)}</strong>
+                <strong className={styles.resultadoTotal}>{fmtP(ventaDetalle.total)}</strong>
               </div>
-              {compraDetalle.observaciones && (
+              {ventaDetalle.factura_id && (
                 <div className={styles.detalleRow}>
-                  <span>Observaciones</span>
-                  <strong>{compraDetalle.observaciones}</strong>
+                  <span>Factura vinculada</span>
+                  <strong className={styles.badgeFactura}>✓ Con factura</strong>
                 </div>
               )}
-
+              {ventaDetalle.observaciones && (
+                <div className={styles.detalleRow}>
+                  <span>Observaciones</span>
+                  <strong>{ventaDetalle.observaciones}</strong>
+                </div>
+              )}
               {detalleItems.length > 0 && (
                 <div className={styles.detalleItemsWrap}>
-                  <div className={styles.detalleItemsTitulo}>Productos comprados</div>
+                  <div className={styles.detalleItemsTitulo}>Productos vendidos</div>
                   <table className={styles.detalleItemsTabla}>
                     <thead>
                       <tr>

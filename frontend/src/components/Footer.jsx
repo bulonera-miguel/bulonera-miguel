@@ -43,10 +43,10 @@ export default function Footer() {
         <div className={styles.col}>
           <div className={styles.colTitulo}>Contacto</div>
           <div className={styles.colItems}>
-            <span>📞 0376 494-7546</span>
-            <span>✉ ventas@buloneramiguel.com.ar</span>
-            <span>🕐 Lun–Vie 8:00 – 18:00</span>
-            <span>🕐 Sáb 8:00 – 13:00</span>
+            <span>📞 0376 4236105</span>
+            <span>✉ bulonera.miguel@gmail.com</span>
+            <span>🕐 Lun–Vie 8:00 – 19:00</span>
+            <span>🕐 Sáb 8:00 – 18:00</span>
           </div>
         </div>
 

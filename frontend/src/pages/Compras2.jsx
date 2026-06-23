@@ -479,58 +479,37 @@ export default function Compras() {
               </button>
             </div>
 
+            {/* TABLA */}
             {cargandoHist ? (
               <div className={styles.estado}>Cargando compras...</div>
             ) : compras.length === 0 ? (
               <div className={styles.estado}>No hay compras registradas</div>
             ) : (
-              <>
-                {/* TABLA — desktop/tablet */}
-                <table className={styles.tabla}>
-                  <thead>
-                    <tr>
-                      <th>Número</th>
-                      <th>Proveedor</th>
-                      <th>Fecha</th>
-                      <th>Productos</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {compras.map(c => (
-                      <tr key={c.id} className={styles.tablaFila}
-                        onClick={() => verDetalle(c)}>
-                        <td className={styles.tdNumero}>
-                          C-{c.id.slice(0, 8).toUpperCase()}
-                        </td>
-                        <td>{c.proveedores?.nombre || '—'}</td>
-                        <td>{fmtF(c.fecha)}</td>
-                        <td className={styles.tdCenter}>—</td>
-                        <td className={styles.tdTotal}>{fmtP(c.total)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* TARJETAS — móvil */}
-                <div className={styles.tarjetasList}>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Número</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {compras.map(c => (
-                    <div key={c.id} className={styles.tarjeta} onClick={() => verDetalle(c)}>
-                      <div className={styles.tarjetaTop}>
-                        <span className={styles.tarjetaNumero}>
-                          C-{c.id.slice(0, 8).toUpperCase()}
-                        </span>
-                        <span className={styles.tarjetaTotal}>{fmtP(c.total)}</span>
-                      </div>
-                      <div className={styles.tarjetaProveedor}>
-                        {c.proveedores?.nombre || '—'}
-                      </div>
-                      <div className={styles.tarjetaFecha}>{fmtF(c.fecha)}</div>
-                      <div className={styles.tarjetaVerDetalle}>Ver detalle ›</div>
-                    </div>
+                    <tr key={c.id} className={styles.tablaFila}
+                      onClick={() => verDetalle(c)}>
+                      <td className={styles.tdNumero}>
+                        C-{c.id.slice(0, 8).toUpperCase()}
+                      </td>
+                      <td>{c.proveedores?.nombre || '—'}</td>
+                      <td>{fmtF(c.fecha)}</td>
+                      <td className={styles.tdCenter}>—</td>
+                      <td className={styles.tdTotal}>{fmtP(c.total)}</td>
+                    </tr>
                   ))}
-                </div>
-              </>
+                </tbody>
+              </table>
             )}
           </div>
         )}

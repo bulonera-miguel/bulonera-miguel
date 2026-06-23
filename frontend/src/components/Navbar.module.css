@@ -188,12 +188,32 @@
 
 /* ── RESPONSIVE MOBILE ── */
 @media (max-width: 767px) {
-  .logoImg { height: 48px; }
+  .nav {
+    padding: 8px 12px;
+    overflow: visible;
+    min-height: 56px;
+  }
+  .logo { flex-shrink: 1; min-width: 0; }
+  .logoImg { height: 44px; max-width: 140px; object-fit: contain; }
   .btnNav { display: none; }
   .statusPill { display: none; }
-  .nav { padding: 8px 12px; }
-  /* Usuario logueado en mobile — solo mostrar nombre, ocultar rol */
   .usuarioRol { display: none; }
-  .usuarioWrap { padding: 4px 8px; gap: 8px; }
-  .usuarioNombre { font-size: 12px; }
+  .usuarioWrap { padding: 4px 8px; gap: 6px; flex-shrink: 0; }
+  .usuarioNombre { font-size: 11px; white-space: nowrap; }
+  .navRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+  .hamburger {
+    display: flex;
+    flex-shrink: 0;
+    width: 28px;
+    height: 20px;
+    z-index: 9999;
+    position: relative;
+    overflow: visible;
+  }
 }

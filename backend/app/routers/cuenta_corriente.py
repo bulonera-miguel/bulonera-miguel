@@ -239,21 +239,23 @@ async def registrar_pago(cliente_id: str, datos: PagoCreate):
 
 @router.patch("/{cliente_id}/habilitar", status_code=200)
 async def habilitar_cuenta_corriente(cliente_id: str, habilitar: bool = Query(True)):
-    """Activa o desactiva la cuenta corriente de un cliente."""
     try:
-        res = (
-            supabase.table("clientes")
-            .update({"tiene_cuenta_corriente": habilitar})
-            .eq("id", cliente_id)
-            .execute()
-        )
+        # Si se intenta DESACTIVAR, verificar que no tenga saldo pendiente
+        if not habilitar:
+            todas_ventas = supabase.table("ventas").select("total").eq("cliente_id", cliente_id).execute().data or []
+            todos_pagos  = supabase.table("pagos_cuenta_corriente").select("monto").eq("cliente_id", cliente_id).execute().data or []
+            total_ventas = sum(float(v["total"]) for v in todas_ventas)
+            total_pagos  = sum(float(p["monto"]) for p in todos_pagos)
+            saldo = round(total_ventas - total_pagos, 2)
+            if saldo > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No se puede desactivar la cuenta corriente. El cliente tiene un saldo pendiente de ${saldo:,.2f}. Registrá el pago completo antes de desactivarla."
+                )
+        res = supabase.table("clientes").update({"tiene_cuenta_corriente": habilitar}).eq("id", cliente_id).execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Cliente no encontrado")
-        return {
-            "ok":      True,
-            "cliente_id": cliente_id,
-            "tiene_cuenta_corriente": habilitar,
-        }
+        return {"ok": True, "cliente_id": cliente_id, "tiene_cuenta_corriente": habilitar}
     except HTTPException:
         raise
     except Exception as e:

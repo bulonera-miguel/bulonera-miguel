@@ -21,10 +21,28 @@ export function AuthProvider({ children }) {
   // ── CARGAR SESIÓN AL MONTAR ──────────────────────────────
   useEffect(() => {
     // Verificamos si hay una sesión activa al cargar la app
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUsuario(session?.user ?? null)
-      if (session?.user) cargarPerfil(session.user.id)
-      else setCargando(false)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        setUsuario(session.user)
+        cargarPerfil(session.user.id)
+      } else {
+        // Auto-login con usuario único
+        const email = import.meta.env.VITE_AUTO_EMAIL
+        const password = import.meta.env.VITE_AUTO_PASSWORD
+        if (email && password) {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email, password
+          })
+          if (!error && data.session) {
+            setUsuario(data.session.user)
+            cargarPerfil(data.session.user.id)
+          } else {
+            setCargando(false)
+          }
+        } else {
+          setCargando(false)
+        }
+      }
     })
 
     // Escuchamos cambios de sesión (login, logout, expiración)

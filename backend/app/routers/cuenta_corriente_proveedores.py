@@ -235,3 +235,27 @@ async def registrar_pago_proveedor(proveedor_id: str, datos: PagoProvCreate):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al registrar pago: {str(e)}")
+
+
+@router.patch("/{proveedor_id}/habilitar", status_code=200)
+async def habilitar_cuenta_corriente_proveedor(proveedor_id: str, habilitar: bool = Query(True)):
+    try:
+        if not habilitar:
+            todas_compras = supabase.table("compras_proveedores").select("total").eq("proveedor_id", proveedor_id).execute().data or []
+            todos_pagos   = supabase.table("pagos_proveedores").select("monto").eq("proveedor_id", proveedor_id).execute().data or []
+            total_compras = sum(float(c["total"]) for c in todas_compras)
+            total_pagos   = sum(float(p["monto"]) for p in todos_pagos)
+            saldo = round(total_compras - total_pagos, 2)
+            if saldo > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No se puede desactivar la cuenta corriente. La bulonera tiene un saldo pendiente de ${saldo:,.2f} con este proveedor. Registrá el pago completo antes de desactivarla."
+                )
+        res = supabase.table("proveedores").update({"tiene_cuenta_corriente": habilitar}).eq("id", proveedor_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Proveedor no encontrado")
+        return {"ok": True, "proveedor_id": proveedor_id, "tiene_cuenta_corriente": habilitar}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al actualizar: {str(e)}")

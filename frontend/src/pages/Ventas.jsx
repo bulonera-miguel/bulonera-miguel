@@ -577,28 +577,55 @@ export default function Ventas() {
             ) : ventas.length === 0 ? (
               <div className={styles.estado}>No hay ventas registradas</div>
             ) : (
-              <table className={styles.tabla}>
-                <thead>
-                  <tr>
-                    <th>Número</th>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Factura</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ventas.map(v => (
-                    <tr key={v.id} className={styles.tablaFila} onClick={() => verDetalle(v)}>
-                      <td className={styles.tdNumero}>V-{v.id.slice(0,8).toUpperCase()}</td>
-                      <td>{v.clientes?.nombre || 'Consumidor Final'}</td>
-                      <td>{fmtF(v.fecha)}</td>
-                      <td>{v.factura_id ? <span className={styles.badgeFactura}>✓ Con factura</span> : '—'}</td>
-                      <td className={styles.tdTotal}>{fmtP(v.total)}</td>
+              <>
+                {/* TABLA — desktop/tablet */}
+                <table className={styles.tabla}>
+                  <thead>
+                    <tr>
+                      <th>Número</th>
+                      <th>Cliente</th>
+                      <th>Fecha</th>
+                      <th>Factura</th>
+                      <th>Total</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {ventas.map(v => (
+                      <tr key={v.id} className={styles.tablaFila} onClick={() => verDetalle(v)}>
+                        <td className={styles.tdNumero}>V-{v.id.slice(0,8).toUpperCase()}</td>
+                        <td>{v.clientes?.nombre || 'Consumidor Final'}</td>
+                        <td>{fmtF(v.fecha)}</td>
+                        <td>{v.factura_id ? <span className={styles.badgeFactura}>✓ Con factura</span> : '—'}</td>
+                        <td className={styles.tdTotal}>{fmtP(v.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* TARJETAS — móvil */}
+                <div className={styles.tarjetasList}>
+                  {ventas.map(v => (
+                    <div key={v.id} className={styles.tarjeta} onClick={() => verDetalle(v)}>
+                      <div className={styles.tarjetaTop}>
+                        <span className={styles.tarjetaNumero}>
+                          V-{v.id.slice(0, 8).toUpperCase()}
+                        </span>
+                        <span className={styles.tarjetaTotal}>{fmtP(v.total)}</span>
+                      </div>
+                      <div className={styles.tarjetaCliente}>
+                        {v.clientes?.nombre || 'Consumidor Final'}
+                      </div>
+                      <div className={styles.tarjetaFila}>
+                        <span className={styles.tarjetaFecha}>{fmtF(v.fecha)}</span>
+                        {v.factura_id && (
+                          <span className={styles.tarjetaBadgeFactura}>✓ Con factura</span>
+                        )}
+                      </div>
+                      <div className={styles.tarjetaVerDetalle}>Ver detalle ›</div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </>
             )}
           </div>
         )}
