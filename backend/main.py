@@ -20,7 +20,10 @@ app = FastAPI(title="Bulonera Miguel API", version="1.0.0")
 # Permitir requests desde el frontend React
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://bulonera-miguel.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
