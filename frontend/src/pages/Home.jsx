@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { portadaApi } from '../services/api'
 import Navbar from '../components/Navbar'
 import styles from './Home.module.css'
+import AyudaModal from '../components/AyudaModal'
 
 // ── Opciones del selector de vista ────────────────────────────
 const OPCIONES_VISTA = [
@@ -54,6 +55,9 @@ export default function Home() {
   const esCritico = producto
     ? producto.stock_actual <= producto.stock_minimo
     : false
+
+
+  const [ayudaAbierta, setAyudaAbierta] = useState(false)
 
   return (
     <>
@@ -236,8 +240,15 @@ export default function Home() {
               Trazabilidad completa, alertas automáticas y reportes en tiempo real.
             </p>
             <div className={`${styles.ctaRow} ${styles.fi} ${styles.d5}`}>
-              <button className={styles.btnCta}>Conocer el sistema</button>
-              <button className={styles.btnDemo}>Ver demo</button>
+              <button className={styles.btnCta} onClick={() => setAyudaAbierta(true)}>Conocer el sistema</button>
+              <a
+              href="https://wa.me/5493764360178"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.btnDemo}
+              >
+                Soporte — Pablo Almada
+              </a>
             </div>
             <div className={`${styles.chips} ${styles.fi} ${styles.d6}`}>
               <div className={styles.chip}>
@@ -252,6 +263,7 @@ export default function Home() {
 
         </section>
       </div>
+      {ayudaAbierta && <AyudaModal onCerrar={() => setAyudaAbierta(false)} />}
     </>
   )
 }
