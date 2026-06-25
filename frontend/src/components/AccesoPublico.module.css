@@ -68,8 +68,7 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 24px;
-  justify-content: center;
-  overflow: hidden;
+  justify-content: center;  
 }
 
 .logo {
