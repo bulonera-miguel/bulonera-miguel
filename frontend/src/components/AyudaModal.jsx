@@ -79,7 +79,7 @@ export default function AyudaModal({ onCerrar }) {
         <div className={styles.soporte}>
           <span className={styles.soporteLabel}>¿Necesitás ayuda?</span>
           <a
-            href="https://wa.me/5493764236105"
+            href="https://wa.me/5493764360178"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.soporteBtn}
