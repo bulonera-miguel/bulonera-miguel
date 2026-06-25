@@ -135,13 +135,18 @@ def _encabezado(factura: dict, tipo: str, styles) -> Table:
     [Datos empresa]  |  [Letra grande]  |  [Tipo + Número]
     """
     # Columna izquierda — empresa
-    logo_path = os.path.join(os.path.dirname(__file__), "static", "logo-bm-blueprint.png")
+    logo_path = os.path.join(os.path.dirname(__file__), "static", "logo-bm-pdf.png")
     col_empresa = []
     if os.path.exists(logo_path):
-        col_empresa.append(Image(logo_path, width=38*mm, height=18*mm))
+        from PIL import Image as PILImage
+        with PILImage.open(logo_path) as img:
+            ancho_px, alto_px = img.size
+            proporcion = alto_px / ancho_px
+            ancho_logo = 55*mm
+            alto_logo = ancho_logo * proporcion
+        col_empresa.append(Image(logo_path, width=ancho_logo, height=alto_logo))
         col_empresa.append(Spacer(1, 2*mm))
-    col_empresa += [
-        Paragraph(EMPRESA["nombre"], styles["empresa_nombre"]),
+    col_empresa += [       
         Paragraph(EMPRESA["domicilio"], styles["empresa_sub"]),
         Paragraph(f"Tel: {EMPRESA['telefono']}", styles["empresa_sub"]),
         Paragraph(f"Email: {EMPRESA['email']}", styles["empresa_sub"]),

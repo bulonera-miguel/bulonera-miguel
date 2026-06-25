@@ -1,0 +1,228 @@
+/* components/AccesoPublico.module.css */
+/* Pantalla de acceso público — diseño consistente con el sistema Bulonera Miguel */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;800&family=Bebas+Neue&display=swap');
+
+/* ── FONDO ── */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07111F;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Grid de fondo */
+.gridBg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,200,240,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,240,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Glow central */
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0,200,240,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── ESQUINAS HUD ── */
+.hud {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+.tl { top: 20px; left: 20px; border-top: 1.5px solid rgba(0,200,240,0.4); border-left: 1.5px solid rgba(0,200,240,0.4); }
+.tr { top: 20px; right: 20px; border-top: 1.5px solid rgba(0,200,240,0.4); border-right: 1.5px solid rgba(0,200,240,0.4); }
+.bl { bottom: 20px; left: 20px; border-bottom: 1.5px solid rgba(0,200,240,0.4); border-left: 1.5px solid rgba(0,200,240,0.4); }
+.br { bottom: 20px; right: 20px; border-bottom: 1.5px solid rgba(0,200,240,0.4); border-right: 1.5px solid rgba(0,200,240,0.4); }
+
+/* ── CARD ── */
+.card {
+  position: relative;
+  z-index: 1;
+  background: #0d1d30;
+  border: 1px solid rgba(0,200,240,0.20);
+  clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.logo {
+  height: 52px;
+  width: auto;
+}
+
+.headerTexto {
+  display: flex;
+  flex-direction: column;
+}
+
+.nombre {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #EAF4FF;
+  line-height: 1;
+}
+
+.sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00C8F0;
+  opacity: 0.7;
+  margin-top: 3px;
+}
+
+/* ── SEPARADOR ── */
+.separator {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,240,0.3), transparent);
+  margin-bottom: 28px;
+}
+
+/* ── FORMULARIO ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(200,228,244,0.7);
+}
+
+.input {
+  background: rgba(0,200,240,0.04);
+  border: 1px solid rgba(0,200,240,0.20);
+  color: #EAF4FF;
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: rgba(0,200,240,0.6);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: rgba(200,228,244,0.3);
+}
+
+/* ── ERROR ── */
+.error {
+  background: rgba(255,68,68,0.08);
+  border: 1px solid rgba(255,68,68,0.30);
+  color: #FF4444;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── BOTÓN ── */
+.btn {
+  padding: 13px 24px;
+  background: transparent;
+  border: 1.5px solid #00C8F0;
+  color: #00C8F0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+  margin-top: 6px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #00C8F0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.btn:hover:not(:disabled) {
+  color: #07111F;
+}
+
+.btn:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.btn span,
+.btn {
+  position: relative;
+  z-index: 1;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(200,228,244,0.25);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .card { padding: 28px 20px; }
+  .nombre { font-size: 18px; }
+}

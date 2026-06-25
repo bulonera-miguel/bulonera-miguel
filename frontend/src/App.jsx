@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute  from './components/ProtectedRoute'
+import AccesoPublico   from './components/AccesoPublico'
+import { isAccesoAutorizado } from './utils/auth'
 import Home       from './pages/Home'
 import Inventario from './pages/Inventario'
 import Reportes   from './pages/Reportes'
@@ -14,6 +17,13 @@ import Clientes from './pages/Clientes'
 import Footer from './components/Footer'
 
 export default function App() {
+  const [autorizado, setAutorizado] = useState(isAccesoAutorizado())
+
+  // Si no está autorizado, mostrar pantalla de acceso público
+  if (!autorizado) {
+    return <AccesoPublico onAutorizado={() => setAutorizado(true)} />
+  }
+
   return (
     <BrowserRouter>
       <AuthProvider>

@@ -44,8 +44,8 @@ AFIP_PV        = int(os.getenv("AFIP_PUNTO_VENTA", "1"))
 
 PRODUCCION = AFIP_MODO == "produccion"
 
-# Ruta de OpenSSL en Windows
-OPENSSL = r"C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
+# Ruta de OpenSSL en Linux
+OPENSSL = "/usr/bin/openssl"
 
 
 def _generar_tra(servicio: str) -> bytes:
