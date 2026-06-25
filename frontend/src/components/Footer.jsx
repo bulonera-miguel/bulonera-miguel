@@ -45,7 +45,7 @@ export default function Footer() {
           <div className={styles.colItems}>
             <span>📞 0376 4236105</span>
             <span>✉ bulonera.miguel@gmail.com</span>
-            <span>🕐 Lun–Vie 8:00 – 18.30</span>
+            <span>🕐 Lun–Vie 8:00 – 18:30</span>
             <span>🕐 Sáb 8:00 – 18:00</span>
           </div>
         </div>
