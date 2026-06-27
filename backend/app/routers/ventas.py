@@ -688,68 +688,6 @@ async def crear_presupuesto(datos: PresupuestoCreate):
             detail=f"Error al crear presupuesto: {str(e)}")
 
 
-# ─── PDF DE VENTA ─────────────────────────────────────────────────────────────
-
-@router.get("/{venta_id}/pdf")
-async def pdf_venta(venta_id: str):
-    try:
-        from app.pdf_venta import generar_pdf_venta
-
-        venta = (
-            supabase.table("ventas")
-            .select("*, clientes(nombre, cuit)")
-            .eq("id", venta_id)
-            .single()
-            .execute()
-        )
-        if not venta.data:
-            raise HTTPException(status_code=404, detail="Venta no encontrada")
-
-        items = (
-            supabase.table("ventas_items")
-            .select("*, productos(codigo, nombre)")
-            .eq("venta_id", venta_id)
-            .execute()
-        )
-
-        cliente = venta.data.get("clientes") or {}
-        datos_pdf = {
-            "numero":        f"V-{venta_id[:8].upper()}",
-            "fecha":         venta.data.get("fecha", ""),
-            "cliente": {
-                "nombre": cliente.get("nombre", "Consumidor Final"),
-                "cuit":   cliente.get("cuit", ""),
-            },
-            "items": [
-                {
-                    "codigo":          (it.get("productos") or {}).get("codigo", ""),
-                    "nombre":          (it.get("productos") or {}).get("nombre", ""),
-                    "cantidad":        it.get("cantidad", 0),
-                    "precio_unitario": float(it.get("precio_unitario", 0)),
-                    "subtotal":        float(it.get("subtotal", 0)),
-                }
-                for it in (items.data or [])
-            ],
-            "total":         float(venta.data.get("total", 0)),
-            "observaciones": venta.data.get("observaciones", "") or "",
-        }
-
-        pdf_bytes = generar_pdf_venta(datos_pdf)
-        nro = f"V-{venta_id[:8].upper()}"
-        return StreamingResponse(
-            io.BytesIO(pdf_bytes),
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f'attachment; filename="Venta_{nro}.pdf"',
-                "Content-Length": str(len(pdf_bytes)),
-            },
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500,
-            detail=f"Error generando PDF de venta: {str(e)}")
-
 
 # ─── PDF DE PRESUPUESTO ───────────────────────────────────────────────────────
 
@@ -813,3 +751,66 @@ async def pdf_presupuesto(presupuesto_id: str):
     except Exception as e:
         raise HTTPException(status_code=500,
             detail=f"Error generando PDF de presupuesto: {str(e)}")
+    
+
+# ─── PDF DE VENTA ─────────────────────────────────────────────────────────────
+
+@router.get("/{venta_id}/pdf")
+async def pdf_venta(venta_id: str):
+    try:
+        from app.pdf_venta import generar_pdf_venta
+
+        venta = (
+            supabase.table("ventas")
+            .select("*, clientes(nombre, cuit)")
+            .eq("id", venta_id)
+            .single()
+            .execute()
+        )
+        if not venta.data:
+            raise HTTPException(status_code=404, detail="Venta no encontrada")
+
+        items = (
+            supabase.table("ventas_items")
+            .select("*, productos(codigo, nombre)")
+            .eq("venta_id", venta_id)
+            .execute()
+        )
+
+        cliente = venta.data.get("clientes") or {}
+        datos_pdf = {
+            "numero":        f"V-{venta_id[:8].upper()}",
+            "fecha":         venta.data.get("fecha", ""),
+            "cliente": {
+                "nombre": cliente.get("nombre", "Consumidor Final"),
+                "cuit":   cliente.get("cuit", ""),
+            },
+            "items": [
+                {
+                    "codigo":          (it.get("productos") or {}).get("codigo", ""),
+                    "nombre":          (it.get("productos") or {}).get("nombre", ""),
+                    "cantidad":        it.get("cantidad", 0),
+                    "precio_unitario": float(it.get("precio_unitario", 0)),
+                    "subtotal":        float(it.get("subtotal", 0)),
+                }
+                for it in (items.data or [])
+            ],
+            "total":         float(venta.data.get("total", 0)),
+            "observaciones": venta.data.get("observaciones", "") or "",
+        }
+
+        pdf_bytes = generar_pdf_venta(datos_pdf)
+        nro = f"V-{venta_id[:8].upper()}"
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="Venta_{nro}.pdf"',
+                "Content-Length": str(len(pdf_bytes)),
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,
+            detail=f"Error generando PDF de venta: {str(e)}")
