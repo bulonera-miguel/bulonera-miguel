@@ -816,6 +816,13 @@ export default function Ventas() {
                           >
                             ↓ PDF
                           </button>
+                          <button
+                            className={styles.btnEliminarVenta}
+                            onClick={() => eliminarVenta(v.id, !!v.factura_id)}
+                            title="Eliminar venta"
+                          >
+                            ✕ Eliminar
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -847,6 +854,12 @@ export default function Ventas() {
                           onClick={() => descargarPDFVenta(v.id)}
                         >
                           ↓ PDF
+                        </button>
+                        <button
+                          className={styles.btnEliminarVenta}
+                          onClick={() => eliminarVenta(v.id, !!v.factura_id)}
+                        >
+                          ✕ Eliminar
                         </button>
                         <div className={styles.tarjetaVerDetalle}
                           onClick={() => verDetalle(v)}>

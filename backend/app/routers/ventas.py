@@ -814,3 +814,91 @@ async def detalle_venta(venta_id: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener venta: {str(e)}")
+
+
+# ─── ELIMINAR VENTA SIN FACTURA ───────────────────────────────────────────────
+
+@router.delete("/eliminar/{venta_id}")
+async def eliminar_venta(venta_id: str):
+    try:
+        # Verificar que existe y no tiene factura
+        venta = (
+            supabase.table("ventas")
+            .select("id, factura_id, ventas_items(producto_id, cantidad)")
+            .eq("id", venta_id)
+            .single()
+            .execute()
+        )
+        if not venta.data:
+            raise HTTPException(status_code=404, detail="Venta no encontrada")
+
+        tiene_factura = venta.data.get("factura_id")
+        items         = venta.data.get("ventas_items") or []
+
+        # Restaurar stock de cada producto
+        for item in items:
+            prod = (
+                supabase.table("productos")
+                .select("stock_actual")
+                .eq("id", item["producto_id"])
+                .single()
+                .execute()
+            )
+            if prod.data:
+                supabase.table("productos").update({
+                    "stock_actual": prod.data["stock_actual"] + item["cantidad"]
+                }).eq("id", item["producto_id"]).execute()
+
+            # Registrar movimiento de entrada por anulación
+            supabase.table("movimientos_stock").insert({
+                "producto_id": item["producto_id"],
+                "tipo":        "entrada",
+                "cantidad":    item["cantidad"],
+                "motivo":      f"Anulación venta V-{venta_id[:8].upper()}",
+            }).execute()
+
+        # Eliminar items de la venta
+        supabase.table("ventas_items").delete().eq("venta_id", venta_id).execute()
+
+        # Eliminar la venta
+        supabase.table("ventas").delete().eq("id", venta_id).execute()
+
+        return {
+            "ok":            True,
+            "mensaje":       "Venta eliminada correctamente",
+            "stock_restaurado": True,
+            "tiene_factura": bool(tiene_factura),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,
+            detail=f"Error al eliminar venta: {str(e)}")
+
+
+# ─── ELIMINAR PRESUPUESTO ─────────────────────────────────────────────────────
+
+@router.delete("/presupuestos/eliminar/{presupuesto_id}")
+async def eliminar_presupuesto(presupuesto_id: str):
+    try:
+        pres = (
+            supabase.table("presupuestos")
+            .select("id")
+            .eq("id", presupuesto_id)
+            .single()
+            .execute()
+        )
+        if not pres.data:
+            raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
+
+        supabase.table("presupuesto_items").delete().eq("presupuesto_id", presupuesto_id).execute()
+        supabase.table("presupuestos").delete().eq("id", presupuesto_id).execute()
+
+        return {"ok": True, "mensaje": "Presupuesto eliminado correctamente"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,
+            detail=f"Error al eliminar presupuesto: {str(e)}")

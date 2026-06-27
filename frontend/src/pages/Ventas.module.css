@@ -636,6 +636,16 @@
 }
 .btnDescargarPDF:hover { background: rgba(0,200,240,0.08); }
 
+/* ── BOTÓN ELIMINAR VENTA ── */
+.btnEliminarVenta {
+  padding: 5px 10px; background: transparent;
+  border: 1px solid rgba(255,68,68,0.35); color: #FF4444;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; margin-left: 6px;
+}
+.btnEliminarVenta:hover { background: rgba(255,68,68,0.08); }
+
 
 
 /* ── RESPONSIVE 1023px ── */
@@ -689,4 +699,11 @@
   /* Ocultar tabla, mostrar tarjetas */
   .tabla { display: none; }
   .tarjetasList { display: flex; }
+
+  .btnEliminarVenta {
+    margin-left: 0;
+    margin-top: 6px;
+    width: 100%;
+    text-align: center;
+  }
 }
