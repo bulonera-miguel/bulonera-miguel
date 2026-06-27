@@ -799,9 +799,15 @@ export default function Ventas() {
                           {v.clientes?.nombre || 'Consumidor Final'}
                         </td>
                         <td onClick={() => verDetalle(v)}>{fmtF(v.fecha)}</td>
-                        <td onClick={() => verDetalle(v)}>
+                        <td>
                           {v.factura_id
-                            ? <span className={styles.badgeFactura}>✓ Con factura</span>
+                            ? <button
+                                className={styles.badgeFacturaBtn}
+                                onClick={() => descargarPDFFactura(v.factura_id)}
+                                title="Descargar PDF de la factura"
+                              >
+                                ✓ Con factura ↓
+                              </button>
                             : '—'}
                         </td>
                         <td className={styles.tdTotal}
@@ -842,10 +848,15 @@ export default function Ventas() {
                       <div className={styles.tarjetaCliente} onClick={() => verDetalle(v)}>
                         {v.clientes?.nombre || 'Consumidor Final'}
                       </div>
-                      <div className={styles.tarjetaFila} onClick={() => verDetalle(v)}>
-                        <span className={styles.tarjetaFecha}>{fmtF(v.fecha)}</span>
+                      <div className={styles.tarjetaFila}>
+                        <span className={styles.tarjetaFecha} onClick={() => verDetalle(v)}>{fmtF(v.fecha)}</span>
                         {v.factura_id && (
-                          <span className={styles.tarjetaBadgeFactura}>✓ Con factura</span>
+                          <button
+                            className={styles.badgeFacturaBtn}
+                            onClick={() => descargarPDFFactura(v.factura_id)}
+                          >
+                            ✓ Con factura ↓
+                          </button>
                         )}
                       </div>
                       <div className={styles.tarjetaFila} style={{ marginTop: 8 }}>

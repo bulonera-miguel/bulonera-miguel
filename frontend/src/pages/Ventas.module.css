@@ -646,6 +646,15 @@
 }
 .btnEliminarVenta:hover { background: rgba(255,68,68,0.08); }
 
+/* ── BADGE FACTURA CLICKEABLE ── */
+.badgeFacturaBtn {
+  padding: 2px 8px; background: rgba(0,232,122,0.08);
+  border: 1px solid rgba(0,232,122,0.25); color: #00E87A;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; cursor: pointer;
+  transition: all 0.2s;
+}
+.badgeFacturaBtn:hover { background: rgba(0,232,122,0.18); }
 
 
 /* ── RESPONSIVE 1023px ── */
