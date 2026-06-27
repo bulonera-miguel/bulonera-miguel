@@ -68,35 +68,6 @@ async def listar_ventas(
         raise HTTPException(status_code=500, detail=f"Error al listar ventas: {str(e)}")
 
 
-# ─── DETALLE DE UNA VENTA ─────────────────────────────────────────────────────
-
-@router.get("/{venta_id}", response_model=dict)
-async def detalle_venta(venta_id: str):
-    try:
-        venta = (
-            supabase.table("ventas")
-            .select("*, clientes(nombre, cuit, telefono, email)")
-            .eq("id", venta_id)
-            .single()
-            .execute()
-        )
-        if not venta.data:
-            raise HTTPException(status_code=404, detail="Venta no encontrada")
-
-        items = (
-            supabase.table("ventas_items")
-            .select("*, productos(codigo, nombre)")
-            .eq("venta_id", venta_id)
-            .execute()
-        )
-        return {**venta.data, "items": items.data or []}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener venta: {str(e)}")
-
-
 # ─── REGISTRAR VENTA ──────────────────────────────────────────────────────────
 
 @router.post("/", status_code=201)
@@ -814,3 +785,32 @@ async def pdf_venta(venta_id: str):
     except Exception as e:
         raise HTTPException(status_code=500,
             detail=f"Error generando PDF de venta: {str(e)}")
+    
+
+# ─── DETALLE DE UNA VENTA ─────────────────────────────────────────────────────
+
+@router.get("/{venta_id}", response_model=dict)
+async def detalle_venta(venta_id: str):
+    try:
+        venta = (
+            supabase.table("ventas")
+            .select("*, clientes(nombre, cuit, telefono, email)")
+            .eq("id", venta_id)
+            .single()
+            .execute()
+        )
+        if not venta.data:
+            raise HTTPException(status_code=404, detail="Venta no encontrada")
+
+        items = (
+            supabase.table("ventas_items")
+            .select("*, productos(codigo, nombre)")
+            .eq("venta_id", venta_id)
+            .execute()
+        )
+        return {**venta.data, "items": items.data or []}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener venta: {str(e)}")
