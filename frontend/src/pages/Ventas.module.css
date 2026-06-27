@@ -575,6 +575,7 @@
   cursor: pointer; transition: all 0.2s; text-align: center;
 }
 .tipoFacturaBtn:last-child { border-right: 1px solid rgba(0,200,240,0.18); }
+.tipoFacturaBtnActivo { border-right: 1px solid #00E87A !important; }
 .tipoFacturaBtnActivo {
   background: rgba(0,232,122,0.08);
   border-color: #00E87A; color: #00E87A;
