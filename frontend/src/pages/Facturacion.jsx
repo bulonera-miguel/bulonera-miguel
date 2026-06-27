@@ -14,13 +14,12 @@ import { facturacionApi, productosApi } from '../services/api'
 import styles from './Facturacion.module.css'
 
 const TABS = [
-  { id: 'nueva',     label: '+ Nueva factura' },
-  { id: 'historial', label: '≡ Historial'     },
+  { id: 'historial', label: '≡ Historial' },
 ]
 
 export default function Facturacion() {
 
-  const [tab, setTab] = useState('nueva')
+  const [tab, setTab] = useState('historial')
 
   // ── FORMULARIO ────────────────────────────────────────────
   const [tipoFactura, setTipoFactura]     = useState('B')
