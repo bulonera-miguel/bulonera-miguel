@@ -755,7 +755,7 @@ async def pdf_presupuesto(presupuesto_id: str):
 
 # ─── PDF DE VENTA ─────────────────────────────────────────────────────────────
 
-@router.get("/{venta_id}/pdf")
+@router.get("/venta/{venta_id}/pdf")
 async def pdf_venta(venta_id: str):
     try:
         from app.pdf_venta import generar_pdf_venta

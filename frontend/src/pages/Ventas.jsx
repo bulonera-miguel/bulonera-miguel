@@ -282,7 +282,7 @@ export default function Ventas() {
 
   // ── DESCARGAR PDF ─────────────────────────────────────────
   const descargarPDFVenta = (ventaId) => {
-    window.open(`${BASE_URL}/api/ventas/${ventaId}/pdf`, '_blank')
+    window.open(`${BASE_URL}/api/ventas/venta/${ventaId}/pdf`, '_blank')
   }
 
   const descargarPDFPresupuesto = (presupuestoId) => {
