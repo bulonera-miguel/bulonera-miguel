@@ -3,49 +3,63 @@
 // ============================================================
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { ventasApi, facturacionApi, productosApi } from '../services/api'
 import styles from './Ventas.module.css'
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const TABS = [
   { id: 'nueva',     label: '+ Nueva venta' },
   { id: 'historial', label: '≡ Historial'   },
 ]
 
+const TIPOS_VENTA = [
+  { id: 'sin_factura', label: 'Venta sin factura' },
+  { id: 'con_factura', label: 'Venta con factura' },
+  { id: 'presupuesto', label: 'Presupuesto'        },
+]
+
 export default function Ventas() {
 
-  const [tab, setTab] = useState('nueva')
+  const navigate = useNavigate()
 
-  // ── FORMULARIO ────────────────────────────────────────────
-  const [cliente, setCliente]               = useState(null)
-  const [busqCliente, setBusqCliente]       = useState('')
-  const [sugerClientes, setSugerClientes]   = useState([])
-  const [mostrarSugerC, setMostrarSugerC]   = useState(false)
-  const [fecha, setFecha]                   = useState(new Date().toISOString().split('T')[0])
-  const [observaciones, setObservaciones]   = useState('')
-  const [items, setItems]                   = useState([])
-  const [busqProd, setBusqProd]             = useState('')
-  const [sugerProd, setSugerProd]           = useState([])
-  const [mostrarSugerP, setMostrarSugerP]   = useState(false)
+  const [tab, setTab]           = useState('nueva')
+  const [tipoVenta, setTipoVenta] = useState('sin_factura')
 
-  // Vincular factura
-  const [vincularFactura, setVincularFactura]   = useState(false)
-  const [busqFactura, setBusqFactura]           = useState('')
-  const [facturas, setFacturas]                 = useState([])
-  const [facturaSeleccionada, setFacturaSeleccionada] = useState(null)
-  const [mostrarSugerF, setMostrarSugerF]       = useState(false)
+  // ── FORMULARIO COMÚN ──────────────────────────────────────
+  const [cliente, setCliente]             = useState(null)
+  const [busqCliente, setBusqCliente]     = useState('')
+  const [sugerClientes, setSugerClientes] = useState([])
+  const [mostrarSugerC, setMostrarSugerC] = useState(false)
+  const [clienteEsCC, setClienteEsCC]     = useState(false)
+  const [pagaContado, setPagaContado]     = useState(false)
+  const [fecha, setFecha]                 = useState(new Date().toISOString().split('T')[0])
+  const [observaciones, setObservaciones] = useState('')
+  const [items, setItems]                 = useState([])
+  const [busqProd, setBusqProd]           = useState('')
+  const [sugerProd, setSugerProd]         = useState([])
+  const [mostrarSugerP, setMostrarSugerP] = useState(false)
 
-  const [guardando, setGuardando]           = useState(false)
-  const [resultado, setResultado]           = useState(null)
-  const [error, setError]                   = useState(null)
+  // ── FACTURA ───────────────────────────────────────────────
+  const [tipoFactura, setTipoFactura] = useState('B')
+
+  // ── PRESUPUESTO ───────────────────────────────────────────
+  const [validezDias, setValidezDias] = useState(15)
+
+  // ── ESTADO ────────────────────────────────────────────────
+  const [guardando, setGuardando] = useState(false)
+  const [resultado, setResultado] = useState(null)
+  const [error, setError]         = useState(null)
 
   // ── HISTORIAL ─────────────────────────────────────────────
-  const [ventas, setVentas]                 = useState([])
-  const [cargandoHist, setCargandoHist]     = useState(false)
-  const [filtroDesde, setFiltroDesde]       = useState('')
-  const [filtroHasta, setFiltroHasta]       = useState('')
-  const [ventaDetalle, setVentaDetalle]     = useState(null)
-  const [detalleItems, setDetalleItems]     = useState([])
+  const [ventas, setVentas]           = useState([])
+  const [cargandoHist, setCargandoHist] = useState(false)
+  const [filtroDesde, setFiltroDesde] = useState('')
+  const [filtroHasta, setFiltroHasta] = useState('')
+  const [ventaDetalle, setVentaDetalle] = useState(null)
+  const [detalleItems, setDetalleItems] = useState([])
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
@@ -90,28 +104,13 @@ export default function Ventas() {
     return () => clearTimeout(t)
   }, [busqProd])
 
-  // ── BUSCADOR FACTURAS ─────────────────────────────────────
-  useEffect(() => {
-    if (!vincularFactura) return
-    const cargarFacturas = async () => {
-      try {
-        const data = await facturacionApi.listarFacturas()
-        setFacturas(data)
-      } catch (e) { console.error(e) }
-    }
-    cargarFacturas()
-  }, [vincularFactura])
-
-  const facturasFiltradas = facturas.filter(f =>
-    busqFactura.trim() === '' ||
-    f.numero?.toLowerCase().includes(busqFactura.toLowerCase())
-  )
-
   // ── SELECCIONAR CLIENTE ───────────────────────────────────
   const seleccionarCliente = (c) => {
     setCliente(c)
     setBusqCliente(c.nombre)
     setMostrarSugerC(false)
+    setClienteEsCC(c.tiene_cuenta_corriente || false)
+    setPagaContado(false)
   }
 
   // ── AGREGAR PRODUCTO ──────────────────────────────────────
@@ -156,11 +155,27 @@ export default function Ventas() {
     ))
   }
 
-  const eliminarItem = (productoId) => setItems(items.filter(i => i.producto_id !== productoId))
+  const eliminarItem = (productoId) =>
+    setItems(items.filter(i => i.producto_id !== productoId))
 
   const total = items.reduce((s, i) => s + i.subtotal, 0)
 
-  // ── REGISTRAR VENTA ───────────────────────────────────────
+  // ── RESETEAR FORM ─────────────────────────────────────────
+  const resetForm = () => {
+    setResultado(null)
+    setError(null)
+    setItems([])
+    setCliente(null)
+    setBusqCliente('')
+    setObservaciones('')
+    setFecha(new Date().toISOString().split('T')[0])
+    setClienteEsCC(false)
+    setPagaContado(false)
+    setTipoFactura('B')
+    setValidezDias(15)
+  }
+
+  // ── REGISTRAR VENTA SIN FACTURA ───────────────────────────
   const registrarVenta = async () => {
     if (!items.length) { setError('Agregá al menos un producto'); return }
     setError(null)
@@ -170,21 +185,17 @@ export default function Ventas() {
         cliente_id:    cliente?.id || null,
         fecha,
         observaciones: observaciones || null,
-        factura_id:    facturaSeleccionada?.id || null,
         items: items.map(i => ({
           producto_id:     i.producto_id,
           cantidad:        i.cantidad,
           precio_unitario: i.precio_unitario,
         })),
       })
-      setResultado(res)
+      setResultado({ ...res, tipo: 'venta' })
       setItems([])
       setCliente(null)
       setBusqCliente('')
       setObservaciones('')
-      setFacturaSeleccionada(null)
-      setBusqFactura('')
-      setVincularFactura(false)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -192,20 +203,97 @@ export default function Ventas() {
     }
   }
 
-  const nuevaVenta = () => {
-    setResultado(null)
+  // ── REGISTRAR VENTA CON FACTURA ───────────────────────────
+  const registrarVentaConFactura = async () => {
+    if (!items.length) { setError('Agregá al menos un producto'); return }
     setError(null)
-    setItems([])
-    setCliente(null)
-    setBusqCliente('')
-    setObservaciones('')
-    setFacturaSeleccionada(null)
-    setBusqFactura('')
-    setVincularFactura(false)
-    setFecha(new Date().toISOString().split('T')[0])
+    setGuardando(true)
+    try {
+      const res = await fetch(`${BASE_URL}/api/ventas/con-factura`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cliente_id:    cliente?.id || null,
+          fecha,
+          observaciones: observaciones || null,
+          tipo_factura:  tipoFactura,
+          paga_contado:  pagaContado || !clienteEsCC,
+          items: items.map(i => ({
+            producto_id:     i.producto_id,
+            cantidad:        i.cantidad,
+            precio_unitario: i.precio_unitario,
+          })),
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.detail || 'Error al registrar')
+      }
+      const data = await res.json()
+      setResultado({ ...data, tipo: 'factura' })
+      setItems([])
+      setCliente(null)
+      setBusqCliente('')
+      setObservaciones('')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setGuardando(false)
+    }
   }
 
-  // ── VER DETALLE ───────────────────────────────────────────
+  // ── GUARDAR PRESUPUESTO ───────────────────────────────────
+  const guardarPresupuesto = async () => {
+    if (!items.length) { setError('Agregá al menos un producto'); return }
+    setError(null)
+    setGuardando(true)
+    try {
+      const res = await fetch(`${BASE_URL}/api/ventas/presupuestos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cliente_id:    cliente?.id || null,
+          fecha,
+          observaciones: observaciones || null,
+          validez_dias:  validezDias,
+          items: items.map(i => ({
+            producto_id:     i.producto_id,
+            cantidad:        i.cantidad,
+            precio_unitario: i.precio_unitario,
+          })),
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.detail || 'Error al guardar presupuesto')
+      }
+      const data = await res.json()
+      setResultado({ ...data, tipo: 'presupuesto' })
+      setItems([])
+      setCliente(null)
+      setBusqCliente('')
+      setObservaciones('')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  // ── DESCARGAR PDF ─────────────────────────────────────────
+  const descargarPDFVenta = (ventaId) => {
+    window.open(`${BASE_URL}/api/ventas/${ventaId}/pdf`, '_blank')
+  }
+
+  const descargarPDFPresupuesto = (presupuestoId) => {
+    window.open(`${BASE_URL}/api/ventas/presupuestos/${presupuestoId}/pdf`, '_blank')
+  }
+
+  const descargarPDFFactura = (facturaId) => {
+    window.open(`${BASE_URL}/api/facturacion/facturas/${facturaId}/pdf`, '_blank')
+  }
+
+  // ── VER DETALLE VENTA ─────────────────────────────────────
   const verDetalle = async (venta) => {
     try {
       const data = await ventasApi.detalle(venta.id)
@@ -222,6 +310,31 @@ export default function Ventas() {
     catch { return f }
   }
 
+  // ── BOTÓN ACCIÓN SEGÚN TIPO ───────────────────────────────
+  const renderBotonAccion = () => {
+    if (tipoVenta === 'sin_factura') return (
+      <button className={styles.btnRegistrar} onClick={registrarVenta} disabled={guardando}>
+        {guardando
+          ? <span className={styles.btnCargando}><span className={styles.spinner}></span>Registrando...</span>
+          : '▶ Registrar Venta'}
+      </button>
+    )
+    if (tipoVenta === 'con_factura') return (
+      <button className={styles.btnRegistrarFactura} onClick={registrarVentaConFactura} disabled={guardando}>
+        {guardando
+          ? <span className={styles.btnCargando}><span className={styles.spinner}></span>Procesando...</span>
+          : '▶ Registrar Venta y Emitir Factura'}
+      </button>
+    )
+    return (
+      <button className={styles.btnRegistrarPresupuesto} onClick={guardarPresupuesto} disabled={guardando}>
+        {guardando
+          ? <span className={styles.btnCargando}><span className={styles.spinner}></span>Guardando...</span>
+          : '▶ Guardar Presupuesto'}
+      </button>
+    )
+  }
+
   // ── RENDER ────────────────────────────────────────────────
   return (
     <div className={styles.page}>
@@ -233,7 +346,7 @@ export default function Ventas() {
         <div className={styles.pageHeader}>
           <div>
             <h2 className={styles.pageTitle}>Ventas</h2>
-            <span className={styles.pageSubtitle}>Registro de ventas con o sin factura</span>
+            <span className={styles.pageSubtitle}>Registro de ventas, facturas y presupuestos</span>
           </div>
         </div>
 
@@ -254,8 +367,8 @@ export default function Ventas() {
         {tab === 'nueva' && (
           <div>
 
-            {/* RESULTADO */}
-            {resultado && (
+            {/* RESULTADO VENTA SIN FACTURA */}
+            {resultado?.tipo === 'venta' && (
               <div className={styles.resultadoWrap}>
                 <div className={styles.resultadoIcono}>✓</div>
                 <div className={styles.resultadoTextos}>
@@ -275,12 +388,89 @@ export default function Ventas() {
                       <strong className={styles.resultadoTotal}>{fmtP(resultado.total)}</strong>
                     </div>
                   </div>
-                  <div className={styles.resultadoNota}>
-                    ✓ El stock fue descontado automáticamente
-                  </div>
+                  <div className={styles.resultadoNota}>✓ Stock descontado automáticamente</div>
+                  <button
+                    className={styles.btnDescargarPDF}
+                    onClick={() => descargarPDFVenta(resultado.venta_id)}
+                  >
+                    ↓ Descargar PDF
+                  </button>
                 </div>
-                <button className={styles.btnNuevaVenta} onClick={nuevaVenta}>
+                <button className={styles.btnNuevaVenta} onClick={resetForm}>
                   + Nueva venta
+                </button>
+              </div>
+            )}
+
+            {/* RESULTADO VENTA CON FACTURA */}
+            {resultado?.tipo === 'factura' && (
+              <div className={styles.resultadoFacturaWrap}>
+                <div className={styles.resultadoIcono}>✓</div>
+                <div className={styles.resultadoTextos}>
+                  <div className={styles.resultadoFacturaTitulo}>Venta y factura registradas correctamente</div>
+                  <div className={styles.resultadoGrid}>
+                    <div className={styles.resultadoItem}>
+                      <span>Venta</span><strong>{resultado.numero}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Factura</span><strong>{resultado.numero_factura}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Cliente</span><strong>{resultado.cliente}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Total</span>
+                      <strong className={styles.resultadoTotal}>{fmtP(resultado.total)}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>CAE</span><strong>{resultado.cae}</strong>
+                    </div>
+                  </div>
+                  <div className={styles.resultadoNota}>✓ Stock descontado · Factura emitida en AFIP</div>
+                  <button
+                    className={styles.btnDescargarPDF}
+                    onClick={() => descargarPDFFactura(resultado.factura_id)}
+                  >
+                    ↓ Descargar PDF Factura
+                  </button>
+                </div>
+                <button className={styles.btnNuevaVenta} onClick={resetForm}>
+                  + Nueva venta
+                </button>
+              </div>
+            )}
+
+            {/* RESULTADO PRESUPUESTO */}
+            {resultado?.tipo === 'presupuesto' && (
+              <div className={styles.resultadoPresupuestoWrap}>
+                <div className={styles.resultadoIcono}>✓</div>
+                <div className={styles.resultadoTextos}>
+                  <div className={styles.resultadoPresupuestoTitulo}>Presupuesto guardado correctamente</div>
+                  <div className={styles.resultadoGrid}>
+                    <div className={styles.resultadoItem}>
+                      <span>Número</span><strong>{resultado.numero}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Cliente</span><strong>{resultado.cliente}</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Productos</span><strong>{resultado.items} ítems</strong>
+                    </div>
+                    <div className={styles.resultadoItem}>
+                      <span>Total</span>
+                      <strong className={styles.resultadoTotal}>{fmtP(resultado.total)}</strong>
+                    </div>
+                  </div>
+                  <div className={styles.resultadoNota}>✓ El stock NO fue descontado — es solo un presupuesto</div>
+                  <button
+                    className={styles.btnDescargarPDF}
+                    onClick={() => descargarPDFPresupuesto(resultado.presupuesto_id)}
+                  >
+                    ↓ Descargar PDF Presupuesto
+                  </button>
+                </div>
+                <button className={styles.btnNuevaVenta} onClick={resetForm}>
+                  + Nuevo
                 </button>
               </div>
             )}
@@ -290,6 +480,47 @@ export default function Ventas() {
 
                 {/* PANEL IZQUIERDO */}
                 <div className={styles.formPanel}>
+
+                  {/* TIPO DE VENTA */}
+                  <div className={styles.seccion}>
+                    <div className={styles.seccionTitulo}>Tipo de operación</div>
+                    <div className={styles.tipoVentaWrap}>
+                      {TIPOS_VENTA.map(t => (
+                        <button
+                          key={t.id}
+                          className={`${styles.tipoVentaBtn}
+                            ${tipoVenta === t.id ? styles.tipoVentaBtnActivo : ''}
+                            ${t.id === 'presupuesto' ? styles.tipoVentaBtnPresupuesto : ''}
+                            ${t.id === 'con_factura' ? styles.tipoVentaBtnFactura : ''}
+                          `}
+                          onClick={() => { setTipoVenta(t.id); setError(null) }}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* TIPO FACTURA A/B — solo si es venta con factura */}
+                  {tipoVenta === 'con_factura' && (
+                    <div className={styles.seccion}>
+                      <div className={styles.seccionTitulo}>Tipo de comprobante</div>
+                      <div className={styles.tipoFacturaWrap}>
+                        {['B', 'A'].map(t => (
+                          <button
+                            key={t}
+                            className={`${styles.tipoFacturaBtn} ${tipoFactura === t ? styles.tipoFacturaBtnActivo : ''}`}
+                            onClick={() => setTipoFactura(t)}
+                          >
+                            <strong>{t}</strong>
+                            <span className={styles.tipoFacturaDesc}>
+                              {t === 'B' ? 'Consumidor Final / Monotributista' : 'Responsable Inscripto con CUIT'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* CLIENTE */}
                   <div className={styles.seccion}>
@@ -302,7 +533,11 @@ export default function Ventas() {
                         value={busqCliente}
                         onChange={e => {
                           setBusqCliente(e.target.value)
-                          if (!e.target.value) setCliente(null)
+                          if (!e.target.value) {
+                            setCliente(null)
+                            setClienteEsCC(false)
+                            setPagaContado(false)
+                          }
                         }}
                       />
                       {mostrarSugerC && sugerClientes.length > 0 && (
@@ -322,11 +557,32 @@ export default function Ventas() {
                         <div className={styles.clienteDatos}>
                           <span className={styles.clienteNombre}>{cliente.nombre}</span>
                           {cliente.cuit && <span className={styles.clienteSub}>CUIT: {cliente.cuit}</span>}
+                          {clienteEsCC && <span className={styles.clienteSub}>Cuenta corriente</span>}
                         </div>
                         <button className={styles.btnQuitar}
-                          onClick={() => { setCliente(null); setBusqCliente('') }}>✕</button>
+                          onClick={() => {
+                            setCliente(null)
+                            setBusqCliente('')
+                            setClienteEsCC(false)
+                            setPagaContado(false)
+                          }}>✕</button>
                       </div>
                     )}
+
+                    {/* CHECKBOX PAGA AL CONTADO — solo si cliente es CC */}
+                    {clienteEsCC && tipoVenta !== 'presupuesto' && (
+                      <label className={styles.contadoWrap}>
+                        <input
+                          type="checkbox"
+                          checked={pagaContado}
+                          onChange={e => setPagaContado(e.target.checked)}
+                        />
+                        <span className={styles.contadoLabel}>
+                          ★ Esta venta paga al contado
+                        </span>
+                      </label>
+                    )}
+
                     {!cliente && (
                       <div className={styles.sinCliente}>
                         ○ Sin cliente → se registra como Consumidor Final
@@ -336,7 +592,9 @@ export default function Ventas() {
 
                   {/* FECHA */}
                   <div className={styles.seccion}>
-                    <div className={styles.seccionTitulo}>Fecha de venta</div>
+                    <div className={styles.seccionTitulo}>
+                      {tipoVenta === 'presupuesto' ? 'Fecha del presupuesto' : 'Fecha de venta'}
+                    </div>
                     <input
                       type="date"
                       className={styles.input}
@@ -345,74 +603,26 @@ export default function Ventas() {
                     />
                   </div>
 
-                  {/* VINCULAR FACTURA */}
-                  <div className={styles.seccion}>
-                    <div className={styles.seccionTituloRow}>
-                      <span className={styles.seccionTitulo}>Vincular factura (opcional)</span>
-                      <label className={styles.toggleWrap}>
-                        <input
-                          type="checkbox"
-                          checked={vincularFactura}
-                          onChange={e => {
-                            setVincularFactura(e.target.checked)
-                            if (!e.target.checked) {
-                              setFacturaSeleccionada(null)
-                              setBusqFactura('')
-                            }
-                          }}
-                        />
-                        <span className={styles.toggleLabel}>
-                          {vincularFactura ? 'Sí' : 'No'}
-                        </span>
-                      </label>
+                  {/* VALIDEZ — solo presupuesto */}
+                  {tipoVenta === 'presupuesto' && (
+                    <div className={styles.seccion}>
+                      <div className={styles.seccionTitulo}>Validez (días)</div>
+                      <input
+                        type="number"
+                        className={styles.input}
+                        value={validezDias}
+                        min={1}
+                        onChange={e => setValidezDias(parseInt(e.target.value) || 15)}
+                      />
                     </div>
-
-                    {vincularFactura && (
-                      <div className={styles.buscadorWrap}>
-                        <input
-                          type="text"
-                          className={styles.input}
-                          placeholder="Buscar por número de factura..."
-                          value={busqFactura}
-                          onChange={e => {
-                            setBusqFactura(e.target.value)
-                            setMostrarSugerF(true)
-                          }}
-                        />
-                        {mostrarSugerF && facturasFiltradas.length > 0 && busqFactura && (
-                          <ul className={styles.sugerencias}>
-                            {facturasFiltradas.slice(0, 8).map(f => (
-                              <li key={f.id} className={styles.sugerItem}
-                                onClick={() => {
-                                  setFacturaSeleccionada(f)
-                                  setBusqFactura(f.numero)
-                                  setMostrarSugerF(false)
-                                }}>
-                                <span className={styles.sugerNombre}>{f.numero}</span>
-                                <span className={styles.sugerSub}>
-                                  {f.clientes?.nombre || 'Consumidor Final'} — {fmtP(f.total)}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {facturaSeleccionada && (
-                          <div className={styles.facturaVinculada}>
-                            <span>✓ {facturaSeleccionada.numero}</span>
-                            <button className={styles.btnQuitar}
-                              onClick={() => { setFacturaSeleccionada(null); setBusqFactura('') }}>✕</button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  )}
 
                   {/* OBSERVACIONES */}
                   <div className={styles.seccion}>
                     <div className={styles.seccionTitulo}>Observaciones (opcional)</div>
                     <textarea
                       className={styles.textarea}
-                      placeholder="Notas sobre esta venta..."
+                      placeholder="Notas sobre esta operación..."
                       value={observaciones}
                       onChange={e => setObservaciones(e.target.value)}
                       rows={2}
@@ -457,7 +667,9 @@ export default function Ventas() {
                 {/* PANEL DERECHO */}
                 <div className={styles.detallePanel}>
                   <div className={styles.detallePanelHeader}>
-                    <span className={styles.panelTitulo}>Detalle de la venta</span>
+                    <span className={styles.panelTitulo}>
+                      {tipoVenta === 'presupuesto' ? 'Detalle del presupuesto' : 'Detalle de la venta'}
+                    </span>
                     {items.length > 0 && (
                       <span className={styles.itemsCount}>
                         {items.length} ítem{items.length !== 1 ? 's' : ''}
@@ -516,28 +728,14 @@ export default function Ventas() {
                   {items.length > 0 && (
                     <div className={styles.totalesWrap}>
                       <div className={`${styles.totalRow} ${styles.totalFinal}`}>
-                        <span>Total Venta</span>
+                        <span>{tipoVenta === 'presupuesto' ? 'Total Presupuesto' : 'Total Venta'}</span>
                         <span>{fmtP(total)}</span>
                       </div>
-                      {facturaSeleccionada && (
-                        <div className={styles.facturaVinculadaInfo}>
-                          ✓ Vinculada a factura {facturaSeleccionada.numero}
-                        </div>
-                      )}
-                      <button
-                        className={styles.btnRegistrar}
-                        onClick={registrarVenta}
-                        disabled={guardando}
-                      >
-                        {guardando ? (
-                          <span className={styles.btnCargando}>
-                            <span className={styles.spinner}></span>
-                            Registrando...
-                          </span>
-                        ) : '▶ Registrar Venta'}
-                      </button>
+                      {renderBotonAccion()}
                       <div className={styles.nota}>
-                        El stock se descontará automáticamente al registrar
+                        {tipoVenta === 'sin_factura' && 'El stock se descontará automáticamente al registrar'}
+                        {tipoVenta === 'con_factura' && 'Se registrará la venta y se emitirá la factura en AFIP'}
+                        {tipoVenta === 'presupuesto' && 'El stock NO se descuenta en un presupuesto'}
                       </div>
                     </div>
                   )}
@@ -578,7 +776,7 @@ export default function Ventas() {
               <div className={styles.estado}>No hay ventas registradas</div>
             ) : (
               <>
-                {/* TABLA — desktop/tablet */}
+                {/* TABLA desktop */}
                 <table className={styles.tabla}>
                   <thead>
                     <tr>
@@ -587,41 +785,74 @@ export default function Ventas() {
                       <th>Fecha</th>
                       <th>Factura</th>
                       <th>Total</th>
+                      <th>PDF</th>
                     </tr>
                   </thead>
                   <tbody>
                     {ventas.map(v => (
-                      <tr key={v.id} className={styles.tablaFila} onClick={() => verDetalle(v)}>
-                        <td className={styles.tdNumero}>V-{v.id.slice(0,8).toUpperCase()}</td>
-                        <td>{v.clientes?.nombre || 'Consumidor Final'}</td>
-                        <td>{fmtF(v.fecha)}</td>
-                        <td>{v.factura_id ? <span className={styles.badgeFactura}>✓ Con factura</span> : '—'}</td>
-                        <td className={styles.tdTotal}>{fmtP(v.total)}</td>
+                      <tr key={v.id} className={styles.tablaFila}>
+                        <td className={styles.tdNumero}
+                          onClick={() => verDetalle(v)}>
+                          V-{v.id.slice(0,8).toUpperCase()}
+                        </td>
+                        <td onClick={() => verDetalle(v)}>
+                          {v.clientes?.nombre || 'Consumidor Final'}
+                        </td>
+                        <td onClick={() => verDetalle(v)}>{fmtF(v.fecha)}</td>
+                        <td onClick={() => verDetalle(v)}>
+                          {v.factura_id
+                            ? <span className={styles.badgeFactura}>✓ Con factura</span>
+                            : '—'}
+                        </td>
+                        <td className={styles.tdTotal}
+                          onClick={() => verDetalle(v)}>
+                          {fmtP(v.total)}
+                        </td>
+                        <td>
+                          <button
+                            className={styles.btnDescargarPDF}
+                            onClick={() => descargarPDFVenta(v.id)}
+                            title="Descargar PDF de esta venta"
+                          >
+                            ↓ PDF
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
 
-                {/* TARJETAS — móvil */}
+                {/* TARJETAS móvil */}
                 <div className={styles.tarjetasList}>
                   {ventas.map(v => (
-                    <div key={v.id} className={styles.tarjeta} onClick={() => verDetalle(v)}>
-                      <div className={styles.tarjetaTop}>
+                    <div key={v.id} className={styles.tarjeta}>
+                      <div className={styles.tarjetaTop} onClick={() => verDetalle(v)}>
                         <span className={styles.tarjetaNumero}>
                           V-{v.id.slice(0, 8).toUpperCase()}
                         </span>
                         <span className={styles.tarjetaTotal}>{fmtP(v.total)}</span>
                       </div>
-                      <div className={styles.tarjetaCliente}>
+                      <div className={styles.tarjetaCliente} onClick={() => verDetalle(v)}>
                         {v.clientes?.nombre || 'Consumidor Final'}
                       </div>
-                      <div className={styles.tarjetaFila}>
+                      <div className={styles.tarjetaFila} onClick={() => verDetalle(v)}>
                         <span className={styles.tarjetaFecha}>{fmtF(v.fecha)}</span>
                         {v.factura_id && (
                           <span className={styles.tarjetaBadgeFactura}>✓ Con factura</span>
                         )}
                       </div>
-                      <div className={styles.tarjetaVerDetalle}>Ver detalle ›</div>
+                      <div className={styles.tarjetaFila} style={{ marginTop: 8 }}>
+                        <button
+                          className={styles.btnDescargarPDF}
+                          onClick={() => descargarPDFVenta(v.id)}
+                        >
+                          ↓ PDF
+                        </button>
+                        <div className={styles.tarjetaVerDetalle}
+                          onClick={() => verDetalle(v)}>
+                          Ver detalle ›
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -638,7 +869,8 @@ export default function Ventas() {
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>Venta V-{ventaDetalle.id?.slice(0,8).toUpperCase()}</h3>
-              <button className={styles.modalCerrar} onClick={() => setVentaDetalle(null)}>✕</button>
+              <button className={styles.modalCerrar}
+                onClick={() => setVentaDetalle(null)}>✕</button>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.detalleRow}>
@@ -690,6 +922,13 @@ export default function Ventas() {
                   </table>
                 </div>
               )}
+              <button
+                className={styles.btnDescargarPDF}
+                onClick={() => descargarPDFVenta(ventaDetalle.id)}
+                style={{ marginTop: 8 }}
+              >
+                ↓ Descargar PDF
+              </button>
             </div>
           </div>
         </div>

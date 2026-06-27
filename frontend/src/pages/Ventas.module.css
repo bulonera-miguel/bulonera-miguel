@@ -519,6 +519,125 @@
   border-bottom: 1px solid rgba(0,200,240,0.06);
 }
 
+
+/* ── COMBO TIPO VENTA ── */
+.tipoVentaWrap {
+  display: flex; gap: 0; margin-bottom: 0;
+}
+.tipoVentaBtn {
+  flex: 1; padding: 10px 8px; background: transparent;
+  border: 1px solid rgba(0,200,240,0.18); border-right: none;
+  color: rgba(200,228,244,0.45);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.tipoVentaBtn:last-child { border-right: 1px solid rgba(0,200,240,0.18); }
+.tipoVentaBtn:hover { color: #EAF4FF; background: rgba(0,200,240,0.05); }
+.tipoVentaBtnActivo {
+  background: rgba(0,200,240,0.10);
+  border-color: #00C8F0; color: #00C8F0;
+}
+.tipoVentaBtnPresupuesto.tipoVentaBtnActivo {
+  background: rgba(255,184,0,0.08);
+  border-color: #FFB800; color: #FFB800;
+}
+.tipoVentaBtnFactura.tipoVentaBtnActivo {
+  background: rgba(0,232,122,0.08);
+  border-color: #00E87A; color: #00E87A;
+}
+
+/* ── CHECKBOX PAGA AL CONTADO ── */
+.contadoWrap {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 10px 12px;
+  background: rgba(255,184,0,0.05);
+  border: 1px solid rgba(255,184,0,0.25); cursor: pointer;
+}
+.contadoWrap input { cursor: pointer; accent-color: #FFB800; width: 16px; height: 16px; }
+.contadoLabel {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  color: #FFB800;
+}
+
+/* ── TIPO FACTURA A/B ── */
+.tipoFacturaWrap { display: flex; gap: 0; }
+.tipoFacturaBtn {
+  flex: 1; padding: 12px 8px; background: transparent;
+  border: 1px solid rgba(0,200,240,0.18); border-right: none;
+  color: rgba(200,228,244,0.45);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.tipoFacturaBtn:last-child { border-right: 1px solid rgba(0,200,240,0.18); }
+.tipoFacturaBtnActivo {
+  background: rgba(0,232,122,0.08);
+  border-color: #00E87A; color: #00E87A;
+}
+.tipoFacturaDesc {
+  font-family: "Barlow", sans-serif;
+  font-size: 10px; text-transform: none; letter-spacing: 0;
+  color: rgba(200,228,244,0.35); display: block; margin-top: 2px;
+}
+
+/* ── BOTÓN REGISTRAR VARIANTES ── */
+.btnRegistrarFactura {
+  width: 100%; padding: 15px; background: #00E87A; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  border: none; cursor: pointer; margin-top: 8px;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 0 20px rgba(0,232,122,0.25);
+}
+.btnRegistrarFactura:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.btnRegistrarFactura:disabled { opacity: 0.50; cursor: not-allowed; }
+.btnRegistrarPresupuesto {
+  width: 100%; padding: 15px; background: #FFB800; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  border: none; cursor: pointer; margin-top: 8px;
+  clip-path: polygon(8px 0%,100% 0%,100% calc(100% - 8px),calc(100% - 8px) 100%,0% 100%,0% 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 0 20px rgba(255,184,0,0.25);
+}
+.btnRegistrarPresupuesto:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.btnRegistrarPresupuesto:disabled { opacity: 0.50; cursor: not-allowed; }
+
+/* ── RESULTADO FACTURA ── */
+.resultadoFacturaWrap {
+  display: flex; align-items: flex-start; gap: 20px; padding: 24px;
+  background: rgba(0,232,122,0.05); border: 1px solid rgba(0,232,122,0.25);
+  margin-bottom: 20px;
+}
+.resultadoPresupuestoWrap {
+  display: flex; align-items: flex-start; gap: 20px; padding: 24px;
+  background: rgba(255,184,0,0.05); border: 1px solid rgba(255,184,0,0.25);
+  margin-bottom: 20px;
+}
+.resultadoFacturaTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00E87A; margin-bottom: 12px;
+}
+.resultadoPresupuestoTitulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: #FFB800; margin-bottom: 12px;
+}
+.btnDescargarPDF {
+  padding: 8px 16px; background: transparent;
+  border: 1px solid rgba(0,200,240,0.35); color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; margin-top: 8px;
+}
+.btnDescargarPDF:hover { background: rgba(0,200,240,0.08); }
+
+
+
 /* ── RESPONSIVE 1023px ── */
 @media (max-width: 1023px) {
   .mainGrid { grid-template-columns: 1fr; }
@@ -530,6 +649,12 @@
   .contenido { padding: 16px; }
   .mainGrid { grid-template-columns: 1fr; }
   .filtrosWrap { flex-wrap: wrap; }
+  .tipoVentaWrap { flex-direction: column; }
+  .tipoVentaBtn { border-right: 1px solid rgba(0,200,240,0.18); border-bottom: none; }
+  .tipoVentaBtn:last-child { border-bottom: 1px solid rgba(0,200,240,0.18); }
+  .tipoFacturaWrap { flex-direction: column; }
+  .tipoFacturaBtn { border-right: 1px solid rgba(0,200,240,0.18); border-bottom: none; }
+  .tipoFacturaBtn:last-child { border-bottom: 1px solid rgba(0,200,240,0.18); }
 }
 
 /* ── RESPONSIVE 600px ── */
@@ -540,6 +665,16 @@
   .itemRow { flex-direction: column; align-items: flex-start; gap: 8px; }
   .itemControles { width: 100%; justify-content: space-between; }
   .resultadoWrap { flex-direction: column; }
+  .tipoVentaWrap { flex-direction: row; }
+  .tipoVentaBtn { padding: 8px 4px; font-size: 10px; }
+  .tipoVentaBtn:last-child { border-right: 1px solid rgba(0,200,240,0.18); }
+  .tipoFacturaWrap { flex-direction: row; }
+  .tipoFacturaBtn { padding: 10px 4px; font-size: 11px; }
+  .contadoWrap { padding: 8px 10px; }
+  .contadoLabel { font-size: 11px; }
+  .btnRegistrarFactura { font-size: 12px; padding: 13px; }
+  .btnRegistrarPresupuesto { font-size: 12px; padding: 13px; }
+  .btnDescargarPDF { width: 100%; text-align: center; }
 
   .filtrosWrap {
     flex-direction: column;

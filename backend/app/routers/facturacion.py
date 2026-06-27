@@ -248,19 +248,7 @@ async def emitir_factura(datos: FacturaCreate):
             for item in datos.items
         ]).execute()
 
-        # PASO 8: Actualizar stock
-        for item in datos.items:
-            supabase.table("movimientos_stock").insert({
-                "producto_id": item.producto_id,
-                "tipo":        "salida",
-                "cantidad":    item.cantidad,
-                "motivo":      f"Factura {numero_str}",
-                "factura_id":  factura_id,
-            }).execute()
-            prod = supabase.table("productos").select("stock_actual").eq("id", item.producto_id).single().execute()
-            supabase.table("productos").update({
-                "stock_actual": prod.data["stock_actual"] - item.cantidad
-            }).eq("id", item.producto_id).execute()
+        
 
         return {
             "ok":         True,
