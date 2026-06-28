@@ -660,6 +660,22 @@
 }
 .badgeFacturaBtn:hover { background: rgba(0,232,122,0.18); }
 
+/* ── COLUMNA PDF ── */
+.tdPDF {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 14px;
+}
+.btnDescargarPDFFactura {
+  padding: 5px 10px; background: transparent;
+  border: 1px solid rgba(0,232,122,0.35); color: #00E87A;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btnDescargarPDFFactura:hover { background: rgba(0,232,122,0.08); }
+
 
 /* ── RESPONSIVE 1023px ── */
 @media (max-width: 1023px) {

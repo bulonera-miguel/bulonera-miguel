@@ -786,6 +786,7 @@ export default function Ventas() {
                       <th>Factura</th>
                       <th>Total</th>
                       <th>PDF</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -799,29 +800,34 @@ export default function Ventas() {
                           {v.clientes?.nombre || 'Consumidor Final'}
                         </td>
                         <td onClick={() => verDetalle(v)}>{fmtF(v.fecha)}</td>
-                        <td>
+                        <td onClick={() => verDetalle(v)}>
                           {v.factura_id
-                            ? <button
-                                className={styles.badgeFacturaBtn}
-                                onClick={() => descargarPDFFactura(v.factura_id)}
-                                title="Descargar PDF de la factura"
-                              >
-                                ✓ Con factura ↓
-                              </button>
+                            ? <span className={styles.badgeFactura}>✓ Con factura</span>
                             : '—'}
                         </td>
                         <td className={styles.tdTotal}
                           onClick={() => verDetalle(v)}>
                           {fmtP(v.total)}
                         </td>
-                        <td>
+                        <td className={styles.tdPDF}>
                           <button
                             className={styles.btnDescargarPDF}
                             onClick={() => descargarPDFVenta(v.id)}
-                            title="Descargar PDF de esta venta"
+                            title="Descargar comprobante de venta"
                           >
-                            ↓ PDF
+                            ↓ Venta
                           </button>
+                          {v.factura_id && (
+                            <button
+                              className={styles.btnDescargarPDFFactura}
+                              onClick={() => descargarPDFFactura(v.factura_id)}
+                              title="Descargar PDF de la factura"
+                            >
+                              ↓ Factura
+                            </button>
+                          )}
+                        </td>
+                        <td>
                           <button
                             className={styles.btnEliminarVenta}
                             onClick={() => eliminarVenta(v.id, !!v.factura_id)}
@@ -860,18 +866,28 @@ export default function Ventas() {
                         )}
                       </div>
                       <div className={styles.tarjetaFila} style={{ marginTop: 8 }}>
-                        <button
-                          className={styles.btnDescargarPDF}
-                          onClick={() => descargarPDFVenta(v.id)}
-                        >
-                          ↓ PDF
-                        </button>
-                        <button
-                          className={styles.btnEliminarVenta}
-                          onClick={() => eliminarVenta(v.id, !!v.factura_id)}
-                        >
-                          ✕ Eliminar
-                        </button>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            className={styles.btnDescargarPDF}
+                            onClick={() => descargarPDFVenta(v.id)}
+                          >
+                            ↓ Venta
+                          </button>
+                          {v.factura_id && (
+                            <button
+                              className={styles.btnDescargarPDFFactura}
+                              onClick={() => descargarPDFFactura(v.factura_id)}
+                            >
+                              ↓ Factura
+                            </button>
+                          )}
+                          <button
+                            className={styles.btnEliminarVenta}
+                            onClick={() => eliminarVenta(v.id, !!v.factura_id)}
+                          >
+                            ✕
+                          </button>
+                        </div>
                         <div className={styles.tarjetaVerDetalle}
                           onClick={() => verDetalle(v)}>
                           Ver detalle ›
