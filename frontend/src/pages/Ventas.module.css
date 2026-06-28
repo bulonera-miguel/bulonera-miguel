@@ -632,11 +632,12 @@
   color: #FFB800; margin-bottom: 12px;
 }
 .btnDescargarPDF {
-  padding: 8px 16px; background: transparent;
+  padding: 0 10px; height: 28px; background: transparent;
   border: 1px solid rgba(0,200,240,0.35); color: #00C8F0;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center;
 }
 .btnDescargarPDF:hover { background: rgba(0,200,240,0.08); }
 
@@ -669,12 +670,14 @@
   align-items: center;
   flex-wrap: wrap;
 }
+
 .btnDescargarPDFFactura {
-  padding: 5px 10px; background: transparent;
+  padding: 0 10px; height: 28px; background: transparent;
   border: 1px solid rgba(0,232,122,0.35); color: #00E87A;
   font-family: "Barlow Condensed", sans-serif;
   font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
   cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center;
 }
 .btnDescargarPDFFactura:hover { background: rgba(0,232,122,0.08); }
 
