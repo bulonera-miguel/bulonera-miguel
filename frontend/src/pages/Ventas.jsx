@@ -35,7 +35,7 @@ export default function Ventas() {
   const [mostrarSugerC, setMostrarSugerC] = useState(false)
   const [clienteEsCC, setClienteEsCC]     = useState(false)
   const [pagaContado, setPagaContado]     = useState(false)
-  const [fecha, setFecha]                 = useState(new Date().toISOString().split('T')[0])
+  const [fecha, setFecha]                 = useState(new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' })).toISOString().split('T')[0])
   const [observaciones, setObservaciones] = useState('')
   const [items, setItems]                 = useState([])
   const [busqProd, setBusqProd]           = useState('')
