@@ -67,12 +67,12 @@ async def _calcular_flujo(desde_query: date, hasta_query: date) -> list:
         monto      = float(v["total"])
         paga_contado = v.get("paga_contado", False)
 
-    # Entra como ingreso si:
-    # - no tiene cliente, o
-    # - el cliente no es CC, o
-    # - el cliente es CC pero marcó "paga al contado"
-    if not cliente_id or cliente_id not in ids_clientes_cc or paga_contado:
-        agregar(mes_key, "ingresos_contado", monto)
+        # Entra como ingreso si:
+        # - no tiene cliente, o
+        # - el cliente no es CC, o
+        # - el cliente es CC pero marcó "paga al contado"
+        if not cliente_id or cliente_id not in ids_clientes_cc or paga_contado:
+            agregar(mes_key, "ingresos_contado", monto)
 
     # Pagos CC clientes
     pagos_cc_res = (
