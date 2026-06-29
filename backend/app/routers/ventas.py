@@ -36,6 +36,7 @@ class VentaCreate(BaseModel):
     fecha:         Optional[str] = None
     observaciones: Optional[str] = None
     factura_id:    Optional[str] = None
+    paga_contado:  bool = False
     items:         List[ItemVenta]
 
 
@@ -91,6 +92,7 @@ async def registrar_venta(datos: VentaCreate):
                 "total":         total,
                 "factura_id":    datos.factura_id,
                 "observaciones": datos.observaciones,
+                "paga_contado":  datos.paga_contado,   # ← agregar esta línea
             })
             .execute()
         )

@@ -207,6 +207,7 @@ export default function Ventas() {
         cliente_id:    cliente?.id || null,
         fecha,
         observaciones: observaciones || null,
+        paga_contado:  pagaContado,
         items: items.map(i => ({
           producto_id:     i.producto_id,
           cantidad:        i.cantidad,

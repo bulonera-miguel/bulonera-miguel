@@ -55,18 +55,24 @@ async def _calcular_flujo(desde_query: date, hasta_query: date) -> list:
 
     # Ventas al contado
     ventas_res = (
-        supabase.table("ventas")
-        .select("cliente_id, total, fecha")
-        .gte("fecha", desde_query.isoformat())
-        .lte("fecha", hasta_query.isoformat())
-        .execute()
+    supabase.table("ventas")
+    .select("cliente_id, total, fecha, paga_contado")
+    .gte("fecha", desde_query.isoformat())
+    .lte("fecha", hasta_query.isoformat())
+    .execute()
     )
     for v in (ventas_res.data or []):
-        mes_key = v["fecha"][:7]
+        mes_key    = v["fecha"][:7]
         cliente_id = v.get("cliente_id")
-        monto = float(v["total"])
-        if not cliente_id or cliente_id not in ids_clientes_cc:
-            agregar(mes_key, "ingresos_contado", monto)
+        monto      = float(v["total"])
+        paga_contado = v.get("paga_contado", False)
+
+    # Entra como ingreso si:
+    # - no tiene cliente, o
+    # - el cliente no es CC, o
+    # - el cliente es CC pero marcó "paga al contado"
+    if not cliente_id or cliente_id not in ids_clientes_cc or paga_contado:
+        agregar(mes_key, "ingresos_contado", monto)
 
     # Pagos CC clientes
     pagos_cc_res = (
