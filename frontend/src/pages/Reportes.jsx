@@ -59,7 +59,7 @@ export default function Reportes() {
   const [cargando, setCargando]             = useState(false)
   const [error, setError]                   = useState(null)
   const [filaResaltada, setFilaResaltada]   = useState(null)
-  const [vista, setVista]                   = useState('ambos')
+  const [vista, setVista] = useState('tabla')
 
   const [filtros, setFiltros] = useState({
     desde:        '',
@@ -802,9 +802,9 @@ export default function Reportes() {
           <div className={styles.vistaToggle}>
             <span className={styles.vistaLabel}>Vista:</span>
             {[
-              { id: 'ambos',   label: '▦ Tabla + Gráficos' },
               { id: 'tabla',   label: '≡ Solo tabla'        },
               { id: 'grafico', label: '◉ Solo gráficos'     },
+              { id: 'ambos',   label: '▦ Tabla + Gráficos'  },
             ].map(v => (
               <button key={v.id}
                 className={`${styles.vistaBtn} ${vista === v.id ? styles.vistaBtnActivo : ''}`}

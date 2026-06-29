@@ -281,12 +281,24 @@ export default function Clientes() {
               <div className={styles.estado}>{busqueda ? 'Sin resultados' : 'No hay clientes registrados'}</div>
             ) : (
               <table className={styles.tabla}>
-                <thead><tr><th>Nombre</th><th>CUIT</th><th>Teléfono</th><th>Email</th><th>Tipo fact.</th><th>Cta. Cte.</th><th>Acciones</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>CUIT</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Tipo fact.</th>
+                    <th>Cta. Cte.</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {clientes.map(c => (
                     <tr key={c.id} className={styles.tablaFila}>
                       <td className={styles.tdNombre}>{c.nombre}</td>
                       <td className={styles.tdSub}>{c.cuit || '—'}</td>
+                      <td className={styles.tdSub}>{c.direccion || '—'}</td>
                       <td className={styles.tdSub}>{c.telefono || '—'}</td>
                       <td className={styles.tdSub}>{c.email || '—'}</td>
                       <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
