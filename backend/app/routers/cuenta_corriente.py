@@ -30,7 +30,8 @@ def calcular_saldo(cliente_id: str, ventas: list, pagos: list) -> float:
     saldo > 0 → cliente debe plata
     saldo < 0 → cliente tiene saldo a favor
     """
-    total_ventas = sum(float(v["total"]) for v in ventas)
+    # Excluir ventas que ya pagaron al contado
+    total_ventas = sum(float(v["total"]) for v in ventas if not v.get("paga_contado", False))
     total_pagos  = sum(float(p["monto"]) for p in pagos)
     return round(total_ventas - total_pagos, 2)
 
@@ -72,7 +73,7 @@ async def listar_cuenta_corriente():
             # Ventas del cliente (todas, no pagadas aún consideramos el total)
             ventas_res = (
                 supabase.table("ventas")
-                .select("id, total, fecha")
+                .select("id, total, fecha, paga_contado")
                 .eq("cliente_id", cid)
                 .execute()
             )
@@ -135,7 +136,7 @@ async def detalle_cuenta_corriente(
         # Ventas — con filtro de fecha opcional
         q_ventas = (
             supabase.table("ventas")
-            .select("id, total, fecha")
+            .select("id, total, fecha, paga_contado")
             .eq("cliente_id", cliente_id)
             .order("fecha", desc=True)
         )
@@ -161,7 +162,7 @@ async def detalle_cuenta_corriente(
         # Saldo siempre sobre el total histórico (sin filtro de fecha)
         todas_ventas = (
             supabase.table("ventas")
-            .select("total")
+            .select("total, paga_contado")
             .eq("cliente_id", cliente_id)
             .execute()
         ).data or []
