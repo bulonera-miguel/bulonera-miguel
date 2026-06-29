@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { ventasApi, facturacionApi, productosApi } from '../services/api'
 import styles from './Ventas.module.css'
+import ModalConfirm from '../components/ModalConfirm'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -65,6 +66,9 @@ export default function Ventas() {
 
   const [presupuestoDetalle, setPresupuestoDetalle] = useState(null)
   const [detalleItemsPres, setDetalleItemsPres]     = useState([])
+
+  const [modalConfirm, setModalConfirm] = useState(null)
+// modalConfirm: { titulo, mensaje, onConfirmar, peligroso } | null
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
@@ -317,41 +321,40 @@ export default function Ventas() {
   }
 
   // ── ELIMINAR VENTA ────────────────────────────────────────
-const eliminarVenta = async (ventaId, tieneFactura) => {
-  const mensaje = tieneFactura
-    ? '⚠ Esta venta tiene una factura emitida en ARCA. El sistema eliminará la venta y restaurará el stock, pero recordá que debés emitir la Nota de Crédito manualmente en ARCA. ¿Confirmás?'
-    : '¿Confirmás que querés eliminar esta venta? El stock será restaurado automáticamente.'
-  if (!window.confirm(mensaje)) return
-  try {
-    const res = await fetch(`${BASE_URL}/api/ventas/eliminar/${ventaId}`, {
-      method: 'DELETE',
+  const eliminarVenta = (ventaId, tieneFactura) => {
+    setModalConfirm({
+      titulo:    'Eliminar venta',
+      mensaje:   tieneFactura
+        ? 'Esta venta tiene una factura emitida en ARCA. El sistema eliminará la venta y restaurará el stock, pero recordá emitir la Nota de Crédito manualmente en ARCA.'
+        : 'Se eliminará la venta y el stock será restaurado automáticamente.',
+      peligroso: true,
+      onConfirmar: async () => {
+        setModalConfirm(null)
+        try {
+          const res = await fetch(`${BASE_URL}/api/ventas/eliminar/${ventaId}`, { method: 'DELETE' })
+          if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
+          cargarHistorial()
+        } catch (e) { alert(`Error: ${e.message}`) }
+      }
     })
-    if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err.detail || 'Error al eliminar')
-    }
-    cargarHistorial()
-  } catch (e) {
-    alert(`Error: ${e.message}`)
   }
-}
 
 // ── ELIMINAR PRESUPUESTO ──────────────────────────────────
-const eliminarPresupuesto = async (presupuestoId) => {
-  if (!window.confirm('¿Confirmás que querés eliminar este presupuesto?')) return
-  try {
-    const res = await fetch(`${BASE_URL}/api/ventas/presupuestos/eliminar/${presupuestoId}`, {
-      method: 'DELETE',
+  const eliminarPresupuesto = (presupuestoId) => {
+    setModalConfirm({
+      titulo:    'Eliminar presupuesto',
+      mensaje:   'Se eliminará el presupuesto permanentemente.',
+      peligroso: true,
+      onConfirmar: async () => {
+        setModalConfirm(null)
+        try {
+          const res = await fetch(`${BASE_URL}/api/ventas/presupuestos/eliminar/${presupuestoId}`, { method: 'DELETE' })
+          if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
+          cargarPresupuestos()
+        } catch (e) { alert(`Error: ${e.message}`) }
+      }
     })
-    if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err.detail || 'Error al eliminar')
-    }
-    cargarPresupuestos()
-  } catch (e) {
-    alert(`Error: ${e.message}`)
   }
-}
 
   // ── VER DETALLE VENTA ─────────────────────────────────────
   const verDetalle = async (venta) => {
@@ -1185,6 +1188,16 @@ const eliminarPresupuesto = async (presupuestoId) => {
             </div>
           </div>
         </div>
+      )}
+
+      {modalConfirm && (
+        <ModalConfirm
+          titulo={modalConfirm.titulo}
+          mensaje={modalConfirm.mensaje}
+          peligroso={modalConfirm.peligroso}
+          onConfirmar={modalConfirm.onConfirmar}
+          onCancelar={() => setModalConfirm(null)}
+        />
       )}
 
     </div>

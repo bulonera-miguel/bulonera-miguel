@@ -1,0 +1,80 @@
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(7,17,31,0.88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: #0D1F2D;
+  border: 1px solid rgba(0,200,240,0.20);
+  width: 100%; max-width: 420px;
+  padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.header {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.iconoPeligro {
+  font-size: 22px; color: #FF4444;
+}
+
+.iconoInfo {
+  font-size: 22px; color: #00C8F0;
+}
+
+.titulo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 16px; letter-spacing: 2px; text-transform: uppercase;
+  color: #EAF4FF; margin: 0;
+}
+
+.mensaje {
+  font-family: "Barlow", sans-serif;
+  font-size: 13px; color: rgba(200,228,244,0.75);
+  line-height: 1.6; margin: 0;
+  border-left: 2px solid rgba(0,200,240,0.25);
+  padding-left: 12px;
+}
+
+.acciones {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,200,240,0.10);
+}
+
+.btnCancelar {
+  padding: 9px 20px;
+  background: transparent;
+  border: 1px solid rgba(200,228,244,0.18);
+  color: rgba(200,228,244,0.55);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btnCancelar:hover {
+  border-color: rgba(200,228,244,0.40);
+  color: #EAF4FF;
+}
+
+.btnConfirmar {
+  padding: 9px 20px;
+  background: #00C8F0; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer; transition: opacity 0.2s;
+  clip-path: polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
+}
+.btnConfirmar:hover { opacity: 0.85; }
+
+.btnPeligro {
+  padding: 9px 20px;
+  background: #FF4444; color: #fff;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer; transition: opacity 0.2s;
+  clip-path: polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
+}
+.btnPeligro:hover { opacity: 0.85; }

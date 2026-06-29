@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import { facturacionApi, productosApi } from '../services/api'
 import styles from './Facturacion.module.css'
+import ModalConfirm from '../components/ModalConfirm'
 
 const TABS = [
   { id: 'historial', label: '≡ Historial' },
@@ -49,6 +50,7 @@ export default function Facturacion() {
   const [enviandoEmail, setEnviandoEmail] = useState(false)
   const [emailFeedback, setEmailFeedback] = useState(null)
   // emailFeedback: { ok: bool, mensaje: string } | null
+  const [modalConfirm, setModalConfirm] = useState(null)
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
@@ -67,21 +69,23 @@ export default function Facturacion() {
     }
   }
 
-  const eliminarFactura = async (facturaId) => {
-    if (!window.confirm('¿Confirmás que querés eliminar esta factura? Esta acción no anula el comprobante en ARCA.')) return
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${facturaId}`,
-        { method: 'DELETE' }
-      )
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.detail || 'Error al eliminar')
+  const eliminarFactura = (facturaId) => {
+    setModalConfirm({
+      titulo:    'Eliminar factura',
+      mensaje:   'Se eliminará la factura del sistema. Recordá que esta acción no anula el comprobante en ARCA.',
+      peligroso: true,
+      onConfirmar: async () => {
+        setModalConfirm(null)
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${facturaId}`,
+            { method: 'DELETE' }
+          )
+          if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
+          cargarHistorial()
+        } catch (e) { alert(`Error: ${e.message}`) }
       }
-      cargarHistorial()
-    } catch (e) {
-      alert(`Error: ${e.message}`)
-    }
+    })
   }
 
   // ── BUSCADOR CLIENTES ─────────────────────────────────────
@@ -842,6 +846,16 @@ export default function Facturacion() {
             )}
           </div>
         </div>
+      )}
+
+      {modalConfirm && (
+        <ModalConfirm
+          titulo={modalConfirm.titulo}
+          mensaje={modalConfirm.mensaje}
+          peligroso={modalConfirm.peligroso}
+          onConfirmar={modalConfirm.onConfirmar}
+          onCancelar={() => setModalConfirm(null)}
+        />
       )}
 
     </div>
