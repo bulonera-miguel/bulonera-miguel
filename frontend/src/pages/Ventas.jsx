@@ -11,8 +11,9 @@ import styles from './Ventas.module.css'
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const TABS = [
-  { id: 'nueva',     label: '+ Nueva venta' },
-  { id: 'historial', label: '≡ Historial'   },
+  { id: 'nueva',        label: '+ Nueva venta'  },
+  { id: 'ventas',       label: '≡ Ventas'        },
+  { id: 'presupuestos', label: '≡ Presupuestos'  },
 ]
 
 const TIPOS_VENTA = [
@@ -59,11 +60,13 @@ export default function Ventas() {
   const [filtroDesde, setFiltroDesde] = useState('')
   const [filtroHasta, setFiltroHasta] = useState('')
   const [ventaDetalle, setVentaDetalle] = useState(null)
+  const [presupuestos, setPresupuestos] = useState([])
   const [detalleItems, setDetalleItems] = useState([])
 
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
-    if (tab === 'historial') cargarHistorial()
+    if (tab === 'ventas') cargarHistorial()
+    if (tab === 'presupuestos') cargarPresupuestos()
   }, [tab])
 
   const cargarHistorial = async (params = {}) => {
@@ -77,6 +80,22 @@ export default function Ventas() {
       setCargandoHist(false)
     }
   }
+
+  const cargarPresupuestos = async (params = {}) => {
+  try {
+    setCargandoHist(true)
+    const query = new URLSearchParams()
+    if (params.desde) query.append('desde', params.desde)
+    if (params.hasta) query.append('hasta', params.hasta)
+    const res = await fetch(`${BASE_URL}/api/ventas/presupuestos?${query.toString()}`)
+    const data = await res.json()
+    setPresupuestos(data)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    setCargandoHist(false)
+  }
+}
 
   // ── BUSCADOR CLIENTES ─────────────────────────────────────
   useEffect(() => {
@@ -784,7 +803,7 @@ const eliminarPresupuesto = async (presupuestoId) => {
         )}
 
         {/* ══════ TAB: HISTORIAL ══════ */}
-        {tab === 'historial' && (
+        {tab === 'ventas' && (
           <div>
             <div className={styles.filtrosWrap}>
               <div className={styles.filtroGrupo}>
@@ -933,6 +952,81 @@ const eliminarPresupuesto = async (presupuestoId) => {
                     </div>
                   ))}
                 </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ══════ TAB: PRESUPUESTOS ══════ */}
+        {tab === 'presupuestos' && (
+          <div>
+            <div className={styles.filtrosWrap}>
+              <div className={styles.filtroGrupo}>
+                <label>Desde</label>
+                <input type="date" className={styles.filtroInput}
+                  value={filtroDesde} onChange={e => setFiltroDesde(e.target.value)} />
+              </div>
+              <div className={styles.filtroGrupo}>
+                <label>Hasta</label>
+                <input type="date" className={styles.filtroInput}
+                  value={filtroHasta} onChange={e => setFiltroHasta(e.target.value)} />
+              </div>
+              <button className={styles.btnFiltrar}
+                onClick={() => cargarPresupuestos({ desde: filtroDesde, hasta: filtroHasta })}>
+                ▶ Filtrar
+              </button>
+              <button className={styles.btnLimpiarFiltro}
+                onClick={() => { setFiltroDesde(''); setFiltroHasta(''); cargarPresupuestos() }}>
+                ✕ Limpiar
+              </button>
+            </div>
+
+            {cargandoHist ? (
+              <div className={styles.estado}>Cargando presupuestos...</div>
+            ) : presupuestos.length === 0 ? (
+              <div className={styles.estado}>No hay presupuestos registrados</div>
+            ) : (
+              <>
+                <table className={styles.tabla}>
+                  <thead>
+                    <tr>
+                      <th>Número</th>
+                      <th>Cliente</th>
+                      <th>Fecha</th>
+                      <th>Validez</th>
+                      <th>Total</th>
+                      <th>PDF</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {presupuestos.map(p => (
+                      <tr key={p.id} className={styles.tablaFila}>
+                        <td className={styles.tdNumero}>PRES-{p.id.slice(0,8).toUpperCase()}</td>
+                        <td>{p.clientes?.nombre || 'Sin especificar'}</td>
+                        <td>{fmtF(p.fecha)}</td>
+                        <td>{p.validez_dias} días</td>
+                        <td className={styles.tdTotal}>{fmtP(p.total)}</td>
+                        <td className={styles.tdPDF}>
+                          <button
+                            className={styles.btnDescargarPDF}
+                            onClick={() => descargarPDFPresupuesto(p.id)}
+                          >
+                            ↓ PDF
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            className={styles.btnEliminarVenta}
+                            onClick={() => eliminarPresupuesto(p.id)}
+                          >
+                            ✕ Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </>
             )}
           </div>

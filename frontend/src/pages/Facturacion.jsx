@@ -67,6 +67,23 @@ export default function Facturacion() {
     }
   }
 
+  const eliminarFactura = async (facturaId) => {
+    if (!window.confirm('¿Confirmás que querés eliminar esta factura? Esta acción no anula el comprobante en ARCA.')) return
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/facturacion/facturas/${facturaId}`,
+        { method: 'DELETE' }
+      )
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.detail || 'Error al eliminar')
+      }
+      cargarHistorial()
+    } catch (e) {
+      alert(`Error: ${e.message}`)
+    }
+  }
+
   // ── BUSCADOR CLIENTES ─────────────────────────────────────
   useEffect(() => {
     if (busqCliente.trim().length < 2) { setMostrarSugerC(false); return }
@@ -624,6 +641,16 @@ export default function Facturacion() {
                           {f.email_enviado_a && (
                             <span className={styles.emailEnviadoDot} title={`Enviada a ${f.email_enviado_a}`}>●</span>
                           )}
+                        </button>
+                        <button
+                          className={styles.btnEliminarVenta}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            eliminarFactura(f.id)
+                          }}
+                          title="Eliminar factura (no anula en ARCA)"
+                        >
+                          ✕ Eliminar
                         </button>
                       </td>
                     </tr>

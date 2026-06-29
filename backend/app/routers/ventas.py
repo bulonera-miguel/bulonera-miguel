@@ -662,6 +662,31 @@ async def crear_presupuesto(datos: PresupuestoCreate):
 
 # ─── PDF DE PRESUPUESTO ───────────────────────────────────────────────────────
 
+@router.get("/presupuestos", response_model=list[dict])
+async def listar_presupuestos(
+    desde: Optional[date] = Query(None),
+    hasta: Optional[date] = Query(None),
+):
+    try:
+        query = (
+            supabase.table("presupuestos")
+            .select("*, clientes(nombre, cuit)")
+            .order("fecha", desc=True)
+            .order("created_at", desc=True)
+        )
+        if desde:
+            query = query.gte("fecha", desde.isoformat())
+        if hasta:
+            query = query.lte("fecha", hasta.isoformat())
+
+        response = query.limit(200).execute()
+        return response.data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al listar presupuestos: {str(e)}")
+
+
+
 @router.get("/presupuestos/{presupuesto_id}/pdf")
 async def pdf_presupuesto(presupuesto_id: str):
     try:

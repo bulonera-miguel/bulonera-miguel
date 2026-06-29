@@ -513,6 +513,21 @@ async def enviar_email_factura(factura_id: str, datos: EmailRequest):
         )
     
 
+@router.delete("/facturas/{factura_id}")
+async def eliminar_factura(factura_id: str):
+    try:
+        fac = supabase.table("facturas").select("id").eq("id", factura_id).single().execute()
+        if not fac.data:
+            raise HTTPException(status_code=404, detail="Factura no encontrada")
+        supabase.table("factura_items").delete().eq("factura_id", factura_id).execute()
+        supabase.table("facturas").delete().eq("id", factura_id).execute()
+        return {"ok": True, "mensaje": "Factura eliminada del sistema (recordá emitir Nota de Crédito en ARCA si corresponde)"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar factura: {str(e)}")
+
+
 @router.patch("/clientes/{cliente_id}")
 async def actualizar_cliente(cliente_id: str, datos: dict):
     try:
