@@ -293,6 +293,43 @@ export default function Ventas() {
     window.open(`${BASE_URL}/api/facturacion/facturas/${facturaId}/pdf`, '_blank')
   }
 
+  // ── ELIMINAR VENTA ────────────────────────────────────────
+const eliminarVenta = async (ventaId, tieneFactura) => {
+  const mensaje = tieneFactura
+    ? '⚠ Esta venta tiene una factura emitida en ARCA. El sistema eliminará la venta y restaurará el stock, pero recordá que debés emitir la Nota de Crédito manualmente en ARCA. ¿Confirmás?'
+    : '¿Confirmás que querés eliminar esta venta? El stock será restaurado automáticamente.'
+  if (!window.confirm(mensaje)) return
+  try {
+    const res = await fetch(`${BASE_URL}/api/ventas/eliminar/${ventaId}`, {
+      method: 'DELETE',
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.detail || 'Error al eliminar')
+    }
+    cargarHistorial()
+  } catch (e) {
+    alert(`Error: ${e.message}`)
+  }
+}
+
+// ── ELIMINAR PRESUPUESTO ──────────────────────────────────
+const eliminarPresupuesto = async (presupuestoId) => {
+  if (!window.confirm('¿Confirmás que querés eliminar este presupuesto?')) return
+  try {
+    const res = await fetch(`${BASE_URL}/api/ventas/presupuestos/eliminar/${presupuestoId}`, {
+      method: 'DELETE',
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.detail || 'Error al eliminar')
+    }
+    cargarHistorial()
+  } catch (e) {
+    alert(`Error: ${e.message}`)
+  }
+}
+
   // ── VER DETALLE VENTA ─────────────────────────────────────
   const verDetalle = async (venta) => {
     try {
