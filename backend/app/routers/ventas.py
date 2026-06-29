@@ -747,7 +747,60 @@ async def pdf_presupuesto(presupuesto_id: str):
     except Exception as e:
         raise HTTPException(status_code=500,
             detail=f"Error generando PDF de presupuesto: {str(e)}")
-    
+
+
+@router.get("/presupuestos/{presupuesto_id}/detalle", response_model=dict)
+async def detalle_presupuesto(presupuesto_id: str):
+    try:
+        pres = (
+            supabase.table("presupuestos")
+            .select("*, clientes(nombre, cuit)")
+            .eq("id", presupuesto_id)            
+            .execute()
+        )
+        if not pres.data:
+            raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
+
+        items = (
+            supabase.table("presupuesto_items")
+            .select("*, productos(codigo, nombre)")
+            .eq("presupuesto_id", presupuesto_id)
+            .execute()
+        )
+        return {**pres.data[0], "items": items.data or []}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener presupuesto: {str(e)}")
+
+
+
+# ─── ELIMINAR PRESUPUESTO ─────────────────────────────────────────────────────
+
+@router.delete("/presupuestos/eliminar/{presupuesto_id}")
+async def eliminar_presupuesto(presupuesto_id: str):
+    try:
+        pres = (
+            supabase.table("presupuestos")
+            .select("id")
+            .eq("id", presupuesto_id)
+            .execute()
+        )
+        if not pres.data or len(pres.data) == 0:
+            raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
+
+        supabase.table("presupuesto_items").delete().eq("presupuesto_id", presupuesto_id).execute()
+        supabase.table("presupuestos").delete().eq("id", presupuesto_id).execute()
+
+        return {"ok": True, "mensaje": "Presupuesto eliminado correctamente"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,
+            detail=f"Error al eliminar presupuesto: {str(e)}")
+
 
 # ─── PDF DE VENTA ─────────────────────────────────────────────────────────────
 
@@ -811,6 +864,7 @@ async def pdf_venta(venta_id: str):
         raise HTTPException(status_code=500,
             detail=f"Error generando PDF de venta: {str(e)}")
     
+
 
 # ─── DETALLE DE UNA VENTA ─────────────────────────────────────────────────────
 
@@ -902,57 +956,3 @@ async def eliminar_venta(venta_id: str):
             detail=f"Error al eliminar venta: {str(e)}")
 
 
-@router.get("/presupuestos/{presupuesto_id}/detalle", response_model=dict)
-async def detalle_presupuesto(presupuesto_id: str):
-    try:
-        pres = (
-            supabase.table("presupuestos")
-            .select("*, clientes(nombre, cuit)")
-            .eq("id", presupuesto_id)            
-            .execute()
-        )
-        if not pres.data:
-            raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
-
-        items = (
-            supabase.table("presupuesto_items")
-            .select("*, productos(codigo, nombre)")
-            .eq("presupuesto_id", presupuesto_id)
-            .execute()
-        )
-        return {**pres.data[0], "items": items.data or []}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener presupuesto: {str(e)}")
-
-
-
-
-
-
-# ─── ELIMINAR PRESUPUESTO ─────────────────────────────────────────────────────
-
-@router.delete("/presupuestos/eliminar/{presupuesto_id}")
-async def eliminar_presupuesto(presupuesto_id: str):
-    try:
-        pres = (
-            supabase.table("presupuestos")
-            .select("id")
-            .eq("id", presupuesto_id)
-            .execute()
-        )
-        if not pres.data or len(pres.data) == 0:
-            raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
-
-        supabase.table("presupuesto_items").delete().eq("presupuesto_id", presupuesto_id).execute()
-        supabase.table("presupuestos").delete().eq("id", presupuesto_id).execute()
-
-        return {"ok": True, "mensaje": "Presupuesto eliminado correctamente"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500,
-            detail=f"Error al eliminar presupuesto: {str(e)}")
