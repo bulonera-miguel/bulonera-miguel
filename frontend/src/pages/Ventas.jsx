@@ -346,7 +346,7 @@ const eliminarPresupuesto = async (presupuestoId) => {
       const err = await res.json()
       throw new Error(err.detail || 'Error al eliminar')
     }
-    cargarHistorial()
+    cargarPresupuestos()
   } catch (e) {
     alert(`Error: ${e.message}`)
   }
@@ -1022,7 +1022,7 @@ const eliminarPresupuesto = async (presupuestoId) => {
                         <td className={styles.tdPDF}>
                           <button
                             className={styles.btnDescargarPDF}
-                            onClick={() => descargarPDFPresupuesto(p.id)}
+                            onClick={(e) => { e.stopPropagation(); descargarPDFPresupuesto(p.id) }}
                           >
                             ↓ PDF
                           </button>
@@ -1030,7 +1030,7 @@ const eliminarPresupuesto = async (presupuestoId) => {
                         <td>
                           <button
                             className={styles.btnEliminarVenta}
-                            onClick={() => eliminarPresupuesto(p.id)}
+                            onClick={(e) => { e.stopPropagation(); eliminarPresupuesto(p.id) }}
                           >
                             ✕ Eliminar
                           </button>
