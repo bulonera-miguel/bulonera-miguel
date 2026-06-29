@@ -735,12 +735,22 @@
   .tarjetasList { display: flex; }
 
   .btnEliminarVenta {
-    margin-left: 0;
-    margin-top: 0;
-    text-align: center;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
+  margin-left: 0;
+  margin-top: 0;
+  text-align: center;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 10px;
+  }
+
+  .btnDescargarPDF {
+  padding: 0 8px;
+  font-size: 10px;
+  }
+  .tarjetaVerDetalle {
+  margin-top: 6px;
+  padding-top: 6px;
   }
 }
