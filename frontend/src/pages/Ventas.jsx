@@ -63,6 +63,9 @@ export default function Ventas() {
   const [presupuestos, setPresupuestos] = useState([])
   const [detalleItems, setDetalleItems] = useState([])
 
+  const [presupuestoDetalle, setPresupuestoDetalle] = useState(null)
+  const [detalleItemsPres, setDetalleItemsPres]     = useState([])
+
   // ── CARGAR HISTORIAL ──────────────────────────────────────
   useEffect(() => {
     if (tab === 'ventas') cargarHistorial()
@@ -355,6 +358,15 @@ const eliminarPresupuesto = async (presupuestoId) => {
       const data = await ventasApi.detalle(venta.id)
       setVentaDetalle(data)
       setDetalleItems(data.items || [])
+    } catch (e) { console.error(e) }
+  }
+
+  const verDetallePresupuesto = async (p) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/ventas/presupuestos/${p.id}/detalle`)
+      const data = await res.json()
+      setPresupuestoDetalle(data)
+      setDetalleItemsPres(data.items || [])
     } catch (e) { console.error(e) }
   }
 
@@ -1001,7 +1013,7 @@ const eliminarPresupuesto = async (presupuestoId) => {
                   </thead>
                   <tbody>
                     {presupuestos.map(p => (
-                      <tr key={p.id} className={styles.tablaFila}>
+                      <tr key={p.id} className={styles.tablaFila} onClick={() => verDetallePresupuesto(p)}>
                         <td className={styles.tdNumero}>PRES-{p.id.slice(0,8).toUpperCase()}</td>
                         <td>{p.clientes?.nombre || 'Sin especificar'}</td>
                         <td>{fmtF(p.fecha)}</td>
@@ -1096,6 +1108,75 @@ const eliminarPresupuesto = async (presupuestoId) => {
               <button
                 className={styles.btnDescargarPDF}
                 onClick={() => descargarPDFVenta(ventaDetalle.id)}
+                style={{ marginTop: 8 }}
+              >
+                ↓ Descargar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL DETALLE PRESUPUESTO ── */}
+      {presupuestoDetalle && (
+        <div className={styles.modalOverlay} onClick={() => setPresupuestoDetalle(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Presupuesto PRES-{presupuestoDetalle.id?.slice(0,8).toUpperCase()}</h3>
+              <button className={styles.modalCerrar}
+                onClick={() => setPresupuestoDetalle(null)}>✕</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.detalleRow}>
+                <span>Cliente</span>
+                <strong>{presupuestoDetalle.clientes?.nombre || 'Sin especificar'}</strong>
+              </div>
+              <div className={styles.detalleRow}>
+                <span>Fecha</span>
+                <strong>{fmtF(presupuestoDetalle.fecha)}</strong>
+              </div>
+              <div className={styles.detalleRow}>
+                <span>Validez</span>
+                <strong>{presupuestoDetalle.validez_dias} días</strong>
+              </div>
+              <div className={styles.detalleRow}>
+                <span>Total</span>
+                <strong className={styles.resultadoTotal}>{fmtP(presupuestoDetalle.total)}</strong>
+              </div>
+              {presupuestoDetalle.observaciones && (
+                <div className={styles.detalleRow}>
+                  <span>Observaciones</span>
+                  <strong>{presupuestoDetalle.observaciones}</strong>
+                </div>
+              )}
+              {detalleItemsPres.length > 0 && (
+                <div className={styles.detalleItemsWrap}>
+                  <div className={styles.detalleItemsTitulo}>Productos</div>
+                  <table className={styles.detalleItemsTabla}>
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detalleItemsPres.map((it, i) => (
+                        <tr key={i}>
+                          <td>{it.productos?.nombre || '—'}</td>
+                          <td className={styles.tdCenter}>{it.cantidad}</td>
+                          <td className={styles.tdRight}>{fmtP(it.precio_unitario)}</td>
+                          <td className={styles.tdRight}>{fmtP(it.subtotal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <button
+                className={styles.btnDescargarPDF}
+                onClick={() => descargarPDFPresupuesto(presupuestoDetalle.id)}
                 style={{ marginTop: 8 }}
               >
                 ↓ Descargar PDF
