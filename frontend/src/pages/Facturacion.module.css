@@ -696,6 +696,28 @@
   border-color: #00C8F0;
 }
 
+/* ── Botón Eliminar en historial ── */
+.btnEliminarFactura {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  color: #FF4444;
+  border: 1px solid rgba(255,68,68,0.35);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 6px;
+}
+.btnEliminarFactura:hover {
+  background: rgba(255,68,68,0.10);
+  border-color: #FF4444;
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE — TABLET 768px
 ══════════════════════════════════════ */

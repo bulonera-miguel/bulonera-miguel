@@ -643,7 +643,7 @@ export default function Facturacion() {
                           )}
                         </button>
                         <button
-                          className={styles.btnEliminarVenta}
+                          className={styles.btnEliminarFactura}
                           onClick={(e) => {
                             e.stopPropagation()
                             eliminarFactura(f.id)
