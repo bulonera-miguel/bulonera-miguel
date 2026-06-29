@@ -908,8 +908,7 @@ async def detalle_presupuesto(presupuesto_id: str):
         pres = (
             supabase.table("presupuestos")
             .select("*, clientes(nombre, cuit)")
-            .eq("id", presupuesto_id)
-            .single()
+            .eq("id", presupuesto_id)            
             .execute()
         )
         if not pres.data:
@@ -921,12 +920,16 @@ async def detalle_presupuesto(presupuesto_id: str):
             .eq("presupuesto_id", presupuesto_id)
             .execute()
         )
-        return {**pres.data, "items": items.data or []}
+        return {**pres.data[0], "items": items.data or []}
 
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener presupuesto: {str(e)}")
+
+
+
+
 
 
 # ─── ELIMINAR PRESUPUESTO ─────────────────────────────────────────────────────
@@ -938,10 +941,9 @@ async def eliminar_presupuesto(presupuesto_id: str):
             supabase.table("presupuestos")
             .select("id")
             .eq("id", presupuesto_id)
-            .single()
             .execute()
         )
-        if not pres.data:
+        if not pres.data or len(pres.data) == 0:
             raise HTTPException(status_code=404, detail="Presupuesto no encontrado")
 
         supabase.table("presupuesto_items").delete().eq("presupuesto_id", presupuesto_id).execute()
