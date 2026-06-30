@@ -70,6 +70,9 @@ export default function Reportes() {
   })
 
   const [filtroProveedor, setFiltroProveedor] = useState('')
+  const [agrupacion, setAgrupacion]     = useState('mes')
+  const [paginaActual, setPaginaActual] = useState(1)
+  const REGISTROS_POR_PAGINA           = 15
 
   // ── CARGAR CATEGORÍAS ────────────────────────────────────
   useEffect(() => {
@@ -95,6 +98,7 @@ export default function Reportes() {
       const p = new URLSearchParams()
       if (filtros.desde) p.append('desde', filtros.desde)
       if (filtros.hasta) p.append('hasta', filtros.hasta)
+      p.append('agrupacion', agrupacion)
       return `${BASE_URL}/api/flujo-caja/?${p.toString()}`
     }
     const params = new URLSearchParams()
@@ -126,6 +130,7 @@ export default function Reportes() {
       const p = new URLSearchParams()
       if (filtros.desde) p.append('desde', filtros.desde)
       if (filtros.hasta) p.append('hasta', filtros.hasta)
+      p.append('agrupacion', agrupacion)
       return `${BASE_URL}/api/flujo-caja/pdf?${p.toString()}`
     }
     // Reportes estándar
@@ -562,15 +567,20 @@ export default function Reportes() {
 
       // ── FLUJO DE CAJA ──────────────────────────────────────
       case 'flujo-caja': {
-        const totalIngresos = datos.reduce((s, d) => s + d.ingresos, 0)
-        const totalEgresos  = datos.reduce((s, d) => s + d.egresos,  0)
-        const totalNeto     = totalIngresos - totalEgresos
+        const datosPaginados = agrupacion === 'dia'
+          ? datos.slice((paginaActual - 1) * REGISTROS_POR_PAGINA, paginaActual * REGISTROS_POR_PAGINA)
+          : datos
+        const totalPaginas   = Math.ceil(datos.length / REGISTROS_POR_PAGINA)
+        const totalIngresos  = datos.reduce((s, d) => s + d.ingresos, 0)
+        const totalEgresos   = datos.reduce((s, d) => s + d.egresos,  0)
+        const totalNeto      = totalIngresos - totalEgresos
+
         return (
           <div className={styles.graficosWrap}>
             <div className={styles.graficoBloque}>
-              <div className={styles.graficoTitulo}>Ingresos vs Egresos por mes</div>
+              <div className={styles.graficoTitulo}>Ingresos vs Egresos</div>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={datos} barCategoryGap="25%">
+                <BarChart data={datosPaginados} barCategoryGap="25%">
                   <CartesianGrid strokeDasharray="3 3" stroke={C.dim} vertical={false} />
                   <XAxis dataKey="mes_nombre" tick={{ fill: C.textMid, fontSize: 10 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
@@ -581,9 +591,9 @@ export default function Reportes() {
               </ResponsiveContainer>
             </div>
             <div className={styles.graficoBloque}>
-              <div className={styles.graficoTitulo}>Resultado neto por mes</div>
+              <div className={styles.graficoTitulo}>Resultado neto</div>
               <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={datos}>
+                <LineChart data={datosPaginados}>
                   <CartesianGrid strokeDasharray="3 3" stroke={C.dim} />
                   <XAxis dataKey="mes_nombre" tick={{ fill: C.textMid, fontSize: 10 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: C.textMid, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
@@ -797,6 +807,23 @@ export default function Reportes() {
           </div>
         )}
 
+        {/* SELECTOR AGRUPACIÓN — solo flujo de caja */}
+        {reporteActivo === 'flujo-caja' && (
+          <div className={styles.vistaToggle} style={{ marginBottom: 8 }}>
+            <span className={styles.vistaLabel}>Agrupar por:</span>
+            {[
+              { id: 'mes', label: '≡ Por mes' },
+              { id: 'dia', label: '◉ Por día' },
+            ].map(a => (
+              <button key={a.id}
+                className={`${styles.vistaBtn} ${agrupacion === a.id ? styles.vistaBtnActivo : ''}`}
+                onClick={() => { setAgrupacion(a.id); setPaginaActual(1); }}>
+                {a.label}
+              </button>
+            ))}
+          </div>
+        )}
+        
         {/* TOGGLE VISTA */}
         {!cargando && datos.length > 0 && (
           <div className={styles.vistaToggle}>
@@ -840,6 +867,28 @@ export default function Reportes() {
                   <span className={styles.panelContador}>{datos.length} registros</span>
                 </div>
                 {renderTabla()}
+                {/* PAGINACIÓN — solo flujo de caja por día */}
+                {reporteActivo === 'flujo-caja' && agrupacion === 'dia' && datos.length > REGISTROS_POR_PAGINA && (
+                  <div className={styles.paginacion}>
+                    <button
+                      className={styles.btnPagina}
+                      onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
+                      disabled={paginaActual === 1}
+                    >
+                      ← Anterior
+                    </button>
+                    <span className={styles.paginaInfo}>
+                      Página {paginaActual} de {Math.ceil(datos.length / REGISTROS_POR_PAGINA)}
+                    </span>
+                    <button
+                      className={styles.btnPagina}
+                      onClick={() => setPaginaActual(p => Math.min(Math.ceil(datos.length / REGISTROS_POR_PAGINA), p + 1))}
+                      disabled={paginaActual === Math.ceil(datos.length / REGISTROS_POR_PAGINA)}
+                    >
+                      Siguiente →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             {(vista === 'ambos' || vista === 'grafico') && (

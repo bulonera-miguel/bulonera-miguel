@@ -1,11 +1,20 @@
 # ============================================================
 # routers/flujo_caja.py — Reporte Flujo de Caja
+# Bulonera Miguel
+#
+# Ingresos reales =
+#   ventas al contado (clientes SIN cuenta corriente)
+#   + pagos recibidos en cuenta corriente (pagos_cuenta_corriente)
+#
+# Egresos reales =
+#   compras al contado (proveedores SIN cuenta corriente)
+#   + pagos realizados en cuenta corriente (pagos_proveedores)
 # ============================================================
 
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from typing import Optional
-from datetime import date, timedelta
+from datetime import date
 import io
 from app.database import supabase
 from app.pdf_reportes import generar_pdf_reporte
@@ -20,32 +29,20 @@ NOMBRES_MES = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ]
 
-LIMITE_DIAS = 365
 
+async def _calcular_flujo(desde_query: date, hasta_query: date) -> list:
+    meses = {}
 
-def validar_rango(desde_query: date, hasta_query: date, agrupacion: str):
-    delta = (hasta_query - desde_query).days
-    if agrupacion == "dia" and delta > LIMITE_DIAS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"El rango máximo para vista diaria es 12 meses ({LIMITE_DIAS} días). "
-                   f"El rango seleccionado tiene {delta} días. Ajustá las fechas."
-        )
-
-
-async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str = "mes") -> list:
-    periodos = {}
-
-    def agregar(periodo_key, campo, monto):
-        if periodo_key not in periodos:
-            periodos[periodo_key] = {
-                "periodo":          periodo_key,
+    def agregar(mes_key, campo, monto):
+        if mes_key not in meses:
+            meses[mes_key] = {
+                "mes": mes_key,
                 "ingresos_contado": 0.0,
                 "ingresos_cc":      0.0,
                 "egresos_contado":  0.0,
                 "egresos_cc":       0.0,
             }
-        periodos[periodo_key][campo] += monto
+        meses[mes_key][campo] += monto
 
     # Clientes con CC
     clientes_cc_res = (
@@ -56,21 +53,26 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
     )
     ids_clientes_cc = {c["id"] for c in (clientes_cc_res.data or [])}
 
-    # Ventas
+    # Ventas al contado
     ventas_res = (
-        supabase.table("ventas")
-        .select("cliente_id, total, fecha, paga_contado")
-        .gte("fecha", desde_query.isoformat())
-        .lte("fecha", hasta_query.isoformat())
-        .execute()
+    supabase.table("ventas")
+    .select("cliente_id, total, fecha, paga_contado")
+    .gte("fecha", desde_query.isoformat())
+    .lte("fecha", hasta_query.isoformat())
+    .execute()
     )
     for v in (ventas_res.data or []):
-        periodo_key  = v["fecha"] if agrupacion == "dia" else v["fecha"][:7]
-        cliente_id   = v.get("cliente_id")
-        monto        = float(v["total"])
+        mes_key    = v["fecha"][:7]
+        cliente_id = v.get("cliente_id")
+        monto      = float(v["total"])
         paga_contado = v.get("paga_contado", False)
+
+        # Entra como ingreso si:
+        # - no tiene cliente, o
+        # - el cliente no es CC, o
+        # - el cliente es CC pero marcó "paga al contado"
         if not cliente_id or cliente_id not in ids_clientes_cc or paga_contado:
-            agregar(periodo_key, "ingresos_contado", monto)
+            agregar(mes_key, "ingresos_contado", monto)
 
     # Pagos CC clientes
     pagos_cc_res = (
@@ -81,8 +83,7 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
         .execute()
     )
     for p in (pagos_cc_res.data or []):
-        periodo_key = p["fecha"] if agrupacion == "dia" else p["fecha"][:7]
-        agregar(periodo_key, "ingresos_cc", float(p["monto"]))
+        agregar(p["fecha"][:7], "ingresos_cc", float(p["monto"]))
 
     # Proveedores con CC
     proveedores_cc_res = (
@@ -93,7 +94,7 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
     )
     ids_proveedores_cc = {p["id"] for p in (proveedores_cc_res.data or [])}
 
-    # Compras
+    # Compras al contado
     compras_res = (
         supabase.table("compras_proveedores")
         .select("proveedor_id, total, fecha")
@@ -102,11 +103,11 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
         .execute()
     )
     for c in (compras_res.data or []):
-        periodo_key  = c["fecha"] if agrupacion == "dia" else c["fecha"][:7]
+        mes_key = c["fecha"][:7]
         proveedor_id = c.get("proveedor_id")
-        monto        = float(c["total"])
+        monto = float(c["total"])
         if not proveedor_id or proveedor_id not in ids_proveedores_cc:
-            agregar(periodo_key, "egresos_contado", monto)
+            agregar(mes_key, "egresos_contado", monto)
 
     # Pagos CC proveedores
     pagos_prov_res = (
@@ -117,27 +118,18 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
         .execute()
     )
     for p in (pagos_prov_res.data or []):
-        periodo_key = p["fecha"] if agrupacion == "dia" else p["fecha"][:7]
-        agregar(periodo_key, "egresos_cc", float(p["monto"]))
+        agregar(p["fecha"][:7], "egresos_cc", float(p["monto"]))
 
     # Construir resultado
     resultado = []
-    for periodo_key, d in sorted(periodos.items()):
+    for mes_key, d in sorted(meses.items()):
+        anio, nm = mes_key.split("-")
         ingresos = round(d["ingresos_contado"] + d["ingresos_cc"], 2)
         egresos  = round(d["egresos_contado"]  + d["egresos_cc"],  2)
         neto     = round(ingresos - egresos, 2)
-
-        if agrupacion == "dia":
-            # Formatear fecha como dd/mm/aaaa
-            partes = periodo_key.split("-")
-            label  = f"{partes[2]}/{partes[1]}/{partes[0]}"
-        else:
-            anio, nm = periodo_key.split("-")
-            label    = f"{NOMBRES_MES[int(nm)]} {anio}"
-
         resultado.append({
-            "periodo":          periodo_key,
-            "mes_nombre":       label,
+            "mes":              mes_key,
+            "mes_nombre":       f"{NOMBRES_MES[int(nm)]} {anio}",
             "ingresos":         ingresos,
             "ingresos_contado": round(d["ingresos_contado"], 2),
             "ingresos_cc":      round(d["ingresos_cc"], 2),
@@ -152,46 +144,34 @@ async def _calcular_flujo(desde_query: date, hasta_query: date, agrupacion: str 
 
 @router.get("/", response_model=list[dict])
 async def reporte_flujo_caja(
-    desde:      Optional[date] = Query(None),
-    hasta:      Optional[date] = Query(None),
-    agrupacion: str            = Query("mes"),
+    desde: Optional[date] = Query(None),
+    hasta: Optional[date] = Query(None),
 ):
     try:
-        hoy         = date.today()
+        hoy = date.today()
         desde_query = desde or date(hoy.year, 1, 1)
         hasta_query = hasta or date(hoy.year, 12, 31)
-        validar_rango(desde_query, hasta_query, agrupacion)
-        return await _calcular_flujo(desde_query, hasta_query, agrupacion)
-    except HTTPException:
-        raise
+        return await _calcular_flujo(desde_query, hasta_query)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en flujo de caja: {str(e)}")
 
 
 @router.get("/pdf")
 async def reporte_flujo_caja_pdf(
-    desde:      Optional[date] = Query(None),
-    hasta:      Optional[date] = Query(None),
-    agrupacion: str            = Query("mes"),
+    desde: Optional[date] = Query(None),
+    hasta: Optional[date] = Query(None),
 ):
     try:
-        hoy         = date.today()
+        hoy = date.today()
         desde_query = desde or date(hoy.year, 1, 1)
         hasta_query = hasta or date(hoy.year, 12, 31)
-        validar_rango(desde_query, hasta_query, agrupacion)
-        datos   = await _calcular_flujo(desde_query, hasta_query, agrupacion)
-        filtros = {
-            "desde":      str(desde_query),
-            "hasta":      str(hasta_query),
-            "agrupacion": agrupacion,
-        }
+        datos = await _calcular_flujo(desde_query, hasta_query)
+        filtros = {"desde": str(desde_query), "hasta": str(hasta_query)}
         pdf_bytes = generar_pdf_reporte("flujo-caja", datos, filtros)
         return StreamingResponse(
             io.BytesIO(pdf_bytes),
             media_type="application/pdf",
             headers={"Content-Disposition": 'attachment; filename="Reporte_Flujo_Caja.pdf"'},
         )
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")

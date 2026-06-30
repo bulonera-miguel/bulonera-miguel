@@ -450,6 +450,36 @@
   border-color: #00C8F0;
 }
 
+
+.paginacion {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; padding: 16px;
+  border-top: 1px solid rgba(0,200,240,0.10);
+}
+
+.btnPagina {
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid rgba(0,200,240,0.25);
+  color: #00C8F0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btnPagina:hover:not(:disabled) {
+  background: rgba(0,200,240,0.08);
+  border-color: #00C8F0;
+}
+.btnPagina:disabled {
+  opacity: 0.30; cursor: not-allowed;
+}
+
+.paginaInfo {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; letter-spacing: 1px;
+  color: rgba(200,228,244,0.50);
+}
+
 /* ══════════════════════════════════════════════
    RESPONSIVE — TABLET 768px
    ══════════════════════════════════════════════ */
@@ -532,4 +562,14 @@
 
   /* KPI grid en mobile: columna */
   .kpiGrid { grid-template-columns: 1fr; }
+
+  /* Paginación en mobile: apilada */
+  .paginacion {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+  .btnPagina {
+    width: 100%;
+  }
 }
