@@ -970,6 +970,33 @@
 }
 .btnEliminarPago:hover { background: rgba(255,68,68,0.08); }
 
+/* ── MODAL CONFIRMAR ── */
+.modalConfirmarBox {
+  background: #0D1F2D; border: 1px solid rgba(255,68,68,0.30);
+  width: 100%; max-width: 400px; padding: 28px 24px;
+  text-align: center;
+}
+.modalConfirmarIcono {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.30);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #FF4444; margin: 0 auto 16px;
+}
+.modalConfirmarTexto {
+  font-family: "Barlow", sans-serif; font-size: 14px;
+  color: #EAF4FF; line-height: 1.5; margin: 0 0 22px;
+}
+.modalConfirmarAcciones {
+  display: flex; gap: 10px; justify-content: center;
+}
+.btnEliminarConfirmar {
+  padding: 10px 20px; background: #FF4444; color: #07111F;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  border: none; cursor: pointer; transition: opacity 0.2s;
+}
+.btnEliminarConfirmar:hover { opacity: 0.88; }
+
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .kpiRow      { grid-template-columns: repeat(2, 1fr); }

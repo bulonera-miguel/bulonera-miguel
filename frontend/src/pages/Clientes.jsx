@@ -36,6 +36,9 @@ export default function Clientes() {
   const [guardando, setGuardando]   = useState(false)
   const [errorForm, setErrorForm]   = useState(null)
 
+  const [modalConfirmar, setModalConfirmar] = useState(null)
+// modalConfirmar: { mensaje: string, onConfirmar: function } | null
+
   const cargarClientes = async (q = '') => {
     try {
       setCargando(true); setError(null)
@@ -178,16 +181,22 @@ export default function Clientes() {
     finally { setGuardandoPago(false) }
   }
 
-  const eliminarPago = async (pagoId) => {
-    if (!window.confirm('¿Confirmás que querés eliminar este pago? Esta acción no se puede deshacer.')) return
-    try {
-      const res = await fetch(`${BASE_URL}/api/cuenta-corriente/pagos/${pagoId}`, { method: 'DELETE' })
-      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
-      await cargarDetalle(clienteCC, filtroDesde, filtroHasta)
-      await cargarClientesCC()
-    } catch (e) {
-      alert(`Error: ${e.message}`)
-    }
+ const eliminarPago = (pagoId) => {
+    setModalConfirmar({
+      mensaje: '¿Confirmás que querés eliminar este pago? Esta acción no se puede deshacer.',
+      onConfirmar: async () => {
+        try {
+          const res = await fetch(`${BASE_URL}/api/cuenta-corriente/pagos/${pagoId}`, { method: 'DELETE' })
+          if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
+          await cargarDetalle(clienteCC, filtroDesde, filtroHasta)
+          await cargarClientesCC()
+          setModalConfirmar(null)
+        } catch (e) {
+          alert(`Error: ${e.message}`)
+          setModalConfirmar(null)
+        }
+      }
+    })
   }
 
   // ══════════════════════════════════════════════════════════
@@ -548,6 +557,20 @@ export default function Clientes() {
                 <button className={styles.btnCancelar} onClick={() => setModal(false)}>Cancelar</button>
                 <button className={styles.btnConfirmar} onClick={guardarCliente} disabled={guardando}>{guardando ? 'Guardando...' : editando ? '✓ Guardar cambios' : '✓ Crear cliente'}</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ MODAL: CONFIRMAR ACCIÓN ══ */}
+      {modalConfirmar && (
+        <div className={styles.modalOverlay} onClick={() => setModalConfirmar(null)}>
+          <div className={styles.modalConfirmarBox} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalConfirmarIcono}>⚠</div>
+            <p className={styles.modalConfirmarTexto}>{modalConfirmar.mensaje}</p>
+            <div className={styles.modalConfirmarAcciones}>
+              <button className={styles.btnCancelar} onClick={() => setModalConfirmar(null)}>Cancelar</button>
+              <button className={styles.btnEliminarConfirmar} onClick={modalConfirmar.onConfirmar}>✕ Eliminar</button>
             </div>
           </div>
         </div>
