@@ -109,7 +109,7 @@ export default function Reportes() {
     if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
     const qs = params.toString()
     return `${BASE_URL}/api/reportes/${reporteId}${qs ? '?' + qs : ''}`
-  }, [filtros, filtroProveedor])
+  }, [filtros, filtroProveedor, agrupacion])
 
   // ── CONSTRUIR URL PDF ────────────────────────────────────
   const construirUrlPDF = useCallback(() => {
@@ -142,7 +142,7 @@ export default function Reportes() {
     if (filtros.categoria_id) params.append('categoria_id', filtros.categoria_id)
     const qs = params.toString()
     return `${BASE_URL}/api/reportes/${reporteActivo}/pdf${qs ? '?' + qs : ''}`
-  }, [reporteActivo, filtros, filtroProveedor])
+  }, [reporteActivo, filtros, filtroProveedor, agrupacion])
 
   // ── EJECUTAR REPORTE ─────────────────────────────────────
   const ejecutarReporte = useCallback(async (reporteId = reporteActivo) => {
