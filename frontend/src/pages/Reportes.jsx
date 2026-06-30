@@ -172,7 +172,7 @@ export default function Reportes() {
   // Ejecutar automáticamente al cambiar de reporte
   useEffect(() => {
     ejecutarReporte(reporteActivo)
-  }, [reporteActivo])
+  }, [reporteActivo, agrupacion])
 
   // ── CAMBIAR REPORTE ──────────────────────────────────────
   const cambiarReporte = (id) => {
