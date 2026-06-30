@@ -261,3 +261,28 @@ async def habilitar_cuenta_corriente(cliente_id: str, habilitar: bool = Query(Tr
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar: {str(e)}")
+    
+
+# ─── ELIMINAR PAGO ────────────────────────────────────────────────────────────
+
+@router.delete("/pagos/{pago_id}")
+async def eliminar_pago(pago_id: str):
+    try:
+        pago = (
+            supabase.table("pagos_cuenta_corriente")
+            .select("id")
+            .eq("id", pago_id)
+            .single()
+            .execute()
+        )
+        if not pago.data:
+            raise HTTPException(status_code=404, detail="Pago no encontrado")
+
+        supabase.table("pagos_cuenta_corriente").delete().eq("id", pago_id).execute()
+
+        return {"ok": True, "mensaje": "Pago eliminado correctamente"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar pago: {str(e)}")

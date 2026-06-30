@@ -178,6 +178,18 @@ export default function Clientes() {
     finally { setGuardandoPago(false) }
   }
 
+  const eliminarPago = async (pagoId) => {
+    if (!window.confirm('¿Confirmás que querés eliminar este pago? Esta acción no se puede deshacer.')) return
+    try {
+      const res = await fetch(`${BASE_URL}/api/cuenta-corriente/pagos/${pagoId}`, { method: 'DELETE' })
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Error al eliminar') }
+      await cargarDetalle(clienteCC, filtroDesde, filtroHasta)
+      await cargarClientesCC()
+    } catch (e) {
+      alert(`Error: ${e.message}`)
+    }
+  }
+
   // ══════════════════════════════════════════════════════════
   // TAB: HISTORIAL DE VENTAS
   // ══════════════════════════════════════════════════════════
@@ -404,8 +416,8 @@ export default function Clientes() {
                       <div className={styles.detallePanelHeader}><span className={styles.panelTitulo}>Pagos recibidos</span><span className={styles.panelContador}>{detalle.pagos?.length || 0} registros</span></div>
                       {!detalle.pagos?.length ? <div className={styles.tablaVacia}>Sin pagos en el período</div> : (
                         <table className={styles.tablaInterna}>
-                          <thead><tr><th>Fecha</th><th>Medio</th><th>Obs.</th><th className={styles.thRight}>Monto</th></tr></thead>
-                          <tbody>{detalle.pagos.map((p, i) => <tr key={i}><td>{fmtF(p.fecha)}</td><td><span className={styles.badgeMedio}>{p.medio_pago}</span></td><td className={styles.tdObs}>{p.observaciones || '—'}</td><td className={styles.tdRight} style={{ color: '#00E87A' }}>{fmtP(p.monto)}</td></tr>)}</tbody>
+                          <thead><tr><th>Fecha</th><th>Medio</th><th>Obs.</th><th className={styles.thRight}>Monto</th><th></th></tr></thead>
+                          <tbody>{detalle.pagos.map((p, i) => <tr key={i}><td>{fmtF(p.fecha)}</td><td><span className={styles.badgeMedio}>{p.medio_pago}</span></td><td className={styles.tdObs}>{p.observaciones || '—'}</td><td className={styles.tdRight} style={{ color: '#00E87A' }}>{fmtP(p.monto)}</td><td><button className={styles.btnEliminarPago} onClick={() => eliminarPago(p.id)}>✕</button></td></tr>)}</tbody>
                           <tfoot><tr><td colSpan={3} className={styles.tfootLabel}>Subtotal pagos</td><td className={`${styles.tdRight} ${styles.tfootValor}`} style={{ color: '#00E87A' }}>{fmtP(detalle.pagos.reduce((s, p) => s + parseFloat(p.monto), 0))}</td></tr></tfoot>
                         </table>
                       )}

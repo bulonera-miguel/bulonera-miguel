@@ -963,6 +963,13 @@
   color: rgba(200,228,244,0.4);
 }
 
+.btnEliminarPago {
+  padding: 3px 8px; background: transparent;
+  border: 1px solid rgba(255,68,68,0.35); color: #FF4444;
+  font-size: 12px; cursor: pointer; transition: all 0.2s;
+}
+.btnEliminarPago:hover { background: rgba(255,68,68,0.08); }
+
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .kpiRow      { grid-template-columns: repeat(2, 1fr); }
