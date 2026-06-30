@@ -51,7 +51,7 @@ async def listar_ventas(
     try:
         query = (
             supabase.table("ventas")
-            .select("*, clientes(nombre, cuit)")
+            .select("*, clientes(nombre, cuit, tiene_cuenta_corriente)")
             .order("fecha", desc=True)
             .order("created_at", desc=True)
         )

@@ -321,12 +321,19 @@ export default function Ventas() {
   }
 
   // ── ELIMINAR VENTA ────────────────────────────────────────
-  const eliminarVenta = (ventaId, tieneFactura) => {
+  const eliminarVenta = (ventaId, tieneFactura, esClienteCC) => {
+    let mensaje = 'Se eliminará la venta y el stock será restaurado automáticamente.'
+    if (tieneFactura && esClienteCC) {
+      mensaje = 'Esta venta tiene una factura emitida en ARCA y el cliente tiene cuenta corriente. El sistema eliminará la venta y restaurará el stock. Recordá emitir la Nota de Crédito manualmente en ARCA, y si ya se registró un pago para esta venta, ajustalo manualmente en Clientes → Cuenta Corriente.'
+    } else if (tieneFactura) {
+      mensaje = 'Esta venta tiene una factura emitida en ARCA. El sistema eliminará la venta y restaurará el stock, pero recordá emitir la Nota de Crédito manualmente en ARCA.'
+    } else if (esClienteCC) {
+      mensaje = 'Se eliminará la venta y el stock será restaurado automáticamente. Si el cliente tiene cuenta corriente y ya se registró un pago para esta venta, recordá ajustarlo manualmente en Clientes → Cuenta Corriente.'
+    }
+
     setModalConfirm({
       titulo:    'Eliminar venta',
-      mensaje:   tieneFactura
-        ? 'Esta venta tiene una factura emitida en ARCA. El sistema eliminará la venta y restaurará el stock, pero recordá emitir la Nota de Crédito manualmente en ARCA.'
-        : 'Se eliminará la venta y el stock será restaurado automáticamente.',
+      mensaje,
       peligroso: true,
       onConfirmar: async () => {
         setModalConfirm(null)
@@ -902,7 +909,7 @@ export default function Ventas() {
                         <td>
                           <button
                             className={styles.btnEliminarVenta}
-                            onClick={() => eliminarVenta(v.id, !!v.factura_id)}
+                            onClick={() => eliminarVenta(v.id, !!v.factura_id, !!v.clientes?.tiene_cuenta_corriente)}
                             title="Eliminar venta"
                           >
                             ✕ Eliminar
@@ -955,7 +962,7 @@ export default function Ventas() {
                           )}
                           <button
                             className={styles.btnEliminarVenta}
-                            onClick={() => eliminarVenta(v.id, !!v.factura_id)}
+                            onClick={() => eliminarVenta(v.id, !!v.factura_id, !!v.clientes?.tiene_cuenta_corriente)}
                           >
                             ✕
                           </button>
