@@ -335,84 +335,43 @@ export default function Inventario() {
             ) : productos.length === 0 ? (
               <div className={styles.estado}>No se encontraron productos.</div>
             ) : (
-                <>
-                    <table className={styles.tabla}>
-                    <thead>
-                        <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th className={styles.thRight}>Precio</th>
-                        <th className={styles.thCenter}>Stock</th>
-                        <th className={styles.thCenter}>Mínimo</th>
-                        <th className={styles.thCenter}>Estado</th>
-                        <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {productos.map(p => (
-                        <tr key={p.id} className={p.stock_actual <= p.stock_minimo ? styles.filaCritica : ''}>
-                            <td className={styles.tdCodigo}>{p.codigo}</td>
-                            <td>{p.nombre}</td>
-                            <td className={styles.tdSub}>{p.categorias?.nombre || '—'}</td>
-                            <td className={styles.tdRight}>${p.precio.toLocaleString('es-AR')}</td>
-                            <td className={`${styles.tdCenter} ${p.stock_actual <= p.stock_minimo ? styles.stockCritico : styles.stockOk}`}>
-                            {p.stock_actual}
-                            </td>
-                            <td className={styles.tdCenter}>{p.stock_minimo}</td>
-                            <td className={styles.tdCenter}>
-                            {p.stock_actual <= p.stock_minimo
-                                ? <span className={styles.badgeCritico}>⚠ Crítico</span>
-                                : <span className={styles.badgeOk}>✓ Normal</span>}
-                            </td>
-                            <td className={styles.tdAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirModalEditar(p)}>Editar</button>
-                            <button className={styles.btnEliminar} onClick={() => eliminarProducto(p.id, p.nombre)}>Eliminar</button>
-                            </td>
-                        </tr>
-                        ))}
-                    </tbody>
-                    </table>
-
-                    {/* TARJETAS MOBILE */}
-                    <div className={styles.tarjetasList}>
-                    {productos.map(p => (
-                        <div key={p.id} className={`${styles.tarjeta} ${p.stock_actual <= p.stock_minimo ? styles.tarjetaCritica : ''}`}>
-                        <div className={styles.tarjetaTop}>
-                            <span className={styles.tarjetaCodigo}>{p.codigo}</span>
-                            <span className={p.stock_actual <= p.stock_minimo ? styles.badgeCritico : styles.badgeOk}>
-                            {p.stock_actual <= p.stock_minimo ? '⚠ Crítico' : '✓ Normal'}
-                            </span>
-                        </div>
-                        <div className={styles.tarjetaNombre}>{p.nombre}</div>
-                        <div className={styles.tarjetaDatos}>
-                            <div className={styles.tarjetaDato}>
-                            <span>Categoría</span>
-                            <strong>{p.categorias?.nombre || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Precio</span>
-                            <strong>${p.precio.toLocaleString('es-AR')}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Stock</span>
-                            <strong className={p.stock_actual <= p.stock_minimo ? styles.stockCritico : styles.stockOk}>
-                                {p.stock_actual}
-                            </strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Mínimo</span>
-                            <strong>{p.stock_minimo}</strong>
-                            </div>
-                        </div>
-                        <div className={styles.tarjetaAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirModalEditar(p)}>✎ Editar</button>
-                            <button className={styles.btnEliminar} onClick={() => eliminarProducto(p.id, p.nombre)}>✕ Eliminar</button>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-                </>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th className={styles.thRight}>Precio</th>
+                    <th className={styles.thCenter}>Stock</th>
+                    <th className={styles.thCenter}>Mínimo</th>
+                    <th className={styles.thCenter}>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productos.map(p => (
+                    <tr key={p.id} className={p.stock_actual <= p.stock_minimo ? styles.filaCritica : ''}>
+                      <td className={styles.tdCodigo}>{p.codigo}</td>
+                      <td>{p.nombre}</td>
+                      <td className={styles.tdSub}>{p.categorias?.nombre || '—'}</td>
+                      <td className={styles.tdRight}>${p.precio.toLocaleString('es-AR')}</td>
+                      <td className={`${styles.tdCenter} ${p.stock_actual <= p.stock_minimo ? styles.stockCritico : styles.stockOk}`}>
+                        {p.stock_actual}
+                      </td>
+                      <td className={styles.tdCenter}>{p.stock_minimo}</td>
+                      <td className={styles.tdCenter}>
+                        {p.stock_actual <= p.stock_minimo
+                          ? <span className={styles.badgeCritico}>⚠ Crítico</span>
+                          : <span className={styles.badgeOk}>✓ Normal</span>}
+                      </td>
+                      <td className={styles.tdAcciones}>
+                        <button className={styles.btnEditar} onClick={() => abrirModalEditar(p)}>Editar</button>
+                        <button className={styles.btnEliminar} onClick={() => eliminarProducto(p.id, p.nombre)}>Eliminar</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         )}
