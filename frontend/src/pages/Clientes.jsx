@@ -12,7 +12,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const TABS = [
   { id: 'clientes',          label: '≡ Clientes'          },
   { id: 'cuenta-corriente',  label: '$ Cuenta Corriente'  },
-  { id: 'historial-ventas',  label: '↑ Historial Ventas'  },
+  { id: 'historial-ventas', label: <><span className={styles.tabLabelDesktop}>↑ Historial Ventas</span><span className={styles.tabLabelMobile}>↑ Historial</span></> },
 ]
 
 const UMBRAL_ATENCION = 20000
@@ -301,89 +301,43 @@ export default function Clientes() {
             ) : clientes.length === 0 ? (
               <div className={styles.estado}>{busqueda ? 'Sin resultados' : 'No hay clientes registrados'}</div>
             ) : (
-                <>
-                    <table className={styles.tabla}>
-                    <thead>
-                        <tr>
-                        <th>Nombre</th>
-                        <th>CUIT</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
-                        <th>Tipo fact.</th>
-                        <th>Cta. Cte.</th>
-                        <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {clientes.map(c => (
-                        <tr key={c.id} className={styles.tablaFila}>
-                            <td className={styles.tdNombre}>{c.nombre}</td>
-                            <td className={styles.tdSub}>{c.cuit || '—'}</td>
-                            <td className={styles.tdSub}>{c.direccion || '—'}</td>
-                            <td className={styles.tdSub}>{c.telefono || '—'}</td>
-                            <td className={styles.tdSub}>{c.email || '—'}</td>
-                            <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
-                            <td className={styles.tdCenter}>
-                            <label className={styles.toggleWrap}>
-                                <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
-                                <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
-                            </label>
-                            </td>
-                            <td className={styles.tdAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
-                            {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ Ver CC</button>}
-                            <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
-                            </td>
-                        </tr>
-                        ))}
-                    </tbody>
-                    </table>
-
-                    {/* TARJETAS MOBILE */}
-                    <div className={styles.tarjetasList}>
-                    {clientes.map(c => (
-                        <div key={c.id} className={styles.tarjeta}>
-                        <div className={styles.tarjetaTop}>
-                            <span className={styles.tarjetaNombre}>{c.nombre}</span>
-                            <span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>
-                            Factura {c.tipo_factura?.trim() || 'B'}
-                            </span>
-                        </div>
-                        <div className={styles.tarjetaDatos}>
-                            <div className={styles.tarjetaDato}>
-                            <span>CUIT</span>
-                            <strong>{c.cuit || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Teléfono</span>
-                            <strong>{c.telefono || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Email</span>
-                            <strong>{c.email || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Dirección</span>
-                            <strong>{c.direccion || '—'}</strong>
-                            </div>
-                        </div>
-                        <div className={styles.tarjetaFooter}>
-                            <label className={styles.toggleWrap}>
-                            <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
-                            <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
-                            <span className={styles.tarjetaCCLabel}>Cta. Cte.</span>
-                            </label>
-                            <div className={styles.tarjetaAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
-                            {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ CC</button>}
-                            <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
-                            </div>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-                </>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>CUIT</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Tipo fact.</th>
+                    <th>Cta. Cte.</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clientes.map(c => (
+                    <tr key={c.id} className={styles.tablaFila}>
+                      <td className={styles.tdNombre}>{c.nombre}</td>
+                      <td className={styles.tdSub}>{c.cuit || '—'}</td>
+                      <td className={styles.tdSub}>{c.direccion || '—'}</td>
+                      <td className={styles.tdSub}>{c.telefono || '—'}</td>
+                      <td className={styles.tdSub}>{c.email || '—'}</td>
+                      <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
+                      <td className={styles.tdCenter}>
+                        <label className={styles.toggleWrap}>
+                          <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
+                          <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
+                        </label>
+                      </td>
+                      <td className={styles.tdAcciones}>
+                        <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
+                        {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ Ver CC</button>}
+                        <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         )}
@@ -492,6 +446,8 @@ export default function Clientes() {
                 <div className={styles.histSeleccionarMsg}>
                   Seleccioná un cliente desde la pestaña <strong>Clientes</strong> usando el botón <span className={styles.inlineBtn}>↑ Ventas</span>
                 </div>
+
+                {/* Tabla desktop */}
                 <table className={styles.tabla}>
                   <thead><tr><th>Nombre</th><th>CUIT</th><th>Acciones</th></tr></thead>
                   <tbody>
@@ -504,10 +460,29 @@ export default function Clientes() {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Tarjetas mobile */}
+                <div className={styles.tarjetasList}>
+                  {clientes.map(c => (
+                    <div key={c.id} className={styles.tarjeta}>
+                      <div className={styles.tarjetaTop}>
+                        <span className={styles.tarjetaNombre}>{c.nombre}</span>
+                      </div>
+                      <div className={styles.tarjetaDatos}>
+                        <div className={styles.tarjetaDato}>
+                          <span>CUIT</span>
+                          <strong>{c.cuit || '—'}</strong>
+                        </div>
+                      </div>
+                      <div className={styles.tarjetaAcciones}>
+                        <button className={styles.btnVerHist} onClick={() => seleccionarClienteHist(c)}>↑ Ver ventas</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div>
-                {/* Header */}
                 <div className={styles.detalleHeader}>
                   <button className={styles.btnVolver} onClick={volverAListaHist}>← Volver</button>
                   <div className={styles.detalleClienteInfo}>
@@ -522,7 +497,6 @@ export default function Clientes() {
 
                 {histError && <div className={styles.errorMsg}>⚠ {histError}</div>}
 
-                {/* Filtros */}
                 <div className={styles.filtrosWrap}>
                   <div className={styles.filtroGrupo}><label>Desde</label><input type="date" className={styles.filtroInput} value={histDesde} onChange={e => setHistDesde(e.target.value)} /></div>
                   <div className={styles.filtroGrupo}><label>Hasta</label><input type="date" className={styles.filtroInput} value={histHasta} onChange={e => setHistHasta(e.target.value)} /></div>
@@ -552,7 +526,14 @@ export default function Clientes() {
                         {ventaDetalle?.id === v.id && v.items?.length > 0 && (
                           <div className={styles.histDetalle}>
                             <table className={styles.tablaInterna}>
-                              <thead><tr><th>Producto</th><th className={styles.thCenter}>Cant.</th><th className={styles.thRight}>Precio unit.</th><th className={styles.thRight}>Subtotal</th></tr></thead>
+                              <thead>
+                                <tr>
+                                  <th>Producto</th>
+                                  <th className={styles.thCenter}>Cant.</th>
+                                  <th className={styles.thRight}>Precio unit.</th>
+                                  <th className={styles.thRight}>Subtotal</th>
+                                </tr>
+                              </thead>
                               <tbody>
                                 {v.items.map((it, i) => (
                                   <tr key={i}>

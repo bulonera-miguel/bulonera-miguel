@@ -1000,6 +1000,9 @@
 /* Ocultar tarjetas en desktop */
 .tarjetasList { display: none; }
 
+.tabLabelMobile { display: none; }
+.tabLabelDesktop { display: inline; }
+
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -1128,4 +1131,7 @@
   .histCardLeft { gap: 6px; }
   .histLista { gap: 6px; }
   .histCard { border-radius: 6px; }
+
+  .tabLabelMobile { display: inline; }
+  .tabLabelDesktop { display: none; }
 }
