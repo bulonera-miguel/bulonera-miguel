@@ -301,89 +301,43 @@ export default function Clientes() {
             ) : clientes.length === 0 ? (
               <div className={styles.estado}>{busqueda ? 'Sin resultados' : 'No hay clientes registrados'}</div>
             ) : (
-                <>
-                    <table className={styles.tabla}>
-                    <thead>
-                        <tr>
-                        <th>Nombre</th>
-                        <th>CUIT</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
-                        <th>Tipo fact.</th>
-                        <th>Cta. Cte.</th>
-                        <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {clientes.map(c => (
-                        <tr key={c.id} className={styles.tablaFila}>
-                            <td className={styles.tdNombre}>{c.nombre}</td>
-                            <td className={styles.tdSub}>{c.cuit || '—'}</td>
-                            <td className={styles.tdSub}>{c.direccion || '—'}</td>
-                            <td className={styles.tdSub}>{c.telefono || '—'}</td>
-                            <td className={styles.tdSub}>{c.email || '—'}</td>
-                            <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
-                            <td className={styles.tdCenter}>
-                            <label className={styles.toggleWrap}>
-                                <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
-                                <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
-                            </label>
-                            </td>
-                            <td className={styles.tdAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
-                            {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ Ver CC</button>}
-                            <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
-                            </td>
-                        </tr>
-                        ))}
-                    </tbody>
-                    </table>
-
-                    {/* TARJETAS MOBILE */}
-                    <div className={styles.tarjetasList}>
-                    {clientes.map(c => (
-                        <div key={c.id} className={styles.tarjeta}>
-                        <div className={styles.tarjetaTop}>
-                            <span className={styles.tarjetaNombre}>{c.nombre}</span>
-                            <span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>
-                            Factura {c.tipo_factura?.trim() || 'B'}
-                            </span>
-                        </div>
-                        <div className={styles.tarjetaDatos}>
-                            <div className={styles.tarjetaDato}>
-                            <span>CUIT</span>
-                            <strong>{c.cuit || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Teléfono</span>
-                            <strong>{c.telefono || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Email</span>
-                            <strong>{c.email || '—'}</strong>
-                            </div>
-                            <div className={styles.tarjetaDato}>
-                            <span>Dirección</span>
-                            <strong>{c.direccion || '—'}</strong>
-                            </div>
-                        </div>
-                        <div className={styles.tarjetaFooter}>
-                            <label className={styles.toggleWrap}>
-                            <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
-                            <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
-                            <span className={styles.tarjetaCCLabel}>Cta. Cte.</span>
-                            </label>
-                            <div className={styles.tarjetaAcciones}>
-                            <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
-                            {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ CC</button>}
-                            <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
-                            </div>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-                </>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>CUIT</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Tipo fact.</th>
+                    <th>Cta. Cte.</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clientes.map(c => (
+                    <tr key={c.id} className={styles.tablaFila}>
+                      <td className={styles.tdNombre}>{c.nombre}</td>
+                      <td className={styles.tdSub}>{c.cuit || '—'}</td>
+                      <td className={styles.tdSub}>{c.direccion || '—'}</td>
+                      <td className={styles.tdSub}>{c.telefono || '—'}</td>
+                      <td className={styles.tdSub}>{c.email || '—'}</td>
+                      <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
+                      <td className={styles.tdCenter}>
+                        <label className={styles.toggleWrap}>
+                          <input type="checkbox" checked={c.tiene_cuenta_corriente || false} onChange={e => toggleCuentaCorriente(c, e.target.checked)} />
+                          <span className={`${styles.toggle} ${c.tiene_cuenta_corriente ? styles.toggleOn : ''}`}></span>
+                        </label>
+                      </td>
+                      <td className={styles.tdAcciones}>
+                        <button className={styles.btnEditar} onClick={() => abrirEditar(c)}>✎ Editar</button>
+                        {c.tiene_cuenta_corriente && <button className={styles.btnVerCC} onClick={() => verCuentaCorriente(c)}>$ Ver CC</button>}
+                        <button className={styles.btnVerHist} onClick={() => verHistorialCliente(c)}>↑ Ventas</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         )}

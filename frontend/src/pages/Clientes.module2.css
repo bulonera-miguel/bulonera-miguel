@@ -997,10 +997,6 @@
 }
 .btnEliminarConfirmar:hover { opacity: 0.88; }
 
-/* Ocultar tarjetas en desktop */
-.tarjetasList { display: none; }
-
-
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .kpiRow      { grid-template-columns: repeat(2, 1fr); }
@@ -1049,83 +1045,43 @@
 }
 
 @media (max-width: 600px) {
-  .kpiRow   { grid-template-columns: 1fr 1fr; }
+  .kpiRow  { grid-template-columns: 1fr 1fr; }
   .tipoWrap { flex-direction: column; }
-  .contenido { padding: 16px; }
-
-  /* Tabs con scroll horizontal */
-  .tabs {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-  }
-  .tab {
-    white-space: nowrap;
-    font-size: 0.72rem;
-    padding: 8px 10px;
-    letter-spacing: 0.05em;
-  }
-
-  /* Ocultar tabla, mostrar tarjetas */
-  .tabla { display: none; }
-
-  .tarjetasList {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-
-  .tarjeta {
-    background: rgba(200,228,244,0.04);
-    border: 1px solid rgba(200,228,244,0.10);
-    padding: 14px;
-    display: flex; flex-direction: column; gap: 12px;
-    border-radius: 6px;
-  }
-
-  .tarjetaTop {
-    display: flex; justify-content: space-between; align-items: center;
-  }
-
-  .tarjetaNombre {
-    font-size: 1rem; font-weight: 700; color: #EAF4FF;
-  }
-
-  .tarjetaDatos {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  }
-
-  .tarjetaDato {
-    display: flex; flex-direction: column; gap: 2px;
-  }
-  .tarjetaDato span {
-    font-size: 0.70rem; letter-spacing: 0.10em; text-transform: uppercase;
-    color: rgba(200,228,244,0.45);
-  }
-  .tarjetaDato strong {
-    font-size: 0.88rem; color: #EAF4FF;
-    word-break: break-all;
-  }
-
-  .tarjetaFooter {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 10px;
-    border-top: 1px solid rgba(200,228,244,0.08);
-    flex-wrap: wrap; gap: 8px;
-  }
-
-  .tarjetaCCLabel {
-    font-size: 0.78rem; color: rgba(200,228,244,0.55);
-    margin-left: 6px;
-  }
-
-  .tarjetaAcciones {
-    display: flex; gap: 6px;
-  }
-
   .histCardHeader { padding: 12px 14px; }
   .histNumero { font-size: 0.85rem; }
   .histFecha { font-size: 0.78rem; }
   .histCardLeft { gap: 6px; }
   .histLista { gap: 6px; }
   .histCard { border-radius: 6px; }
+
+  /* Ocultar columnas menos importantes en móvil */
+  .tabla th:nth-child(3),
+  .tabla td:nth-child(3),
+  .tabla th:nth-child(4),
+  .tabla td:nth-child(4),
+  .tabla th:nth-child(5),
+  .tabla td:nth-child(5) {
+    display: none;
+  }
+
+  /* La tabla se hace scrolleable horizontalmente */
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Acciones en columna vertical */
+  .tdAcciones {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .tab {
+    white-space: nowrap;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+    letter-spacing: 0.05em;
+  }
 }
