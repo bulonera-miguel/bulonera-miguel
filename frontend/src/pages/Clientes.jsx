@@ -10,9 +10,9 @@ import styles from './Clientes.module.css'
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const TABS = [
-  { id: 'clientes',          label: '≡ Clientes'          },
-  { id: 'cuenta-corriente',  label: '$ Cuenta Corriente'  },
-  { id: 'historial-ventas',  label: '↑ Historial Ventas'  },
+  { id: 'clientes',          labelDesktop: '≡ Clientes',          labelMobile: '≡ Clientes'  },
+  { id: 'cuenta-corriente',  labelDesktop: '$ Cuenta Corriente',  labelMobile: '$ Cta. Cte.' },
+  { id: 'historial-ventas',  labelDesktop: '↑ Historial Ventas',  labelMobile: '↑ Historial' },
 ]
 
 const UMBRAL_ATENCION = 20000
@@ -283,7 +283,8 @@ export default function Clientes() {
                 if (t.id === 'clientes') { setClienteCC(null); setDetalle(null); setClienteHist(null); setHistVentas([]) }
                 if (t.id === 'historial-ventas' && !clienteHist) { /* espera selección */ }
               }}>
-              {t.label}
+              <span className={styles.tabLabelDesktop}>{t.labelDesktop}</span>
+              <span className={styles.tabLabelMobile}>{t.labelMobile}</span>
             </button>
           ))}
         </div>
