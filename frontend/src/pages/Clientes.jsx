@@ -488,6 +488,20 @@ export default function Clientes() {
                     ))}
                   </tbody>
                 </table>
+
+                <div className={styles.tarjetasClientes}>
+                  {clientes.map(c => (
+                    <div key={c.id} className={styles.tarjetaCliente}>
+                      <div className={styles.tarjetaClienteTop}>
+                        <span className={styles.tarjetaClienteNombre}>{c.nombre}</span>
+                      </div>
+                      {c.cuit && <div className={styles.tarjetaClienteDato}><span>CUIT</span><strong>{c.cuit}</strong></div>}
+                      <div className={styles.tarjetaClienteAcciones}>
+                        <button className={styles.btnVerHist} onClick={() => seleccionarClienteHist(c)}>↑ Ver ventas</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div>

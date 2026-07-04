@@ -1157,12 +1157,15 @@
     color: #EAF4FF; text-transform: uppercase; letter-spacing: 1px;
   }
   .tarjetaClienteDato {
-    display: flex; justify-content: space-between;
-    padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
     font-family: "Barlow", sans-serif; font-size: 13px;
   }
-  .tarjetaClienteDato span { color: rgba(200,228,244,0.45); }
-  .tarjetaClienteDato strong { color: #EAF4FF; }
+  .tarjetaClienteDato span {
+    color: rgba(200,228,244,0.45);
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .tarjetaClienteDato strong { color: #EAF4FF; font-size: 0.9rem; line-height: 1.35; }
   .tarjetaClienteAcciones {
     display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
   }
