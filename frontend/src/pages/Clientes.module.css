@@ -1003,6 +1003,9 @@
 .tabLabelMobile { display: none; }
 .tabLabelDesktop { display: inline; }
 
+/* ── TARJETAS LISTA CLIENTES MÓVIL ── */
+.tarjetasClientes { display: none; }
+
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -1134,4 +1137,35 @@
 
   .tabLabelMobile { display: inline; }
   .tabLabelDesktop { display: none; }
+
+  .tarjetasClientes {
+    display: flex; flex-direction: column; gap: 12px; margin-top: 12px;
+  }
+  .tarjetaCliente {
+    background: rgba(200,228,244,0.04);
+    border: 1px solid rgba(200,228,244,0.10);
+    padding: 14px;
+    border-radius: 6px;
+  }
+  .tarjetaClienteTop {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 10px;
+  }
+  .tarjetaClienteNombre {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: #EAF4FF; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .tarjetaClienteDato {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-family: "Barlow", sans-serif; font-size: 13px;
+  }
+  .tarjetaClienteDato span { color: rgba(200,228,244,0.45); }
+  .tarjetaClienteDato strong { color: #EAF4FF; }
+  .tarjetaClienteAcciones {
+    display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .tarjetaClienteAcciones button { flex: 1; min-width: 80px; }
+
 }
