@@ -200,7 +200,7 @@ export default function Clientes() {
                 <div className={styles.estado}>Cargando clientes...</div>
               ) : error ? (
                 <div className={styles.errorMsg}>{error}</div>
-              ) : clientesFiltrados.length === 0 ? (
+              ) : clientes.length === 0 ? (
                 <div className={styles.estado}>No hay clientes registrados</div>
               ) : (
                 <>
@@ -252,7 +252,7 @@ export default function Clientes() {
                   </table>
 
                   <div className={styles.tarjetasClientes}>
-                    {clientesFiltrados.map(c => (
+                    {clientes.map(c => (
                       <div key={c.id} className={styles.tarjetaCliente}>
                         <div className={styles.tarjetaClienteTop}>
                           <span className={styles.tarjetaClienteNombre}>{c.nombre}</span>
