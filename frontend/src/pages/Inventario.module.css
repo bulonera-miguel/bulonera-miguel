@@ -98,6 +98,9 @@
   text-align: center;
 }
 
+.tabLabelMobile { display: none; }
+.tabLabelDesktop { display: inline; }
+
 /* ── BUSCADOR ───────────────────────────────────────────────── */
 .buscadorWrap {
   position: relative;
@@ -606,4 +609,6 @@
     font-size: 0.78rem;
     padding: 8px 14px;
   }
+  .tabLabelMobile { display: inline; }
+  .tabLabelDesktop { display: none; }
 }

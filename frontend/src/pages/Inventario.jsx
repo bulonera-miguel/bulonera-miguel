@@ -9,9 +9,9 @@ import { productosApi, categoriasApi, stockApi } from '../services/api'
 import styles from './Inventario.module.css'
 
 const TABS = [
-  { id: 'productos',   label: '▦ Productos'       },
-  { id: 'categorias',  label: '☰ Categorías'      },
-  { id: 'stock',       label: '↕ Ajuste de Stock' },
+  { id: 'productos',   labelDesktop: '▦ Productos',       labelMobile: '▦ Productos' },
+  { id: 'categorias',  labelDesktop: '☰ Categorías',      labelMobile: '☰ Categorías' },
+  { id: 'stock',       labelDesktop: '↕ Ajuste de Stock', labelMobile: '↕ Stock'      },
 ]
 
 export default function Inventario() {
@@ -301,7 +301,8 @@ export default function Inventario() {
               className={`${styles.tab} ${tab === t.id ? styles.tabActivo : ''}`}
               onClick={() => setTab(t.id)}
             >
-              {t.label}
+              <span className={styles.tabLabelDesktop}>{t.labelDesktop}</span>
+              <span className={styles.tabLabelMobile}>{t.labelMobile}</span>
               {t.id === 'stock' && criticos.length > 0 && (
                 <span className={styles.tabBadge}>{criticos.length}</span>
               )}
