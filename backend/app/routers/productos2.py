@@ -67,7 +67,7 @@ async def listar_productos(
     # Útil para el buscador por tipo de producto (bulones, tuercas, llaves, etc.).
 ):
     try:
-        query = supabase.table("productos").select("*, categorias(nombre)")
+        query = supabase.table("productos").select("*")
         # supabase.table("productos"): apunta a la tabla "productos" en Supabase.
         # .select("*"): trae TODAS las columnas. Equivale a SELECT * FROM productos.
         # Todavía no ejecutamos la consulta, solo la vamos construyendo.
@@ -111,7 +111,7 @@ async def buscar_productos(
     try:
         response = (
             supabase.table("productos")
-            .select("*, categorias(nombre)")
+            .select("*")
             .eq("activo", True)
             # Solo buscamos productos activos
             .ilike("nombre", f"%{q}%")
