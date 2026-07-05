@@ -22,7 +22,13 @@ class ProductoUpdate(BaseModel):
     descripcion: Optional[str] = None
     precio: Optional[float] = None
     stock_minimo: Optional[int] = None
-    activo: Optional[bool] = None
+    activo: Optional[bool] = None    
+
+class CategoriaSimple(BaseModel):
+    nombre: str
+
+    class Config:
+        from_attributes = True
 
 # Schema para la RESPUESTA (lo que devuelve la API)
 class ProductoResponse(ProductoBase):
@@ -30,6 +36,7 @@ class ProductoResponse(ProductoBase):
     stock_actual: int              # Stock actual del producto
     activo: bool                   # Si el producto está activo
     created_at: datetime           # Fecha de creación
+    categorias: Optional[CategoriaSimple] = None  # ← agregar esta línea
 
     class Config:
         from_attributes = True     # Permite convertir objetos de BD a este schema
