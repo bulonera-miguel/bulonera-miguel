@@ -684,8 +684,7 @@
 
 /* ── RESPONSIVE 1023px ── */
 @media (max-width: 1023px) {
-  .mainGrid { grid-template-columns: 1fr; }
-  .detallePanel { order: -1; }
+  .mainGrid { grid-template-columns: 1fr; }  
 }
 
 /* ── RESPONSIVE 768px ── */
@@ -753,4 +752,19 @@
   margin-top: 6px;
   padding-top: 6px;
   }
+
+  .tipoVentaBtn {
+    border-bottom: 1px solid rgba(0,200,240,0.18);
+  }
+  
+  .tipoVentaBtnActivo {
+    border-bottom: 2px solid #00C8F0 !important;
+  }
+  .tipoVentaBtnPresupuesto.tipoVentaBtnActivo {
+    border-bottom: 2px solid #FFB800 !important;
+  }
+  .tipoVentaBtnFactura.tipoVentaBtnActivo {
+    border-bottom: 2px solid #00E87A !important;
+  }
+
 }
