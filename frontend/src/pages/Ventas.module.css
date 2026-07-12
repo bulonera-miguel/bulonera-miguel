@@ -756,14 +756,23 @@
   .tipoVentaBtn {
     border-bottom: 1px solid rgba(0,200,240,0.18);
   }
-  
+
   .tipoVentaBtnActivo {
     border-bottom: 2px solid #00C8F0 !important;
   }
+
   .tipoVentaBtnPresupuesto.tipoVentaBtnActivo {
     border-bottom: 2px solid #FFB800 !important;
   }
+  
   .tipoVentaBtnFactura.tipoVentaBtnActivo {
+    border-bottom: 2px solid #00E87A !important;
+  }
+
+  .tipoFacturaBtn {
+    border-bottom: 1px solid rgba(0,200,240,0.18);
+  }
+  .tipoFacturaBtnActivo {
     border-bottom: 2px solid #00E87A !important;
   }
 
