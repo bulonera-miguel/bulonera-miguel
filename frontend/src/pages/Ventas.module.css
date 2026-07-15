@@ -782,7 +782,7 @@
   .formPanel {
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .detallePanel {
@@ -800,20 +800,13 @@
     padding: 10px 12px;
     display: flex; flex-direction: column; gap: 6px;
   }
+
   .itemTarjetaHeader {
     display: flex; justify-content: space-between; align-items: flex-start;
   }
+
   .itemTarjetaFila {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  }
-
-  .buscadorWrap {
-    position: relative;
-    z-index: 200;
-  }
-
-  .sugerencias {
-    z-index: 200;
-  }
+  }  
 
 }
