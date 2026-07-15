@@ -322,8 +322,8 @@ export default function Clientes() {
                         <td className={styles.tdNombre}>{c.nombre}</td>
                         <td className={styles.tdSub}>{c.cuit || '—'}</td>
                         <td className={styles.tdSub}>{c.direccion || '—'}</td>
-                        <td className={styles.tdSub}>{c.telefono || '—'}</td>
-                        <td className={styles.tdSub}>{c.email || '—'}</td>
+                        <td className={styles.tdSub} title={c.telefono || ''}>{c.telefono || '—'}</td>
+                        <td className={styles.tdSub} title={c.email || ''}>{c.email || '—'}</td>
                         <td><span className={c.tipo_factura?.trim() === 'A' ? styles.badgeTipoA : styles.badgeTipoB}>Factura {c.tipo_factura?.trim() || 'B'}</span></td>
                         <td className={styles.tdCenter}>
                           <label className={styles.toggleWrap}>
