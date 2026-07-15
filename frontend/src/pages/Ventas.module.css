@@ -807,4 +807,13 @@
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   }
 
+  .buscadorWrap {
+    position: relative;
+    z-index: 200;
+  }
+
+  .sugerencias {
+    z-index: 200;
+  }
+
 }
