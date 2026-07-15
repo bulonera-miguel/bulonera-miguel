@@ -209,8 +209,8 @@
 .badgeCritico  { background: rgba(255,68,68,0.15);  color: #FF4444; border: 1px solid rgba(255,68,68,0.3); }
 .badgeAFavor   { background: rgba(0,200,240,0.15);  color: #00C8F0; border: 1px solid rgba(0,200,240,0.3); }
 
-.badgeTipoA { background: rgba(123,97,255,0.15); color: #7B61FF; border: 1px solid rgba(123,97,255,0.3); padding: 3px 10px; border-radius: 3px; font-size: 0.78rem; font-weight: 600; }
-.badgeTipoB { background: rgba(0,200,240,0.12);  color: #00C8F0; border: 1px solid rgba(0,200,240,0.25); padding: 3px 10px; border-radius: 3px; font-size: 0.78rem; font-weight: 600; }
+.badgeTipoA { background: rgba(123,97,255,0.15); color: #7B61FF; border: 1px solid rgba(123,97,255,0.3); padding: 3px 10px; border-radius: 3px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+.badgeTipoB { background: rgba(0,200,240,0.12);  color: #00C8F0; border: 1px solid rgba(0,200,240,0.25); padding: 3px 10px; border-radius: 3px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
 
 .badgeMedio {
   display: inline-block;
