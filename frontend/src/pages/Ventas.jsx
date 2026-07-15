@@ -758,51 +758,77 @@ export default function Ventas() {
 
                   {items.length === 0 ? (
                     <div className={styles.itemsVacio}>
-                      Agregá productos para comenzar
+                      AGREGÁ PRODUCTOS PARA COMENZAR
                     </div>
                   ) : (
-                    <div className={styles.itemsList}>
-                      {items.map(item => (
-                        <div key={item.producto_id} className={styles.itemRow}>
-                          <div className={styles.itemInfo}>
-                            <span className={styles.itemNombre}>{item.nombre}</span>
-                            <span className={styles.itemCodigo}>{item.codigo}</span>
-                            {item.stock_actual <= 0 && (
-                              <span className={styles.itemSinStock}>⚠ Sin stock</span>
-                            )}
-                          </div>
-                          <div className={styles.itemControles}>
+                    <>
+                      {/* LISTA DESKTOP */}
+                      <div className={styles.itemsList}>
+                        {items.map(item => (
+                          <div key={item.producto_id} className={styles.itemRow}>
+                            <div className={styles.itemInfo}>
+                              <span className={styles.itemNombre}>{item.nombre}</span>
+                              <span className={styles.itemCodigo}>{item.codigo}</span>
+                            </div>
                             <div className={styles.itemCantidad}>
                               <button className={styles.btnCantidad}
                                 onClick={() => cambiarCantidad(item.producto_id, item.cantidad - 1)}>−</button>
-                              <input
-                                type="number"
-                                className={styles.inputCantidad}
+                              <input type="number" className={styles.inputCantidad}
                                 value={item.cantidad}
                                 onChange={e => cambiarCantidad(item.producto_id, parseInt(e.target.value) || 1)}
-                                min="1"
-                              />
+                                min="1" />
                               <button className={styles.btnCantidad}
                                 onClick={() => cambiarCantidad(item.producto_id, item.cantidad + 1)}>+</button>
                             </div>
                             <div className={styles.itemPrecioWrap}>
                               <span className={styles.itemPrecioLabel}>$</span>
-                              <input
-                                type="number"
-                                className={styles.inputPrecio}
+                              <input type="number" className={styles.inputPrecio}
                                 value={item.precio_unitario}
                                 onChange={e => cambiarPrecio(item.producto_id, e.target.value)}
-                                min="0" step="0.01"
-                              />
+                                min="0" step="0.01" />
                             </div>
                             <span className={styles.itemSubtotal}>{fmtP(item.subtotal)}</span>
                             <button className={styles.btnEliminarItem}
                               onClick={() => eliminarItem(item.producto_id)}>✕</button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+
+                      {/* TARJETAS MOBILE */}
+                      <div className={styles.itemsListMobile}>
+                        {items.map(item => (
+                          <div key={item.producto_id} className={styles.itemTarjeta}>
+                            <div className={styles.itemTarjetaHeader}>
+                              <span className={styles.itemNombre}>{item.nombre}</span>
+                              <button className={styles.btnEliminarItem}
+                                onClick={() => eliminarItem(item.producto_id)}>✕</button>
+                            </div>
+                            <span className={styles.itemCodigo}>{item.codigo}</span>
+                            <div className={styles.itemTarjetaFila}>
+                              <div className={styles.itemCantidad}>
+                                <button className={styles.btnCantidad}
+                                  onClick={() => cambiarCantidad(item.producto_id, item.cantidad - 1)}>−</button>
+                                <input type="number" className={styles.inputCantidad}
+                                  value={item.cantidad}
+                                  onChange={e => cambiarCantidad(item.producto_id, parseInt(e.target.value) || 1)}
+                                  min="1" />
+                                <button className={styles.btnCantidad}
+                                  onClick={() => cambiarCantidad(item.producto_id, item.cantidad + 1)}>+</button>
+                              </div>
+                              <div className={styles.itemPrecioWrap}>
+                                <span className={styles.itemPrecioLabel}>$</span>
+                                <input type="number" className={styles.inputPrecio}
+                                  value={item.precio_unitario}
+                                  onChange={e => cambiarPrecio(item.producto_id, e.target.value)}
+                                  min="0" step="0.01" />
+                              </div>
+                              <span className={styles.itemSubtotal}>{fmtP(item.subtotal)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}  
 
                   {items.length > 0 && (
                     <div className={styles.totalesWrap}>

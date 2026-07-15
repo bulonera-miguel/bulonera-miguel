@@ -681,8 +681,6 @@
 }
 .btnDescargarPDFFactura:hover { background: rgba(0,232,122,0.08); }
 
-.itemsListMobile { display: none; }
-
 
 /* ── RESPONSIVE 1023px ── */
 @media (max-width: 1023px) {
@@ -774,37 +772,8 @@
   .tipoFacturaBtn {
     border-bottom: 1px solid rgba(0,200,240,0.18);
   }
-  
   .tipoFacturaBtnActivo {
     border-bottom: 2px solid #00E87A !important;
-  }
-
-  .formPanel {
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  .detallePanel {
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  .itemsList { display: none; }
-  .itemsListMobile { display: flex; flex-direction: column; gap: 8px; }
-
-  .itemTarjeta {
-    background: rgba(0,200,240,0.03);
-    border: 1px solid rgba(0,200,240,0.14);
-    padding: 10px 12px;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .itemTarjetaHeader {
-    display: flex; justify-content: space-between; align-items: flex-start;
-  }
-  .itemTarjetaFila {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   }
 
 }
