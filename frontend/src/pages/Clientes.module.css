@@ -182,7 +182,8 @@
 }
 
 .tdNombre  { font-weight: 600; }
-.tdSub { color: rgba(200,228,244,0.55); font-size: 0.85rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tdSub { color: rgba(200,228,244,0.55); font-size: 0.85rem; }
+.tdSubCorto { color: rgba(200,228,244,0.55); font-size: 0.85rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tdCenter  { text-align: center; }
 .tdRight   { text-align: right; }
 .tdObs     { color: rgba(200,228,244,0.55); font-size: 0.85rem; max-width: 140px; }
